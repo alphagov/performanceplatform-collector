@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 from backdrop import collector
 
-requirements = ['requests',]
+requirements = ['requests']
 
 HERE = os.path.dirname(__file__)
 try:
@@ -12,7 +12,7 @@ except:
     long_description = None
 
 setup(
-    name='backdrop.collector',
+    name='backdrop-collector',
     version=collector.__VERSION__,
     packages=find_packages(exclude=['test*']),
 
