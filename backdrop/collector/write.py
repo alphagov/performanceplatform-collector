@@ -1,7 +1,7 @@
 import requests
 
 
-class Backdrop(object):
+class Bucket(object):
     def __init__(self, url, token):
         self.url = url
         self.token = token
