@@ -44,17 +44,16 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('path_to_app',
-                        help='Path to where the application')
-    parser.add_argument('path_to_jobs',
-                        help='Path to the file where job templates are')
-
-    args = parser.parse_args()
-
     current_crontab = sys.stdin.readlines()
-
     try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument('path_to_app',
+                            help='Path to where the application')
+        parser.add_argument('path_to_jobs',
+                            help='Path to the file where job templates are')
+
+        args = parser.parse_args()
+
         crontab = generate_crontab(current_crontab,
                                    args.path_to_jobs,
                                    args.path_to_app)
@@ -62,4 +61,5 @@ if __name__ == '__main__':
         sys.exit(0)
     except StandardError as e:
         sys.stderr.write(str(e))
+        sys.stdout.write("\n".join(current_crontab))
         sys.exit(1)

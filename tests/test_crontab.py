@@ -96,3 +96,10 @@ class TestCrontabScript(object):
         assert_raises(subprocess.CalledProcessError,
                       self.run_crontab_script,
                       'current crontab', '/path/to/app', 'invalid path')
+
+    def test_failure_returns_original_crontab(self):
+        try:
+            self.run_crontab_script(
+                'current crontab', '/path/to/app', 'invalid path')
+        except subprocess.CalledProcessError as e:
+            assert_that(e.output, contains_string('current crontab'))
