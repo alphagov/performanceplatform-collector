@@ -1,2 +1,3 @@
+PyHamcrest
 nose
 mock
