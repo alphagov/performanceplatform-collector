@@ -6,17 +6,9 @@ from backdrop.collector.write import Bucket
 
 class TestBucket(object):
     def test_from_target(self):
-        bucket = Bucket.from_target({
-            'url': 'foo',
-            'token': 'bar'
-        })
+        bucket = Bucket(url='foo', token='bar')
         eq_(bucket.url, 'foo')
         eq_(bucket.token, 'bar')
-
-    def test_from_target_fails_with_invalid_dict(self):
-        assert_raises(KeyError, Bucket.from_target, {
-            'foo': 'bar'
-        })
 
     @mock.patch('backdrop.collector.write.requests')
     def test_post_data_to_bucket(self, requests):
