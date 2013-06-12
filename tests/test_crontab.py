@@ -31,6 +31,16 @@ class TestGenerateCrontab(object):
                         has_item(
                             contains_string("-c /path/to/app/config.json")))
 
+    def test_added_jobs_run_the_crontab_module(self):
+        with temp_file("schedule,query.json,config.json") as jobs_path:
+            generated_jobs = crontab.generate_crontab(
+                [],
+                jobs_path,
+                "/path/to/app")
+            assert_that(generated_jobs,
+                        has_item(
+                            contains_string("-m backdrop.collector.crontab")))
+
     def test_added_jobs_get_tagged_with_comment(self):
         with temp_file("schedule,query.json,config.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
