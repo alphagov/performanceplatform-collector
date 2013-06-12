@@ -1,5 +1,16 @@
+import datetime
+import pytz
 import requests
 import json
+
+
+class JsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            if obj.tzinfo is None:
+                obj = obj.replace(tzinfo=pytz.UTC)
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
 
 
 class Bucket(object):
@@ -31,5 +42,5 @@ class Bucket(object):
         requests.post(
             url=self.url,
             headers=headers,
-            data=json.dumps(records)
+            data=json.dumps(records, cls=JsonEncoder)
         )
