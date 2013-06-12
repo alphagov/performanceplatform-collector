@@ -2,7 +2,7 @@ import argparse
 import json
 
 
-def parse(name=""):
+def parse_args(name="", args=None):
     """Parse command line argument for a collector
 
     Returns an argparse.Namespace with 'credentials' and 'query' options"""
@@ -24,9 +24,9 @@ def parse(name=""):
                              'against the source API '
                              'and the target bucket and'
                              'bearer token for Backdrop')
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
-    if not args.query:
+    if args.query is None:
         parser.print_help()
         exit()
 
