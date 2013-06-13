@@ -2,9 +2,54 @@ import subprocess
 from nose.tools import *
 from hamcrest import *
 import sys
+from backdrop.collector.crontab import remove_existing_crontab_for_app
 
 from tests.tools import temp_file
 from backdrop.collector import crontab
+
+
+def test_jobs_are_not_removed_for_other_apps():
+    crontab = [
+        '# Begin backdrop.collector jobs for my-app',
+        'foobar',
+        '# End backdrop.collector jobs for my-app',
+        '# Begin backdrop.collector jobs for other-app',
+        'barfoo',
+        '# End backdrop.collector jobs for other-app',
+    ]
+    new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
+    assert_that(new_crontab,
+                has_item(contains_string('barfoo')))
+    assert_that(new_crontab,
+                is_not(has_item(contains_string('foobar'))))
+
+
+def test_crontab_end_before_begin():
+    crontab = [
+        '# End backdrop.collector jobs for my-app',
+        'foobar',
+        '# Begin backdrop.collector jobs for my-app',
+        'other'
+    ]
+    new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
+    assert_that(new_crontab,
+                has_item(contains_string('foobar')))
+    assert_that(new_crontab,
+                is_not(has_item(contains_string('other'))))
+
+
+def test_crontab_begin_with_no_end():
+    crontab = [
+        'foobar',
+        '# Begin backdrop.collector jobs for my-app',
+        'other',
+    ]
+    new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
+    assert_that(new_crontab,
+                has_item(contains_string('foobar')))
+    assert_that(new_crontab,
+                is_not(has_item(contains_string('other'))))
+
 
 
 class TestGenerateCrontab(object):
@@ -16,20 +61,26 @@ class TestGenerateCrontab(object):
                 "/path/to/app")
             assert_that(generated_jobs, has_item("other cronjob"))
 
-    def test_some_cronjobs_are_added(self):
+    def test_some_cronjobs_are_added_between_containing_comments(self):
         with temp_file("schedule,query.json,config.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
-                "/path/to/app")
+                "/path/to/my-app")
+            assert_that(generated_jobs,
+                        has_item('# Begin backdrop.collector jobs for my-app'))
+
             assert_that(generated_jobs,
                         has_item(contains_string("schedule")))
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-q /path/to/app/query.json")))
+                            contains_string("-q /path/to/my-app/query.json")))
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-c /path/to/app/config.json")))
+                            contains_string("-c /path/to/my-app/config.json")))
+
+            assert_that(generated_jobs,
+                        has_item('# End backdrop.collector jobs for my-app'))
 
     def test_added_jobs_run_the_crontab_module(self):
         with temp_file("schedule,query.json,config.json") as jobs_path:
@@ -39,25 +90,18 @@ class TestGenerateCrontab(object):
                 "/path/to/app")
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-m backdrop.collector.crontab")))
+                            contains_string("collect.py")))
 
-    def test_added_jobs_get_tagged_with_comment(self):
+    def test_existing_backdrop_cronjobs_are_purged(self):
         with temp_file("schedule,query.json,config.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
-                [],
+                [
+                    '# Begin backdrop.collector jobs for my-app',
+                    'other job',
+                    '# End backdrop.collector jobs for my-app'
+                ],
                 jobs_path,
-                "/path/to/app")
-
-            assert_that(generated_jobs,
-                        has_item(
-                            ends_with('# app')))
-
-    def test_existing_tagged_cronjobs_are_purged(self):
-        with temp_file("schedule,query.json,config.json") as jobs_path:
-            generated_jobs = crontab.generate_crontab(
-                ['other job # app-name'],
-                jobs_path,
-                "/path/to/app")
+                "/path/to/my-app")
             assert_that(generated_jobs,
                         is_not(has_item(contains_string("other job"))))
 
@@ -96,8 +140,6 @@ class TestCrontabScript(object):
                 'current crontab', '/path/to/app', path_to_jobs)
 
             cronjobs = output.split("\n")
-            assert_that(cronjobs,
-                        has_item(ends_with("# app")))
 
             assert_that(cronjobs,
                         has_item(contains_string(sys.executable)))
