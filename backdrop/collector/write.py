@@ -25,8 +25,10 @@ class Bucket(object):
             "Authorization": "Bearer %s" % self.token,
             "Content-type": "application/json"
         }
-        requests.post(
+        response = requests.post(
             url=self.url,
             headers=headers,
             data=json.dumps(records, cls=JsonEncoder)
         )
+
+        response.raise_for_status()
