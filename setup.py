@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 from backdrop import collector
 
-requirements = ['requests', 'pytz']
+requirements = ['requests', 'pytz', 'argparse']
 
 HERE = os.path.dirname(__file__)
 try:
