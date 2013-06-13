@@ -114,6 +114,12 @@ class TestGenerateCrontab(object):
                           "/path/to/app")
 
 
+class ProcessFailureError(StandardError):
+    def __init__(self, code, command, output):
+        self.code = code
+        self.command = command
+        self.output = output
+
 class TestCrontabScript(object):
     def run_crontab_script(self, current_crontab, path_to_app, path_to_jobs):
         with temp_file(current_crontab) as stdin_path:
@@ -122,10 +128,16 @@ class TestCrontabScript(object):
                 '-m', 'backdrop.collector.crontab',
                 path_to_app, path_to_jobs
             ]
-            return subprocess.check_output(
-                args,
-                stdin=open(stdin_path),
-                stderr=subprocess.STDOUT)
+            # Bleh Python 2.6 :(
+            proc = subprocess.Popen(args,
+                                    stdin=open(stdin_path),
+                                    stderr=subprocess.STDOUT,
+                                    stdout=subprocess.PIPE)
+            output = proc.communicate()
+            if proc.returncode != 0:
+                raise ProcessFailureError(
+                    proc.returncode, ' '.join(args), output=output[0])
+            return output[0]
 
     def test_happy_path(self):
         with temp_file('') as path_to_jobs:
@@ -145,7 +157,7 @@ class TestCrontabScript(object):
                         has_item(contains_string(sys.executable)))
 
     def test_failure_results_in_non_zero_exit_status(self):
-        assert_raises(subprocess.CalledProcessError,
+        assert_raises(ProcessFailureError,
                       self.run_crontab_script,
                       'current crontab', '/path/to/app', 'invalid path')
 
@@ -153,5 +165,5 @@ class TestCrontabScript(object):
         try:
             self.run_crontab_script(
                 'current crontab', '/path/to/app', 'invalid path')
-        except subprocess.CalledProcessError as e:
+        except ProcessFailureError as e:
             assert_that(e.output, contains_string('current crontab'))
