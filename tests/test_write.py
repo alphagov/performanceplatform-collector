@@ -1,10 +1,12 @@
 from datetime import datetime
 import mock
 from nose.tools import *
+from requests import Response, HTTPError
 from backdrop.collector.write import Bucket
+import unittest
 
 
-class TestBucket(object):
+class TestBucket(unittest.TestCase):
     def test_from_target(self):
         bucket = Bucket(url='foo', token='bar')
         eq_(bucket.url, 'foo')
@@ -36,3 +38,11 @@ class TestBucket(object):
             headers=mock.ANY,
             data='{"key": "2012-12-12T00:00:00+00:00"}'
         )
+
+    @mock.patch('requests.post')
+    def test_raises_error_on_4XX_or_5XX_responses(self, mock_post):
+        bucket = Bucket(None, None)
+        response = Response()
+        response.status_code = 418
+        mock_post.return_value = response
+        self.assertRaises(HTTPError, bucket.post, {'key': 'foo'})
