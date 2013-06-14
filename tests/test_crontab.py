@@ -58,7 +58,8 @@ class TestGenerateCrontab(object):
             generated_jobs = crontab.generate_crontab(
                 ['other cronjob'],
                 jobs_path,
-                "/path/to/app")
+                "/path/to/app",
+                "some_id")
             assert_that(generated_jobs, has_item("other cronjob"))
 
     def test_some_cronjobs_are_added_between_containing_comments(self):
@@ -66,9 +67,10 @@ class TestGenerateCrontab(object):
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
-                "/path/to/my-app")
+                "/path/to/my-app",
+                'some_id')
             assert_that(generated_jobs,
-                        has_item('# Begin backdrop.collector jobs for my-app'))
+                        has_item('# Begin backdrop.collector jobs for some_id'))
 
             assert_that(generated_jobs,
                         has_item(contains_string("schedule")))
@@ -80,14 +82,15 @@ class TestGenerateCrontab(object):
                             contains_string("-c /path/to/my-app/config.json")))
 
             assert_that(generated_jobs,
-                        has_item('# End backdrop.collector jobs for my-app'))
+                        has_item('# End backdrop.collector jobs for some_id'))
 
     def test_added_jobs_run_the_crontab_module(self):
         with temp_file("schedule,query.json,config.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
-                "/path/to/app")
+                "/path/to/app",
+                "some_id")
             assert_that(generated_jobs,
                         has_item(
                             contains_string("collect.py")))
@@ -96,12 +99,13 @@ class TestGenerateCrontab(object):
         with temp_file("schedule,query.json,config.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [
-                    '# Begin backdrop.collector jobs for my-app',
+                    '# Begin backdrop.collector jobs for some_id',
                     'other job',
-                    '# End backdrop.collector jobs for my-app'
+                    '# End backdrop.collector jobs for some_id'
                 ],
                 jobs_path,
-                "/path/to/my-app")
+                "/path/to/my-app",
+                'some_id')
             assert_that(generated_jobs,
                         is_not(has_item(contains_string("other job"))))
 
@@ -111,8 +115,23 @@ class TestGenerateCrontab(object):
                           crontab.generate_crontab,
                           [],
                           jobs_path,
-                          "/path/to/app")
+                          "/path/to/app",
+                          "some_id")
 
+    def test_can_use_id_for_generating_crontab_entries(self):
+        with temp_file("something, something, dark side") as something:
+            generated_jobs = crontab.generate_crontab(
+                [],
+                something,
+                "/path/to/my-app",
+                "unique-id-of-my-app"
+            )
+            assert_that(generated_jobs,
+                        has_item('# Begin backdrop.collector jobs '
+                                 'for unique-id-of-my-app'))
+            assert_that(generated_jobs,
+                        has_item('# End backdrop.collector jobs '
+                                 'for unique-id-of-my-app'))
 
 class ProcessFailureError(StandardError):
     def __init__(self, code, command, output):
@@ -121,12 +140,13 @@ class ProcessFailureError(StandardError):
         self.output = output
 
 class TestCrontabScript(object):
-    def run_crontab_script(self, current_crontab, path_to_app, path_to_jobs):
+    def run_crontab_script(self, current_crontab, path_to_app, path_to_jobs,
+                           unique_id):
         with temp_file(current_crontab) as stdin_path:
             args = [
                 sys.executable,
                 '-m', 'backdrop.collector.crontab',
-                path_to_app, path_to_jobs
+                path_to_app, path_to_jobs, unique_id
             ]
             # Bleh Python 2.6 :(
             proc = subprocess.Popen(args,
@@ -142,14 +162,14 @@ class TestCrontabScript(object):
     def test_happy_path(self):
         with temp_file('') as path_to_jobs:
             output = self.run_crontab_script(
-                'current crontab', '/path/to/app', path_to_jobs)
+                'current crontab', '/path/to/app', path_to_jobs, 'some_id')
             assert_that(output.strip(),
                         is_('current crontab'))
 
     def test_with_jobs(self):
         with temp_file('one,two,three') as path_to_jobs:
             output = self.run_crontab_script(
-                'current crontab', '/path/to/app', path_to_jobs)
+                'current crontab', '/path/to/app', path_to_jobs, 'some_id')
 
             cronjobs = output.split("\n")
 
@@ -159,11 +179,12 @@ class TestCrontabScript(object):
     def test_failure_results_in_non_zero_exit_status(self):
         assert_raises(ProcessFailureError,
                       self.run_crontab_script,
-                      'current crontab', '/path/to/app', 'invalid path')
+                      'current crontab', '/path/to/app', 'invalid path',
+                      'some_id')
 
     def test_failure_returns_original_crontab(self):
         try:
             self.run_crontab_script(
-                'current crontab', '/path/to/app', 'invalid path')
+                'current crontab', '/path/to/app', 'invalid path', 'some_id')
         except ProcessFailureError as e:
             assert_that(e.output, contains_string('current crontab'))
