@@ -33,6 +33,6 @@ class Bucket(object):
             data=json.dumps(records, cls=JsonEncoder)
         )
 
-        logging.debug("[Backdrop] ", response.text)
+        logging.debug("[Backdrop] " + response.text)
 
         response.raise_for_status()
