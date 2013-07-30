@@ -1,4 +1,5 @@
 import datetime
+import logging
 import pytz
 import requests
 import json
@@ -25,10 +26,13 @@ class Bucket(object):
             "Authorization": "Bearer %s" % self.token,
             "Content-type": "application/json"
         }
+
         response = requests.post(
             url=self.url,
             headers=headers,
             data=json.dumps(records, cls=JsonEncoder)
         )
+
+        logging.debug("[Backdrop] ", response.text)
 
         response.raise_for_status()
