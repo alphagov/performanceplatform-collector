@@ -1,5 +1,6 @@
 import argparse
 import json
+from dateutil.parser import parse as parse_date
 
 
 def parse_args(name="", args=None):
@@ -16,18 +17,22 @@ def parse_args(name="", args=None):
     parser.add_argument('-c', '--credentials', dest='credentials',
                         type=_load_json_file,
                         help='JSON file containing credentials '
-                             'for the source API')
+                             'for the source API',
+                        required=True)
     parser.add_argument('-q', '--query', dest='query',
                         type=_load_json_file,
                         help='JSON file containing details '
                              'about the query to make'
                              'against the source API '
                              'and the target bucket and'
-                             'bearer token for Backdrop')
+                             'bearer token for Backdrop',
+                        required=True)
+    parser.add_argument('-s', '--start', dest='start_at',
+                        type=parse_date,
+                        help='Date to start collection from')
+    parser.add_argument('-e', '--end', dest='end_at',
+                        type=parse_date,
+                        help='Date to end collection')
     args = parser.parse_args(args)
-
-    if args.query is None:
-        parser.print_help()
-        exit()
 
     return args
