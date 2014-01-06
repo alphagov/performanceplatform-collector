@@ -24,5 +24,5 @@ def set_up_logging(app_name, log_level):
         get_log_file_handler("log/collector.log"))
     logger.addHandler(
         get_json_log_handler("log/collector.log.json", app_name))
-    logger.info("{} logging started".format(app_name))
+    logger.info("{0} logging started".format(app_name))
 
