@@ -14,7 +14,7 @@ class TestJsonLogging(unittest.TestCase):
 
     def test_json_log_written_when_logger_called(self):
 
-        set_up_logging('collector_foo', logging.DEBUG)
+        set_up_logging('collector_foo', logging.DEBUG, './log')
         logging.info('Writing out JSON formatted logs m8')
 
         with open('log/collector.log.json') as log_file:
