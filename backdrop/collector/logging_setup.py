@@ -2,6 +2,7 @@ from logstash_formatter import LogstashFormatter
 import logging
 import os
 import pdb
+import sys
 
 
 def get_log_file_handler(path):
@@ -19,7 +20,12 @@ def get_json_log_handler(path, app_name):
     return handler
 
 
+def uncaught_exception_handler(type, value, tb):
+    logging.exception("Uncaught exception: {0}".format(str(value)))
+
+
 def set_up_logging(app_name, log_level, logfile_path):
+    sys.excepthook = uncaught_exception_handler
     logger = logging.getLogger()
     logger.setLevel(log_level)
     logger.addHandler(get_log_file_handler(
