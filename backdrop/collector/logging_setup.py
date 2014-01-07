@@ -3,6 +3,7 @@ import logging
 import os
 import pdb
 import sys
+import traceback
 
 
 def get_log_file_handler(path):
@@ -20,8 +21,9 @@ def get_json_log_handler(path, app_name):
     return handler
 
 
-def uncaught_exception_handler(type, value, tb):
-    logging.exception("Uncaught exception: {0}".format(str(value)))
+def uncaught_exception_handler(*exc_info):
+    text = "".join(traceback.format_exception(*exc_info))
+    logging.error("Unhandled exception: %s", text)
 
 
 def set_up_logging(app_name, log_level, logfile_path):
