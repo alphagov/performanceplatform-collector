@@ -51,7 +51,6 @@ def test_crontab_begin_with_no_end():
                 is_not(has_item(contains_string('other'))))
 
 
-
 class TestGenerateCrontab(object):
     def test_other_cronjobs_are_preserved(self):
         with temp_file("") as jobs_path:
@@ -133,11 +132,13 @@ class TestGenerateCrontab(object):
                         has_item('# End backdrop.collector jobs '
                                  'for unique-id-of-my-app'))
 
+
 class ProcessFailureError(StandardError):
     def __init__(self, code, command, output):
         self.code = code
         self.command = command
         self.output = output
+
 
 class TestCrontabScript(object):
     def run_crontab_script(self, current_crontab, path_to_app, path_to_jobs,
