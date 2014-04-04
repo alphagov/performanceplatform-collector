@@ -33,6 +33,10 @@ class Bucket(object):
             data=json.dumps(records, cls=JsonEncoder)
         )
 
-        logging.debug("[Backdrop] " + response.text)
+        try:
+            response.raise_for_status()
+        except:
+            logging.error('[Backdrop: {}]\n{}'.format(self.url, response.text))
+            raise
 
-        response.raise_for_status()
+        logging.debug("[Backdrop] " + response.text)
