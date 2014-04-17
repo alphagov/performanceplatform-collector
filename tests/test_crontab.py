@@ -132,6 +132,20 @@ class TestGenerateCrontab(object):
                         has_item('# End backdrop.collector jobs '
                                  'for unique-id-of-my-app'))
 
+    def test_can_overide_collection_script_to_use(self):
+        temp_contents = "schedule,query,config,custom-collect.py"
+        with temp_file(temp_contents) as something:
+            generated_jobs = crontab.generate_crontab(
+                [],
+                something,
+                "/path/to/my-app",
+                "unique-id-of-my-app"
+            )
+            job_contains = "/custom-collect.py -q /path/to/my-app/query"
+            assert_that(generated_jobs,
+                        has_item(
+                            contains_string(job_contains)))
+
 
 class ProcessFailureError(StandardError):
     def __init__(self, code, command, output):
