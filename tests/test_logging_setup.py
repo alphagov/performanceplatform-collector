@@ -9,7 +9,6 @@ import unittest
 class TestJsonLogging(unittest.TestCase):
 
     def setUp(self):
-        os.mkdir('./log')
         self.logger = logging.getLogger()
 
     def test_json_log_written_when_logger_called(self):
@@ -31,6 +30,3 @@ class TestJsonLogging(unittest.TestCase):
         # Only remove file if assertion passes
         os.remove('log/collector.log.json')
         os.remove('log/collector.log')
-
-    def tearDown(self):
-        os.rmdir('./log')

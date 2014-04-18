@@ -34,4 +34,10 @@ setup(
     keywords='api data performance_platform',
 
     install_requires=requirements,
+
+    entry_points={
+        'console_scripts': [
+            'backdrop_collector=main:main'
+        ]
+    }
 )
