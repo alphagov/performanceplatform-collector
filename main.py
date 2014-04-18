@@ -28,7 +28,10 @@ def main():
 
     entrypoint = args.query['entrypoint']
 
-    logging_for_entrypoint(entrypoint)
+    # setting up logging will reroute all output to logs/collection.log
+    # this can be overridden by passing in --console-logging
+    if not args.console_logging:
+        logging_for_entrypoint(entrypoint)
 
     entrypoint_module = importlib.import_module(entrypoint)
     entrypoint_module.main(

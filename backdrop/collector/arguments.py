@@ -32,6 +32,10 @@ def parse_args(name="", args=None):
     parser.add_argument('-e', '--end', dest='end_at',
                         type=parse_date,
                         help='Date to end collection')
+    parser.add_argument('--console-logging', dest='console_logging',
+                        action='store_true',
+                        help='Output logging to the console rather than file')
+    parser.set_defaults(console_logging=False)
     args = parser.parse_args(args)
 
     return args
