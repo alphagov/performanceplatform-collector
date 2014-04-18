@@ -6,7 +6,7 @@ from dateutil.parser import parse as parse_date
 def parse_args(name="", args=None):
     """Parse command line argument for a collector
 
-    Returns an argparse.Namespace with 'credentials' and 'query' options"""
+    Returns an argparse.Namespace with 'config' and 'query' options"""
     def _load_json_file(path):
         with open(path) as f:
             return json.load(f)
@@ -14,18 +14,17 @@ def parse_args(name="", args=None):
     parser = argparse.ArgumentParser(description="%s collector for sending"
                                                  " data to the performance"
                                                  " platform" % name)
-    parser.add_argument('-c', '--credentials', dest='credentials',
+    parser.add_argument('-c', '--config', dest='config',
                         type=_load_json_file,
-                        help='JSON file containing credentials '
-                             'for the source API',
+                        help='JSON file containing config '
+                             'for the collector',
                         required=True)
     parser.add_argument('-q', '--query', dest='query',
                         type=_load_json_file,
                         help='JSON file containing details '
                              'about the query to make'
                              'against the source API '
-                             'and the target bucket and'
-                             'bearer token for Backdrop',
+                             'and the target data-set',
                         required=True)
     parser.add_argument('-s', '--start', dest='start_at',
                         type=parse_date,
