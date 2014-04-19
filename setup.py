@@ -5,10 +5,18 @@ from backdrop import collector
 
 requirements = [
     'requests',
-    'pytz',
+    'pytz==2013d',
     'argparse',
     'python-dateutil',
-    'logstash_formatter'
+    'logstash_formatter',
+]
+
+test_requirements = [
+    'PyHamcrest',
+    'nose',
+    'mock',
+    'pep8',
+    'coverage',
 ]
 
 HERE = os.path.dirname(__file__)
@@ -34,6 +42,9 @@ setup(
     keywords='api data performance_platform',
 
     install_requires=requirements,
+    tests_require=test_requirements,
+
+    test_suite='nose.collector',
 
     entry_points={
         'console_scripts': [
