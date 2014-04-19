@@ -44,5 +44,7 @@ def main():
             args.dry_run
         ),
         args.query['query'],
-        args.query['options']
+        args.query['options'],
+        args.start_at,
+        args.end_at
     )
