@@ -40,5 +40,6 @@ def main():
             args.config['backdrop'],
             args.query['data-set']
         ),
-        args.query['query']
+        args.query['query'],
+        args.query['options']
     )

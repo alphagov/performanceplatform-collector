@@ -1,22 +1,30 @@
 from datetime import datetime
 import mock
-from nose.tools import *
+from nose.tools import eq_
 from requests import Response, HTTPError
-from backdrop.collector.write import Bucket
+from backdrop.collector.write import DataSet
 import unittest
 
 
-class TestBucket(unittest.TestCase):
+class TestDataSet(unittest.TestCase):
     def test_from_target(self):
-        bucket = Bucket(url='foo', token='bar')
-        eq_(bucket.url, 'foo')
-        eq_(bucket.token, 'bar')
+        data_set = DataSet(url='foo', token='bar')
+        eq_(data_set.url, 'foo')
+        eq_(data_set.token, 'bar')
+
+    def test_from_config(self):
+        data_set = DataSet.from_config({
+            'url': 'foo',
+            'token': 'bar'
+        })
+        eq_(data_set.url, 'foo')
+        eq_(data_set.token, 'bar')
 
     @mock.patch('backdrop.collector.write.requests')
-    def test_post_data_to_bucket(self, requests):
-        bucket = Bucket('foo', 'bar')
+    def test_post_data_to_data_set(self, requests):
+        data_set = DataSet('foo', 'bar')
 
-        bucket.post({'key': 'value'})
+        data_set.post({'key': 'value'})
 
         requests.post.assert_called_with(
             url='foo',
@@ -28,10 +36,10 @@ class TestBucket(unittest.TestCase):
         )
 
     @mock.patch('backdrop.collector.write.requests')
-    def test_post_to_bucket_serializes_datetimes(self, requests):
-        bucket = Bucket(None, None)
+    def test_post_to_data_set(self, requests):
+        data_set = DataSet(None, None)
 
-        bucket.post({'key': datetime(2012, 12, 12)})
+        data_set.post({'key': datetime(2012, 12, 12)})
 
         requests.post.assert_called_with(
             url=mock.ANY,
@@ -41,8 +49,8 @@ class TestBucket(unittest.TestCase):
 
     @mock.patch('requests.post')
     def test_raises_error_on_4XX_or_5XX_responses(self, mock_post):
-        bucket = Bucket(None, None)
+        data_set = DataSet(None, None)
         response = Response()
         response.status_code = 418
         mock_post.return_value = response
-        self.assertRaises(HTTPError, bucket.post, {'key': 'foo'})
+        self.assertRaises(HTTPError, data_set.post, {'key': 'foo'})
