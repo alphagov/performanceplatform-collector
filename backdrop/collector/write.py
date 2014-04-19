@@ -38,6 +38,7 @@ class DataSet(object):
         json_body = json.dumps(records, cls=JsonEncoder)
 
         if self.dry_run:
+            logging.info(self.url)
             logging.info(headers)
             logging.info(json_body)
         else:
