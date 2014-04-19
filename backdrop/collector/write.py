@@ -19,28 +19,40 @@ class DataSet(object):
 
     @staticmethod
     def from_config(config):
-        return DataSet(config['url'], config['token'])
+        return DataSet(
+            config['url'],
+            config['token'],
+            config['dry_run']
+        )
 
-    def __init__(self, url, token):
+    def __init__(self, url, token, dry_run=False):
         self.url = url
         self.token = token
+        self.dry_run = dry_run
 
     def post(self, records):
         headers = {
             "Authorization": "Bearer %s" % self.token,
             "Content-type": "application/json"
         }
+        json_body = json.dumps(records, cls=JsonEncoder)
 
-        response = requests.post(
-            url=self.url,
-            headers=headers,
-            data=json.dumps(records, cls=JsonEncoder)
-        )
+        if self.dry_run:
+            logging.info(headers)
+            logging.info(json_body)
+        else:
+            response = requests.post(
+                url=self.url,
+                headers=headers,
+                data=json_body
+            )
 
-        try:
-            response.raise_for_status()
-        except:
-            logging.error('[Backdrop: {}]\n{}'.format(self.url, response.text))
-            raise
+            try:
+                response.raise_for_status()
+            except:
+                logging.error('[Backdrop: {}]\n{}'.format(
+                    self.url,
+                    response.text))
+                raise
 
-        logging.debug("[Backdrop] " + response.text)
+            logging.debug("[Backdrop] " + response.text)

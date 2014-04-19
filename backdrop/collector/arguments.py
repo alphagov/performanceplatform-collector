@@ -35,7 +35,11 @@ def parse_args(name="", args=None):
     parser.add_argument('--console-logging', dest='console_logging',
                         action='store_true',
                         help='Output logging to the console rather than file')
-    parser.set_defaults(console_logging=False)
+    parser.add_argument('--dry-run', dest='dry_run',
+                        action='store_true',
+                        help='Instead of pushing to backdrop the collector '
+                             'will print out what would have been pushed')
+    parser.set_defaults(console_logging=False, dry_run=False)
     args = parser.parse_args(args)
 
     return args

@@ -11,14 +11,17 @@ class TestDataSet(unittest.TestCase):
         data_set = DataSet(url='foo', token='bar')
         eq_(data_set.url, 'foo')
         eq_(data_set.token, 'bar')
+        eq_(data_set.dry_run, False)
 
     def test_from_config(self):
         data_set = DataSet.from_config({
             'url': 'foo',
-            'token': 'bar'
+            'token': 'bar',
+            'dry_run': True,
         })
         eq_(data_set.url, 'foo')
         eq_(data_set.token, 'bar')
+        eq_(data_set.dry_run, True)
 
     @mock.patch('backdrop.collector.write.requests')
     def test_post_data_to_data_set(self, requests):
@@ -54,3 +57,12 @@ class TestDataSet(unittest.TestCase):
         response.status_code = 418
         mock_post.return_value = response
         self.assertRaises(HTTPError, data_set.post, {'key': 'foo'})
+
+    @mock.patch('backdrop.collector.write.requests')
+    @mock.patch('backdrop.collector.write.logging')
+    def test_logs_on_dry_run(self, mock_logging, mock_requests):
+        data_set = DataSet(None, None, dry_run=True)
+        data_set.post({'key': datetime(2012, 12, 12)})
+
+        eq_(mock_logging.info.call_count, 2)
+        eq_(mock_requests.post.call_count, 0)
