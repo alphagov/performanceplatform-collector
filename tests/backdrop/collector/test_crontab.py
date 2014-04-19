@@ -146,6 +146,24 @@ class TestGenerateCrontab(object):
                         has_item(
                             contains_string(job_contains)))
 
+    def test_can_handle_whitespace_and_comments(self):
+        temp_contents = ("# some comment\n"
+                         "schedule,query,config,custom-collect.py\n"
+                         "          \n"
+                         "schedule,query,config\n")
+
+        with temp_file(temp_contents) as something:
+            generated_jobs = crontab.generate_crontab(
+                [],
+                something,
+                "/path/to/my-app",
+                "unique-id-of-my-app"
+            )
+            job_contains = "/custom-collect.py -q /path/to/my-app/query"
+            assert_that(generated_jobs,
+                        has_item(
+                            contains_string(job_contains)))
+
 
 class ProcessFailureError(StandardError):
     def __init__(self, code, command, output):

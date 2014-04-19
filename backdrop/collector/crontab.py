@@ -1,6 +1,9 @@
 import argparse
-import os
+import re
 import sys
+
+
+ignore_line_re = re.compile("^#.*|\s*$")
 
 
 class ParseError(StandardError):
@@ -34,13 +37,22 @@ def parse_job_line(line):
     ('* * * *', 'myquery', 'mycredentials', 'collect.py')
     >>> parse_job_line("* * * *,myquery,mycredentials,scripts/foo.py\\n")
     ('* * * *', 'myquery', 'mycredentials', 'scripts/foo.py')
+    >>> parse_job_line("            ") is None
+    True
+    >>> parse_job_line("# comment") is None
+    True
     """
-    parts = line.strip().split(',')
+    parsed = None
 
-    if len(parts) == 3:
-        parts.append('collect.py')
+    if not ignore_line_re.match(line):
+        parts = line.strip().split(',')
 
-    return tuple(parts)
+        if len(parts) == 3:
+            parts.append('collect.py')
+
+        parsed = tuple(parts)
+
+    return parsed
 
 
 def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
@@ -53,24 +65,28 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
                    '-q {app_path}/{query} -c {app_path}/{config} ' \
                    '>> {app_path}/log/out.log 2>> {app_path}/log/error.log'
 
-    crontab = [ line.strip() for line in current_crontab ]
+    crontab = [line.strip() for line in current_crontab]
     crontab = remove_existing_crontab_for_app(crontab, unique_id)
     additional_crontab = []
     with open(path_to_jobs) as jobs:
         try:
             for job in jobs:
-                schedule, query, config, script = parse_job_line(job)
+                parsed = parse_job_line(job)
 
-                cronjob = job_template.format(
-                    schedule=schedule,
-                    python=sys.executable,
-                    app_path=path_to_app,
-                    script=script,
-                    query=query,
-                    config=config
-                )
+                if parsed is not None:
+                    schedule, query, config, script = parsed
 
-                additional_crontab.append(cronjob)
+                    cronjob = job_template.format(
+                        schedule=schedule,
+                        python=sys.executable,
+                        app_path=path_to_app,
+                        script=script,
+                        query=query,
+                        config=config
+                    )
+
+                    additional_crontab.append(cronjob)
+
         except ValueError as e:
             raise ParseError(str(e))
 
