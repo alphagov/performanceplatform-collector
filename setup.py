@@ -9,6 +9,7 @@ requirements = [
     'argparse',
     'python-dateutil',
     'logstash_formatter',
+    'gapy',
 ]
 
 test_requirements = [
@@ -17,6 +18,7 @@ test_requirements = [
     'mock',
     'pep8',
     'coverage',
+    'freezegun',
 ]
 
 HERE = os.path.dirname(__file__)

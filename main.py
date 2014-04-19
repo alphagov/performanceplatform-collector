@@ -20,6 +20,8 @@ def merge_backdrop_config(base, data_set, dry_run=False):
             data_set['data-type']
         ),
         'token': base['token'],
+        'data-group': data_set['data-group'],
+        'data-type': data_set['data-type'],
         'dry_run': dry_run
     }
 
