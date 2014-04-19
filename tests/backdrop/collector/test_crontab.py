@@ -92,7 +92,7 @@ class TestGenerateCrontab(object):
                 "some_id")
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("collect.py")))
+                            contains_string("main.py")))
 
     def test_existing_backdrop_cronjobs_are_purged(self):
         with temp_file("schedule,query.json,config.json") as jobs_path:
@@ -132,23 +132,8 @@ class TestGenerateCrontab(object):
                         has_item('# End backdrop.collector jobs '
                                  'for unique-id-of-my-app'))
 
-    def test_can_overide_collection_script_to_use(self):
-        temp_contents = "schedule,query,config,custom-collect.py"
-        with temp_file(temp_contents) as something:
-            generated_jobs = crontab.generate_crontab(
-                [],
-                something,
-                "/path/to/my-app",
-                "unique-id-of-my-app"
-            )
-            job_contains = "/custom-collect.py -q /path/to/my-app/query"
-            assert_that(generated_jobs,
-                        has_item(
-                            contains_string(job_contains)))
-
     def test_can_handle_whitespace_and_comments(self):
         temp_contents = ("# some comment\n"
-                         "schedule,query,config,custom-collect.py\n"
                          "          \n"
                          "schedule,query,config\n")
 
@@ -159,7 +144,7 @@ class TestGenerateCrontab(object):
                 "/path/to/my-app",
                 "unique-id-of-my-app"
             )
-            job_contains = "/custom-collect.py -q /path/to/my-app/query"
+            job_contains = "/main.py -q /path/to/my-app/query"
             assert_that(generated_jobs,
                         has_item(
                             contains_string(job_contains)))
