@@ -1,0 +1,7 @@
+#!/bin/sh
+
+PATH_TO_APP="$(pwd)"
+PATH_TO_PYTHON="$PATH_TO_APP/venv/bin/python"
+PATH_TO_JOBS="$PATH_TO_APP/config/cronjobs"
+
+crontab -l | $PATH_TO_PYTHON -m backdrop.collector.crontab "$PATH_TO_APP" "$PATH_TO_JOBS" "backdrop-collector" | crontab -
