@@ -1,0 +1,36 @@
+{
+  "totalsForAllResults":{
+    "ga:activeVisitors":"20459"
+  },
+  "kind":"analytics#realtimeData",
+  "rows":[
+    [
+      "20459"
+    ]
+  ],
+  "totalResults":1,
+  "query":{
+    "max-results":1000,
+    "metrics":[
+      "ga:activeVisitors"
+    ],
+    "ids":"ga:74313105"
+  },
+  "profileInfo":{
+    "webPropertyId":"UA-26179049-1",
+    "internalWebPropertyId":"50705554",
+    "tableId":"realtime:74313105",
+    "profileId":"74313105",
+    "profileName":"V. GOV.UK PP 'real-time'",
+    "accountId":"26179049"
+  },
+  "columnHeaders":[
+    {
+      "dataType":"INTEGER",
+      "columnType":"METRIC",
+      "name":"ga:activeVisitors"
+    }
+  ],
+  "selfLink":"https://www.googleapis.com/analytics/v3/data/realtime?ids=ga:74313105&metrics=ga:activeVisitors",
+  "id":"https://www.googleapis.com/analytics/v3/data/realtime?ids=ga:74313105&metrics=ga:activeVisitors"
+}

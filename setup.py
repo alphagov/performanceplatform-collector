@@ -10,6 +10,7 @@ requirements = [
     'python-dateutil',
     'logstash_formatter',
     'gapy',
+    'google-api-python-client==1.0',
 ]
 
 test_requirements = [
