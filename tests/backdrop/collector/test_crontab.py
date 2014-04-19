@@ -4,7 +4,7 @@ from hamcrest import *
 import sys
 from backdrop.collector.crontab import remove_existing_crontab_for_app
 
-from tests.tools import temp_file
+from tests.backdrop.collector.tools import temp_file
 from backdrop.collector import crontab
 
 

@@ -1,5 +1,6 @@
 from nose.tools import *
-from tools import temp_file, json_file, capture_stderr
+from tests.backdrop.collector.tools \
+    import temp_file, json_file, capture_stderr
 from backdrop.collector.arguments import parse_args
 
 
