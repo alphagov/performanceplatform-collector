@@ -50,3 +50,7 @@ def main():
         args.start_at,
         args.end_at
     )
+
+
+if __name__ == '__main__':
+    main()
