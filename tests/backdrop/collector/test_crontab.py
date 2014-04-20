@@ -75,10 +75,10 @@ class TestGenerateCrontab(object):
                         has_item(contains_string("schedule")))
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-q /path/to/my-app/query.json")))
+                            contains_string("-q /path/to/my-app/config/query.json")))
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-c /path/to/my-app/config.json")))
+                            contains_string("-c /path/to/my-app/config/config.json")))
 
             assert_that(generated_jobs,
                         has_item('# End backdrop.collector jobs for some_id'))
@@ -144,7 +144,7 @@ class TestGenerateCrontab(object):
                 "/path/to/my-app",
                 "unique-id-of-my-app"
             )
-            job_contains = "/main.py -q /path/to/my-app/query"
+            job_contains = "/main.py -q /path/to/my-app/config/query"
             assert_that(generated_jobs,
                         has_item(
                             contains_string(job_contains)))
