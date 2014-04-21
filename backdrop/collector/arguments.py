@@ -14,9 +14,9 @@ def parse_args(name="", args=None):
     parser = argparse.ArgumentParser(description="%s collector for sending"
                                                  " data to the performance"
                                                  " platform" % name)
-    parser.add_argument('-c', '--config', dest='config',
+    parser.add_argument('-c', '--credentials', dest='credentials',
                         type=_load_json_file,
-                        help='JSON file containing config '
+                        help='JSON file containing credentials '
                              'for the collector',
                         required=True)
     parser.add_argument('-q', '--query', dest='query',
@@ -25,6 +25,16 @@ def parse_args(name="", args=None):
                              'about the query to make'
                              'against the source API '
                              'and the target data-set',
+                        required=True)
+    parser.add_argument('-t', '--token', dest='token',
+                        type=_load_json_file,
+                        help='JSON file containing token '
+                             'for the collector',
+                        required=True)
+    parser.add_argument('-b', '--backdrop', dest='backdrop',
+                        type=_load_json_file,
+                        help='JSON file containing backdrop config '
+                             'for the collector',
                         required=True)
     parser.add_argument('-s', '--start', dest='start_at',
                         type=parse_date,

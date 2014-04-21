@@ -8,31 +8,36 @@ import main
 class TestMain(unittest.TestCase):
 
     def test_merge_backdrop_config(self):
-        base = {
+        backdrop = {
             'url': 'http://foo/data',
-            'token': 'foo',
         }
         data_set = {
             'data-group': 'group',
             'data-type': 'type'
         }
+        token = {
+            'token': 'foo',
+        }
 
-        merged = main.merge_backdrop_config(base, data_set)
+        merged = main.merge_backdrop_config(backdrop, data_set, token)
 
         assert_that(merged['url'], equal_to('http://foo/data/group/type'))
         assert_that(merged['dry_run'], equal_to(False))
 
     def test_merge_backdrop_config_with_dry_run(self):
-        base = {
+        backdrop = {
             'url': 'http://foo/data',
-            'token': 'foo',
         }
         data_set = {
             'data-group': 'group',
             'data-type': 'type'
         }
+        token = {
+            'token': 'foo',
+        }
 
-        merged = main.merge_backdrop_config(base, data_set, dry_run=True)
+        merged = main.merge_backdrop_config(
+            backdrop, data_set, token, dry_run=True)
 
         assert_that(merged['url'], equal_to('http://foo/data/group/type'))
         assert_that(merged['dry_run'], equal_to(True))

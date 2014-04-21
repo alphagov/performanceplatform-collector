@@ -62,7 +62,7 @@ class TestGenerateCrontab(object):
             assert_that(generated_jobs, has_item("other cronjob"))
 
     def test_some_cronjobs_are_added_between_containing_comments(self):
-        with temp_file("schedule,query.json,config.json") as jobs_path:
+        with temp_file("schedule,query.json,creds.json,token.json,backdrop.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
@@ -78,13 +78,19 @@ class TestGenerateCrontab(object):
                             contains_string("-q /path/to/my-app/config/query.json")))
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-c /path/to/my-app/config/config.json")))
+                            contains_string("-c /path/to/my-app/config/creds.json")))
+            assert_that(generated_jobs,
+                        has_item(
+                            contains_string("-t /path/to/my-app/config/token.json")))
+            assert_that(generated_jobs,
+                        has_item(
+                            contains_string("-b /path/to/my-app/config/backdrop.json")))
 
             assert_that(generated_jobs,
                         has_item('# End backdrop.collector jobs for some_id'))
 
     def test_added_jobs_run_the_crontab_module(self):
-        with temp_file("schedule,query.json,config.json") as jobs_path:
+        with temp_file("schedule,query.json,creds.json,token.json,backdrop.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
@@ -95,7 +101,7 @@ class TestGenerateCrontab(object):
                             contains_string("main.py")))
 
     def test_existing_backdrop_cronjobs_are_purged(self):
-        with temp_file("schedule,query.json,config.json") as jobs_path:
+        with temp_file("schedule,query.json,creds.json,token.json,backdrop.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [
                     '# Begin backdrop.collector jobs for some_id',
@@ -118,7 +124,7 @@ class TestGenerateCrontab(object):
                           "some_id")
 
     def test_can_use_id_for_generating_crontab_entries(self):
-        with temp_file("something, something, dark side") as something:
+        with temp_file("something, something, something, something, dark side") as something:
             generated_jobs = crontab.generate_crontab(
                 [],
                 something,
@@ -135,7 +141,7 @@ class TestGenerateCrontab(object):
     def test_can_handle_whitespace_and_comments(self):
         temp_contents = ("# some comment\n"
                          "          \n"
-                         "schedule,query,config\n")
+                         "schedule,query,creds,token,backdrop\n")
 
         with temp_file(temp_contents) as something:
             generated_jobs = crontab.generate_crontab(
@@ -185,7 +191,7 @@ class TestCrontabScript(object):
                         is_('current crontab'))
 
     def test_with_jobs(self):
-        with temp_file('one,two,three') as path_to_jobs:
+        with temp_file('one,two,three,four,five') as path_to_jobs:
             output = self.run_crontab_script(
                 'current crontab', '/path/to/app', path_to_jobs, 'some_id')
 

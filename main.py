@@ -12,14 +12,14 @@ def logging_for_entrypoint(entrypoint):
     set_up_logging(entrypoint, logging.INFO, logfile_path)
 
 
-def merge_backdrop_config(base, data_set, dry_run=False):
+def merge_backdrop_config(backdrop, data_set, token, dry_run=False):
     return {
         'url': '{0}/{1}/{2}'.format(
-            base['url'],
+            backdrop['url'],
             data_set['data-group'],
             data_set['data-type']
         ),
-        'token': base['token'],
+        'token': token['token'],
         'data-group': data_set['data-group'],
         'data-type': data_set['data-type'],
         'dry_run': dry_run
@@ -39,10 +39,11 @@ def main():
 
     entrypoint_module = importlib.import_module(entrypoint)
     entrypoint_module.main(
-        args.config['credentials'],
+        args.credentials,
         merge_backdrop_config(
-            args.config['backdrop'],
+            args.backdrop,
             args.query['data-set'],
+            args.token,
             args.dry_run
         ),
         args.query['query'],

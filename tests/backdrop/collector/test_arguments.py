@@ -9,18 +9,23 @@ class TestParseArgs(object):
         with json_file({}) as config_path:
             with json_file({}) as query_path:
                 parse_args(
-                    args=["-c", config_path, "-q", query_path]
+                    args=["-c", config_path, "-q", query_path,
+                          "-t", config_path, "-b", config_path]
                 )
 
     def test_query_arg_is_required(self):
         with json_file({}) as config_path:
             assert_raises(
-                SystemExit, parse_args, args=["-c", config_path])
+                SystemExit, parse_args, args=["-c", config_path,
+                                              "-t", config_path,
+                                              "-b", config_path])
 
     def test_config_path_is_required(self):
         with json_file({}) as query_path:
             assert_raises(
-                SystemExit, parse_args, args=["-q", query_path])
+                SystemExit, parse_args, args=["-q", query_path,
+                                              "-t", query_path,
+                                              "-b", query_path])
 
     def test_start_and_end_fields_are_allowed(self):
         with json_file({}) as config_path:
@@ -28,6 +33,7 @@ class TestParseArgs(object):
                 parse_args(
                     args=[
                         "-c", config_path, "-q", query_path,
+                        "-t", config_path, "-b", config_path,
                         "-s", "2013-10-10", "-e", "2013-10-10"])
 
     def test_start_at_must_be_parsable_as_a_date(self):
@@ -36,6 +42,7 @@ class TestParseArgs(object):
                 assert_raises(
                     SystemExit, parse_args, args=[
                         "-c", config_path, "-q", query_path,
+                        "-t", config_path, "-b", config_path,
                         "-s", "not-a-date"])
 
     def test_end_at_must_be_parsable_as_a_date(self):
@@ -44,6 +51,7 @@ class TestParseArgs(object):
                 assert_raises(
                     SystemExit, parse_args, args=[
                         "-c", config_path, "-q", query_path,
+                        "-t", config_path, "-b", config_path,
                         "-e", "not-a-date"])
 
     def test_query_file_must_be_json(self):
