@@ -24,7 +24,7 @@ test_requirements = [
 
 HERE = os.path.dirname(__file__)
 try:
-    long_description = open(os.path.join(HERE, 'README.md')).read()
+    long_description = open(os.path.join(HERE, 'README.rst')).read()
 except:
     long_description = None
 
