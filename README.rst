@@ -61,7 +61,11 @@ parameters:
         "query": {
           "name": "govuk"
         },
-        "options": { }
+        "options": { },
+        "data-set": {
+          "data-group": "my-data-group",
+          "data-set": "my-data-set"
+        }
       }
 
 - Token, this holds the bearer token to be used by this collector when POSTing to backdrop::
