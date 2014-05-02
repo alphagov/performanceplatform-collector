@@ -51,7 +51,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'backdrop_collector=main:main'
+            'backdrop_collector=backdrop.collector.main:main'
         ]
     }
 )
