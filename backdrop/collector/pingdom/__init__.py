@@ -17,7 +17,7 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
     check_name = query['name']
     pingdom_stats = pingdom.stats(check_name, start_dt, end_dt)
 
-    push_stats_to_bucket(
+    push_stats_to_data_set(
         pingdom_stats,
         check_name,
         data_set_config)
@@ -46,9 +46,9 @@ def parse_time_range(start_dt, end_dt):
     return tuple(map(truncate_hour_fraction, (start_dt, end_dt)))
 
 
-def push_stats_to_bucket(pingdom_stats, check_name, data_set_config):
-    bucket = DataSet.from_config(data_set_config)
-    bucket.post([convert_from_pingdom_to_backdrop(thing, check_name) for
+def push_stats_to_data_set(pingdom_stats, check_name, data_set_config):
+    data_set = DataSet.from_config(data_set_config)
+    data_set.post([convert_from_pingdom_to_backdrop(thing, check_name) for
                  thing in pingdom_stats])
 
 
