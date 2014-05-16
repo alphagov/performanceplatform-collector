@@ -28,7 +28,7 @@ def merge_performanceplatform_config(
 
 
 def main():
-    args = arguments.parse_args('Performance Platform Collectors')
+    args = arguments.parse_args('Performance Platform Collector')
 
     entrypoint = args.query['entrypoint']
 
