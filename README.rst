@@ -4,8 +4,8 @@ the result through to the Performance Platform (see http://alphagov.github.io/pe
 for more details). This tool will currently interface with Google Analytics
 and Pingdom to retrieve data.
 
-.. image:: https://travis-ci.org/alphagov/performanceplatform-collectors.svg
-   :target: https://travis-ci.org/alphagov/performanceplatform-collectors
+.. image:: https://travis-ci.org/alphagov/performanceplatform-collector.svg
+   :target: https://travis-ci.org/alphagov/performanceplatform-collector
 
 .. contents:: :local:
 
@@ -17,15 +17,15 @@ Using pip
 
 ::
 
-    $ pip install performanceplatform-collectors
+    $ pip install performanceplatform-collector
 
 From source
 -----------
 
 ::
 
-    $ git clone https://github.com/alphagov/performanceplatform-collectors.git
-    $ cd performanceplatform-collectors
+    $ git clone https://github.com/alphagov/performanceplatform-collector.git
+    $ cd performanceplatform-collector
     $ virtualenv venv
     $ source venv/bin/activate
     $ python setup.py install
@@ -81,10 +81,10 @@ parameters:
         "url": "https://www.performance.service.gov.uk/data"
       }
 
-For our deployment of performanceplatform-collectors we pull in deployment from performanceplatform-collectors-config_ repo. You
+For our deployment of performanceplatform-collector we pull in deployment from performanceplatform-collector-config_ repo. You
 will find much more indepth information about the collector configuration in the repos README.
 
-.. _performanceplatform-collectors-config: https://github.com/alphagov/performanceplatform-collectors-config
+.. _performanceplatform-collector-config: https://github.com/alphagov/performanceplatform-collector-config
 
 Entrypoints
 ===========
@@ -101,5 +101,5 @@ performanceplatform.collector.ga.realtime
 performanceplatform.collector.pingdom
 -------------------------------------
 
-Extending performanceplatform-collectors
+Extending performanceplatform-collector
 ========================================
