@@ -2,7 +2,7 @@ import unittest
 
 from hamcrest import assert_that, equal_to
 
-import main
+from backdrop.collector import main
 
 
 class TestMain(unittest.TestCase):
