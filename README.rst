@@ -5,8 +5,8 @@ and Pingdom to retrieve data.
 
 .. _backdrop: https://github.com/alphagov/backdrop
 
-.. image:: https://travis-ci.org/alphagov/backdrop-collector.svg
-   :target: https://travis-ci.org/alphagov/backdrop-collector
+.. image:: https://travis-ci.org/alphagov/performanceplatform-collectors.svg
+   :target: https://travis-ci.org/alphagov/performanceplatform-collectors
 
 .. contents:: :local:
 
