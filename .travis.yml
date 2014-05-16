@@ -8,3 +8,13 @@ matrix:
 install:
   - "pip install . --use-mirrors"
 script: "python setup.py test"
+env:
+  global:
+    # NOTE: contains GH_TOKEN=xxx from github user gds-pp-ci
+    secure: oJzXXHtKrMjqFAVS+sX/7C4A7PyusY3YKmzq3JGJRzUEtow37eOg6HzIWmCCrwWlL+vsdrlMr7Tw9ko3nfuEGG2+8OOSP67yfXK8Uy9N0XXVCYOpEPiwlPLkunWYl+WB4LLzf/DiYUjZX5O+Fo5etULf7me24gbd/mp1HQhba+Q=
+after_success:
+  - ./.travis_scripts/push_release_tag.sh
+branches:
+  except:
+    - release
+    - /^release_\d+$/
