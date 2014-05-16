@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-from backdrop import collector
+from performanceplatform import collector
 
 requirements = [
     'requests',
@@ -29,7 +29,7 @@ except:
     long_description = None
 
 setup(
-    name='backdrop-collector',
+    name='performanceplatform-collectors',
     version=collector.__VERSION__,
     packages=find_packages(exclude=['test*']),
 
@@ -37,9 +37,9 @@ setup(
     author=collector.__AUTHOR__,
     author_email=collector.__AUTHOR_EMAIL__,
     maintainer='Government Digital Service',
-    url='https://github.com/alphagov/backdrop-collector',
+    url='https://github.com/alphagov/performanceplatform-collectors',
 
-    description='backdrop-collector: tools for sending data to backdrop',
+    description='performanceplatform-collectors: tools for sending data to the Performance Platform',
     long_description=long_description,
     license='MIT',
     keywords='api data performance_platform',
@@ -51,7 +51,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'backdrop_collector=backdrop.collector.main:main'
+            'pp-collect=performanceplatform.collector.main:main'
         ]
     }
 )
