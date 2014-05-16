@@ -18,7 +18,7 @@ def load_plugins(plugin_names):
 
 def load_plugin(plugin_name):
 
-    expr = compile(plugin_name, "backdrop.collector plugin", "eval")
+    expr = compile(plugin_name, "performanceplatform.collector plugin", "eval")
 
     return eval(expr, __builtin__.__dict__,
                 performanceplatform.collector.ga.plugins.__dict__)

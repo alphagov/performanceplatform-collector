@@ -33,8 +33,9 @@ def remove_existing_crontab_for_app(crontab, unique_id):
 
 def parse_job_line(line):
     """
-    >>> parse_job_line("* * * *,myquery,mycredentials,mytoken,backdrop\\n")
-    ('* * * *', 'myquery', 'mycredentials', 'mytoken', 'backdrop')
+    >>> parse_job_line( \
+            "* * * *,myquery,mycredentials,mytoken,performanceplatform\\n")
+    ('* * * *', 'myquery', 'mycredentials', 'mytoken', 'performanceplatform')
     >>> parse_job_line("            ") is None
     True
     >>> parse_job_line("# comment") is None
@@ -58,7 +59,7 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
                    '-q {app_path}/config/{query} ' \
                    '-c {app_path}/config/{credentials} ' \
                    '-t {app_path}/config/{token} ' \
-                   '-b {app_path}/config/{backdrop} ' \
+                   '-b {app_path}/config/{performanceplatform} ' \
                    '>> {app_path}/log/out.log 2>> {app_path}/log/error.log'
 
     crontab = [line.strip() for line in current_crontab]
@@ -70,7 +71,8 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
                 parsed = parse_job_line(job)
 
                 if parsed is not None:
-                    schedule, query, credentials, token, backdrop = parsed
+                    schedule, query, credentials, \
+                        token, performanceplatform = parsed
 
                     cronjob = job_template.format(
                         schedule=schedule,
@@ -79,7 +81,7 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
                         query=query,
                         credentials=credentials,
                         token=token,
-                        backdrop=backdrop
+                        performanceplatform=performanceplatform
                     )
 
                     additional_crontab.append(cronjob)

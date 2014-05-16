@@ -7,8 +7,8 @@ from performanceplatform.collector import main
 
 class TestMain(unittest.TestCase):
 
-    def test_merge_backdrop_config(self):
-        backdrop = {
+    def test_merge_performanceplatform_config(self):
+        performanceplatform = {
             'url': 'http://foo/data',
         }
         data_set = {
@@ -19,13 +19,14 @@ class TestMain(unittest.TestCase):
             'token': 'foo',
         }
 
-        merged = main.merge_backdrop_config(backdrop, data_set, token)
+        merged = main.merge_performanceplatform_config(
+            performanceplatform, data_set, token)
 
         assert_that(merged['url'], equal_to('http://foo/data/group/type'))
         assert_that(merged['dry_run'], equal_to(False))
 
-    def test_merge_backdrop_config_with_dry_run(self):
-        backdrop = {
+    def test_merge_performanceplatform_config_with_dry_run(self):
+        performanceplatform = {
             'url': 'http://foo/data',
         }
         data_set = {
@@ -36,8 +37,8 @@ class TestMain(unittest.TestCase):
             'token': 'foo',
         }
 
-        merged = main.merge_backdrop_config(
-            backdrop, data_set, token, dry_run=True)
+        merged = main.merge_performanceplatform_config(
+            performanceplatform, data_set, token, dry_run=True)
 
         assert_that(merged['url'], equal_to('http://foo/data/group/type'))
         assert_that(merged['dry_run'], equal_to(True))

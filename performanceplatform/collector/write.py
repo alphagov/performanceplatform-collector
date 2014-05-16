@@ -15,7 +15,7 @@ class JsonEncoder(json.JSONEncoder):
 
 
 class DataSet(object):
-    """Client for writing to a backdrop data-set"""
+    """Client for writing to a Performance Platform data-set"""
 
     @staticmethod
     def from_config(config):
@@ -51,9 +51,9 @@ class DataSet(object):
             try:
                 response.raise_for_status()
             except:
-                logging.error('[Backdrop: {}]\n{}'.format(
+                logging.error('[PP: {}]\n{}'.format(
                     self.url,
                     response.text))
                 raise
 
-            logging.debug("[Backdrop] " + response.text)
+            logging.debug("[PP] " + response.text)

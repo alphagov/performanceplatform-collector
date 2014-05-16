@@ -62,7 +62,7 @@ class TestGenerateCrontab(object):
             assert_that(generated_jobs, has_item("other cronjob"))
 
     def test_some_cronjobs_are_added_between_containing_comments(self):
-        with temp_file("schedule,query.json,creds.json,token.json,backdrop.json") as jobs_path:
+        with temp_file("schedule,query.json,creds.json,token.json,performanceplatform.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
@@ -84,13 +84,13 @@ class TestGenerateCrontab(object):
                             contains_string("-t /path/to/my-app/config/token.json")))
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-b /path/to/my-app/config/backdrop.json")))
+                            contains_string("-b /path/to/my-app/config/performanceplatform.json")))
 
             assert_that(generated_jobs,
                         has_item('# End performanceplatform.collector jobs for some_id'))
 
     def test_added_jobs_run_the_crontab_module(self):
-        with temp_file("schedule,query.json,creds.json,token.json,backdrop.json") as jobs_path:
+        with temp_file("schedule,query.json,creds.json,token.json,performanceplatform.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
@@ -100,7 +100,7 @@ class TestGenerateCrontab(object):
                         has_item(
                             contains_string("main.py")))
 
-    def test_existing_backdrop_cronjobs_are_purged(self):
+    def test_existing_pp_cronjobs_are_purged(self):
         with temp_file("schedule,query.json,creds.json,token.json,performanceplatform.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [
@@ -141,7 +141,7 @@ class TestGenerateCrontab(object):
     def test_can_handle_whitespace_and_comments(self):
         temp_contents = ("# some comment\n"
                          "          \n"
-                         "schedule,query,creds,token,backdrop\n")
+                         "schedule,query,creds,token,performanceplatforn\n")
 
         with temp_file(temp_contents) as something:
             generated_jobs = crontab.generate_crontab(

@@ -31,10 +31,11 @@ def parse_args(name="", args=None):
                         help='JSON file containing token '
                              'for the collector',
                         required=True)
-    parser.add_argument('-b', '--backdrop', dest='backdrop',
+    parser.add_argument('-b', '--performanceplatform',
+                        dest='performanceplatform',
                         type=_load_json_file,
-                        help='JSON file containing backdrop config '
-                             'for the collector',
+                        help='JSON file containing the Performance Platform '
+                             'config for the collector',
                         required=True)
     parser.add_argument('-s', '--start', dest='start_at',
                         type=parse_date,
@@ -47,8 +48,9 @@ def parse_args(name="", args=None):
                         help='Output logging to the console rather than file')
     parser.add_argument('--dry-run', dest='dry_run',
                         action='store_true',
-                        help='Instead of pushing to backdrop the collector '
-                             'will print out what would have been pushed')
+                        help='Instead of pushing to the Performance Platform '
+                             'the collector will print out what would have '
+                             'been pushed')
     parser.set_defaults(console_logging=False, dry_run=False)
     args = parser.parse_args(args)
 

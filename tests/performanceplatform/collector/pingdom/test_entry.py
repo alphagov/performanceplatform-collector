@@ -3,14 +3,14 @@ import unittest
 from hamcrest import assert_that, has_entry, is_
 import pytz
 from performanceplatform.collector.pingdom import \
-    convert_from_pingdom_to_backdrop, truncate_hour_fraction, \
+    convert_from_pingdom_to_performanceplatform, truncate_hour_fraction, \
     parse_time_range
 
 from freezegun import freeze_time
 
 
 class TestCollect(unittest.TestCase):
-    def test_converting_from_pingdom_to_backdrop_records(self):
+    def test_converting_from_pingdom_to_performanceplatform_records(self):
         hourly_stats = {
             u'avgresponse': 721,
             u'downtime': 523,
@@ -20,7 +20,8 @@ class TestCollect(unittest.TestCase):
         }
 
         name_of_check = 'testCheck'
-        doc = convert_from_pingdom_to_backdrop(hourly_stats, name_of_check)
+        doc = convert_from_pingdom_to_performanceplatform(
+            hourly_stats, name_of_check)
 
         assert_that(doc,
                     has_entry('_id', 'testCheck.2013-06-15T22:00:00+00:00'))
@@ -31,7 +32,7 @@ class TestCollect(unittest.TestCase):
         assert_that(doc, has_entry('downtime', 523))
         assert_that(doc, has_entry('unmonitored', 12))
 
-    def test_converting_to_backdrop_record_removes_whitespace_from_id(self):
+    def test_converting_to_pp_record_removes_whitespace_from_id(self):
         hourly_stats = {
             u'avgresponse': 721,
             u'downtime': 523,
@@ -41,7 +42,8 @@ class TestCollect(unittest.TestCase):
         }
         name_of_check = "name with whitespace"
 
-        doc = convert_from_pingdom_to_backdrop(hourly_stats, name_of_check)
+        doc = convert_from_pingdom_to_performanceplatform(
+            hourly_stats, name_of_check)
 
         assert_that(doc, has_entry('_id', 'name_with_whitespace.'
                                           '2013-06-15T22:00:00+00:00'))

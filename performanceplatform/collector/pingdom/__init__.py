@@ -48,8 +48,9 @@ def parse_time_range(start_dt, end_dt):
 
 def push_stats_to_data_set(pingdom_stats, check_name, data_set_config):
     data_set = DataSet.from_config(data_set_config)
-    data_set.post([convert_from_pingdom_to_backdrop(thing, check_name) for
-                 thing in pingdom_stats])
+    data_set.post(
+        [convert_from_pingdom_to_performanceplatform(thing, check_name) for
+         thing in pingdom_stats])
 
 
 def get_contents_as_json(path_to_file):
@@ -58,7 +59,7 @@ def get_contents_as_json(path_to_file):
         return json.load(file_to_load)
 
 
-def convert_from_pingdom_to_backdrop(pingdom_stats, name_of_check):
+def convert_from_pingdom_to_performanceplatform(pingdom_stats, name_of_check):
     timestamp = pingdom_stats['starttime'].isoformat()
     name_for_id = name_of_check.replace(' ', '_')
     return {

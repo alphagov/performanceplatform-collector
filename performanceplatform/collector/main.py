@@ -12,10 +12,11 @@ def logging_for_entrypoint(entrypoint):
     set_up_logging(entrypoint, logging.INFO, logfile_path)
 
 
-def merge_backdrop_config(backdrop, data_set, token, dry_run=False):
+def merge_performanceplatform_config(
+        performanceplatform, data_set, token, dry_run=False):
     return {
         'url': '{0}/{1}/{2}'.format(
-            backdrop['url'],
+            performanceplatform['url'],
             data_set['data-group'],
             data_set['data-type']
         ),
@@ -27,7 +28,7 @@ def merge_backdrop_config(backdrop, data_set, token, dry_run=False):
 
 
 def main():
-    args = arguments.parse_args('Backdrop Collector')
+    args = arguments.parse_args('Performance Platform Collectors')
 
     entrypoint = args.query['entrypoint']
 
@@ -40,8 +41,8 @@ def main():
     entrypoint_module = importlib.import_module(entrypoint)
     entrypoint_module.main(
         args.credentials,
-        merge_backdrop_config(
-            args.backdrop,
+        merge_performanceplatform_config(
+            args.performanceplatform,
             args.query['data-set'],
             args.token,
             args.dry_run
