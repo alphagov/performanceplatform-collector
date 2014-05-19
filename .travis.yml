@@ -7,7 +7,7 @@ matrix:
     - python: "3.4"
 install:
   - "pip install . --use-mirrors"
-script: "python setup.py test"
+script: ./run_tests.sh
 env:
   global:
     # NOTE: contains GH_TOKEN=xxx from github user gds-pp-ci
