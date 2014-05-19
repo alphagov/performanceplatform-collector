@@ -8,7 +8,7 @@ from performanceplatform.collector.logging_setup import set_up_logging
 
 def logging_for_entrypoint(entrypoint):
     logfile_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), 'log')
+        os.path.dirname(os.path.realpath(__file__)), '..', '..', 'log')
     set_up_logging(entrypoint, logging.INFO, logfile_path)
 
 
