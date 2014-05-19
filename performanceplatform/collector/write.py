@@ -1,7 +1,7 @@
 import datetime
 import logging
 import pytz
-import requests
+from performanceplatform.utils import requests_with_backoff as requests
 import json
 
 
