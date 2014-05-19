@@ -73,7 +73,7 @@ def data_id(data_type, timestamp, period, dimension_values):
     # `dimension_values` may be non-string python types and need to be coerced.
     values = map(unicode, dimension_values)
     slugs = [data_type, _format(timestamp), period] + values
-    print slugs
+    print(slugs)
     return value_id("_".join(slugs))
 
 
