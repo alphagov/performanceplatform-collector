@@ -39,7 +39,8 @@ setup(
     maintainer='Government Digital Service',
     url='https://github.com/alphagov/performanceplatform-collector',
 
-    description='performanceplatform-collector: tools for sending data to the Performance Platform',
+    description='performanceplatform-collector: tools for sending'
+        'data to the Performance Platform',
     long_description=long_description,
     license='MIT',
     keywords='api data performance_platform',
