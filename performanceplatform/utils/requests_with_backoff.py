@@ -4,6 +4,8 @@ import time
 
 _MAX_RETRIES = 5
 
+# for code that wants to import exceptions from this file
+exceptions = requests.exceptions
 
 
 def get(url, *args, **kwargs):

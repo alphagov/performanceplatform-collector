@@ -58,7 +58,7 @@ class TestPingdomApi(unittest.TestCase):
 
         assert_that(uptime, is_([]))
 
-    @patch("requests.get")
+    @patch("performanceplatform.utils.requests_with_backoff.get")
     def test_response_unixtime_converted_to_isodate(self, mock_get_request):
         mock_response = Mock()
         mock_response.json.return_value = {

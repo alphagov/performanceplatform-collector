@@ -1,6 +1,6 @@
 from datetime import datetime
 import pytz
-import requests
+from performanceplatform.utils import requests_with_backoff as requests
 import time
 import logging
 
