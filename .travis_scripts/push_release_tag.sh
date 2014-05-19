@@ -10,7 +10,8 @@
 
 ##### TESTING LOCALLY #####
 
-# To test locally we need to fake the environment variables provided by Travis.
+# To test locally we need to fake the environment variables provided by Travis:
+# see function below.
 #
 # Do this by setting LOCAL_TEST_MODE to "true" and TESTING_GITHUB_TOKEN to a
 # token you create in github with ``public_repo`` permission.
@@ -18,6 +19,21 @@
 
 LOCAL_TEST_MODE="false"
 TESTING_GITHUB_TOKEN="make-yourself-one-in-github"
+
+function setup_fake_travis_environment {
+  echo "Setting up fake Travis environment"
+
+  TRAVIS_REPO_SLUG="alphagov/performanceplatform-collector"
+  # NOTE: this must be a real commit from the above repository
+  TRAVIS_COMMIT="fc779eaf479406bc3494e393281a0f5bc67a2c12"
+
+  TRAVIS="true"
+  TRAVIS_BRANCH="master"
+  TRAVIS_BUILD_NUMBER="123456789"
+  TRAVIS_PYTHON_VERSION="2.7"
+  GH_TOKEN="${TESTING_GITHUB_TOKEN}"
+}
+
 
 
 ##### RUNNING IN TRAVIS #####
@@ -94,20 +110,6 @@ function make_release_tag_from_travis_build_number {
   git push --force origin --tags --quiet
 
   popd
-}
-
-function setup_fake_travis_environment {
-  echo "Setting up fake Travis environment"
-
-  TRAVIS_REPO_SLUG="alphagov/performanceplatform-collector"
-  # NOTE: this must be a real commit frmo the above repository
-  TRAVIS_COMMIT="fc779eaf479406bc3494e393281a0f5bc67a2c12"
-
-  TRAVIS="true"
-  TRAVIS_BRANCH="master"
-  TRAVIS_BUILD_NUMBER="123456789"
-  TRAVIS_PYTHON_VERSION="2.7"
-  GH_TOKEN="${TESTING_GITHUB_TOKEN}"
 }
 
 if [ "${LOCAL_TEST_MODE}" == "true" ]; then
