@@ -50,7 +50,7 @@ class TestDataSet(unittest.TestCase):
             data='{"key": "2012-12-12T00:00:00+00:00"}'
         )
 
-    @mock.patch('requests.post')
+    @mock.patch('performanceplatform.utils.requests_with_backoff.post')
     def test_raises_error_on_4XX_or_5XX_responses(self, mock_post):
         data_set = DataSet(None, None)
         response = Response()
