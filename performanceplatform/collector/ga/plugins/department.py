@@ -257,7 +257,7 @@ DEPARTMENT_MAPPING = {
     "<OT538>": "health-and-social-care-information-centre",
     "<OT539>": "health-education-england",
     "<OT540>": "infrastructure-uk",
-    "<OT570>": "uk-visas-and-immigration",
+    "<OT554>": "uk-visas-and-immigration",
     "<PB27>": "student-loans-company",
     "<PB28>": "acas",
     "<PB29>": "national-fraud-authority",
