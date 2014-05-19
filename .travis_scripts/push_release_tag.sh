@@ -98,10 +98,13 @@ function make_release_tag_from_travis_build_number {
 
 function setup_fake_travis_environment {
   echo "Setting up fake Travis environment"
+
+  TRAVIS_REPO_SLUG="alphagov/performanceplatform-collector"
+  # NOTE: this must be a real commit frmo the above repository
+  TRAVIS_COMMIT="fc779eaf479406bc3494e393281a0f5bc67a2c12"
+
   TRAVIS="true"
-  TRAVIS_REPO_SLUG="alphagov/stagecraft"
   TRAVIS_BRANCH="master"
-  TRAVIS_COMMIT="3aed87b4f7bbb62e15fef65bd9a1b27d07d6e351"
   TRAVIS_BUILD_NUMBER="123456789"
   TRAVIS_PYTHON_VERSION="2.7"
   GH_TOKEN="${TESTING_GITHUB_TOKEN}"
