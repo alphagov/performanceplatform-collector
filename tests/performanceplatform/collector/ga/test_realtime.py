@@ -38,7 +38,7 @@ class TestCollector(object):
         collector = Collector({"CLIENT_SECRETS": None, "STORAGE_PATH": None})
         data_set_config = {"url": 'url', "token": 'token'}
 
-        #this utc time corresponds to GMT - winter
+        # this utc time corresponds to GMT - winter
         with freeze_time("2014-01-07 10:20:57", tz_offset=0):
             collector.send_records_for({},
                                        to=data_set_config)
@@ -63,7 +63,7 @@ class TestCollector(object):
         collector = Collector({"CLIENT_SECRETS": None, "STORAGE_PATH": None})
         data_set_config = {"url": 'url', "token": 'token'}
 
-        #this utc time corresponds to BST - summer
+        # this utc time corresponds to BST - summer
         with freeze_time("2014-04-07 10:20:57", tz_offset=0):
             collector.send_records_for({},
                                        to=data_set_config)
