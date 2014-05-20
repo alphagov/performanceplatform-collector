@@ -1,32 +1,52 @@
+import io
 import os
+import re
 from setuptools import setup, find_packages
 
 from performanceplatform import collector
 
-requirements = [
-    'requests',
-    'pytz==2013d',
-    'argparse',
-    'python-dateutil',
-    'logstash_formatter',
-    'gapy',
-    'google-api-python-client==1.0',
-]
 
-test_requirements = [
-    'PyHamcrest',
-    'nose',
-    'mock',
-    'pep8',
-    'coverage',
-    'freezegun',
-]
+class Setup(object):
 
-HERE = os.path.dirname(__file__)
-try:
-    long_description = open(os.path.join(HERE, 'README.rst')).read()
-except:
-    long_description = None
+    """A series of helpers for getting the setup looking buff"""
+
+    @staticmethod
+    def read(fname, fail_silently=False):
+        """
+        Read the content of the given file. The path is evaluated from the
+        directory containing this file.
+        """
+        try:
+            filepath = os.path.join(os.path.dirname(__file__), fname)
+            with io.open(filepath, 'rt', encoding='utf8') as f:
+                return f.read()
+        except:
+            if not fail_silently:
+                raise
+            return ''
+
+    @staticmethod
+    def version():
+        data = Setup.read(
+            os.path.join('performanceplatform-collector/__init__.py'))
+        version = (re.search("__version__\s*=\s*u?'([^']+)'", data)
+                   .group(1).strip())
+        return version
+
+    @staticmethod
+    def requirements(fname):
+        """
+        Create a list of requirements from the output of the pip freeze command
+        saved in a text file.
+        """
+        packages = Setup.read(fname, fail_silently=True).split('\n')
+        packages = (p.strip() for p in packages)
+        packages = (p for p in packages if p and not p.startswith('#'))
+        return list(packages)
+
+    @staticmethod
+    def long_description():
+        return Setup.read('README.rst')
 
 setup(
     name='performanceplatform-collector',
@@ -41,12 +61,12 @@ setup(
 
     description='performanceplatform-collector: tools for sending'
         'data to the Performance Platform',
-    long_description=long_description,
+    long_description=Setup.long_description(),
     license='MIT',
     keywords='api data performance_platform',
 
-    install_requires=requirements,
-    tests_require=test_requirements,
+    install_requires=Setup.requirements('requirements.txt'),
+    tests_require=Setup.requirements('requirements_for_tests.txt'),
 
     test_suite='nose.collector',
 
