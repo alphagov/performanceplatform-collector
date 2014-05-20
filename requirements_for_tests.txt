@@ -1,0 +1,6 @@
+PyHamcrest
+nose
+mock
+pep8
+coverage
+freezegun

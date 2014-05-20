@@ -1,0 +1,7 @@
+requests
+pytz==2013d
+argparse
+python-dateutil
+logstash_formatter
+gapy
+google-api-python-client==1.0
