@@ -17,7 +17,7 @@ def get_json_log_handler(path, app_name, json_fields):
     handler = logging.FileHandler(path)
     formatter = LogstashFormatter()
     formatter.defaults['@tags'] = ['collector', app_name]
-    formatter.defaults.update(json_fields)
+    formatter.defaults['@fields'] = json_fields
     handler.setFormatter(formatter)
     return handler
 

@@ -35,10 +35,10 @@ def make_extra_json_fields(args):
     fields to be inserted into JSON logs (logstash_formatter module)
     """
     return {
-        '@data_group': _get_data_group(args.query),
-        '@data_type': _get_data_type(args.query),
-        '@data_group_data_type': _get_data_group_data_type(args.query),
-        '@query': _get_query_params(args.query),
+        'data_group': _get_data_group(args.query),
+        'data_type': _get_data_type(args.query),
+        'data_group_data_type': _get_data_group_data_type(args.query),
+        'query': _get_query_params(args.query),
     }
 
 
