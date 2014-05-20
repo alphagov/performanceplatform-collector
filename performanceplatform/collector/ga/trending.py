@@ -9,7 +9,7 @@ ga_date_keys = ['day', 'month', 'year']
 
 
 def parse_query(query):
-    if not 'metric' in query or not query['metric']:
+    if 'metric' not in query or not query['metric']:
         raise Exception('Metric required')
     else:
         if 'dimensions' in query:
@@ -58,10 +58,10 @@ def sum_data(data, metric, collapse_key, dates, floor):
         dimensions = row['dimensions']
         k = dimensions[collapse_key]
 
-        if not k in collapsed:
+        if k not in collapsed:
             d = {}
             for dim in dimensions:
-                if (not dim in ga_date_keys):
+                if dim not in ga_date_keys:
                     d[dim] = dimensions[dim]
             d['week1'] = 0
             d['week2'] = 0
