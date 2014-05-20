@@ -52,31 +52,32 @@ class Setup(object):
     def long_description():
         return Setup.read('README.rst')
 
-setup(
-    name='performanceplatform-collector',
-    version=Setup.version(),
-    packages=find_packages(exclude=['test*']),
+if __name__ == '__main__':
+    setup(
+        name='performanceplatform-collector',
+        version=Setup.version(),
+        packages=find_packages(exclude=['test*']),
 
-    # metadata for upload to PyPI
-    author=collector.__author__,
-    author_email=collector.__author_email__,
-    maintainer='Government Digital Service',
-    url='https://github.com/alphagov/performanceplatform-collector',
+        # metadata for upload to PyPI
+        author=collector.__author__,
+        author_email=collector.__author_email__,
+        maintainer='Government Digital Service',
+        url='https://github.com/alphagov/performanceplatform-collector',
 
-    description='performanceplatform-collector: tools for sending'
-        'data to the Performance Platform',
-    long_description=Setup.long_description(),
-    license='MIT',
-    keywords='api data performance_platform',
+        description='performanceplatform-collector: tools for sending'
+            'data to the Performance Platform',
+        long_description=Setup.long_description(),
+        license='MIT',
+        keywords='api data performance_platform',
 
-    install_requires=Setup.requirements('requirements.txt'),
-    tests_require=Setup.requirements('requirements_for_tests.txt'),
+        install_requires=Setup.requirements('requirements.txt'),
+        tests_require=Setup.requirements('requirements_for_tests.txt'),
 
-    test_suite='nose.collector',
+        test_suite='nose.collector',
 
-    entry_points={
-        'console_scripts': [
-            'pp-collector=performanceplatform.collector.main:main'
-        ]
-    }
-)
+        entry_points={
+            'console_scripts': [
+                'pp-collector=performanceplatform.collector.main:main'
+            ]
+        }
+    )
