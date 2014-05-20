@@ -28,9 +28,13 @@ class Setup(object):
     @staticmethod
     def version():
         data = Setup.read(
-            os.path.join('performanceplatform-collector/__init__.py'))
-        version = (re.search("__version__\s*=\s*u?'([^']+)'", data)
-                   .group(1).strip())
+            'performanceplatform/collector/__init__.py'
+        )
+        version = re.search(
+            r"^__VERSION__ = ['\"]([^'\"]*)['\"]",
+            data,
+            re.M | re.I
+        ).group(1).strip()
         return version
 
     @staticmethod
