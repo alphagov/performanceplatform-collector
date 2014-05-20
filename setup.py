@@ -31,7 +31,7 @@ class Setup(object):
             'performanceplatform/collector/__init__.py'
         )
         version = re.search(
-            r"^__VERSION__ = ['\"]([^'\"]*)['\"]",
+            r"^__version__ = ['\"]([^'\"]*)['\"]",
             data,
             re.M | re.I
         ).group(1).strip()
@@ -58,8 +58,8 @@ setup(
     packages=find_packages(exclude=['test*']),
 
     # metadata for upload to PyPI
-    author=collector.__AUTHOR__,
-    author_email=collector.__AUTHOR_EMAIL__,
+    author=collector.__author__,
+    author_email=collector.__author_email__,
     maintainer='Government Digital Service',
     url='https://github.com/alphagov/performanceplatform-collector',
 

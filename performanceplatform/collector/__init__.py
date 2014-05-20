@@ -2,6 +2,6 @@
 from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
-__VERSION__ = "1.0.0"
-__AUTHOR__ = "GDS Developers"
-__AUTHOR_EMAIL__ = ""
+__version__ = "1.0.0"
+__author__ = "GDS Developers"
+__author_email__ = "performance@digital.cabinet-office.gov.uk"
