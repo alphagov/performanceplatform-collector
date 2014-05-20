@@ -54,7 +54,7 @@ class Setup(object):
 
 setup(
     name='performanceplatform-collector',
-    version=collector.__VERSION__,
+    version=Setup.version(),
     packages=find_packages(exclude=['test*']),
 
     # metadata for upload to PyPI
