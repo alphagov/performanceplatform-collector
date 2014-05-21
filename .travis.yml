@@ -18,3 +18,5 @@ branches:
   except:
     - release
     - /^release_\d+$/
+notifications:
+  email: false
