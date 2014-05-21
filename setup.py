@@ -35,7 +35,7 @@ class Setup(object):
             data,
             re.M | re.I
         ).group(1).strip()
-        return version
+        return version.encode('ascii')
 
     @staticmethod
     def requirements(fname):
