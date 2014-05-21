@@ -16,15 +16,21 @@ function publish_or_die(){
     if [ "$TAG_EXISTS" ]; then
         exit 0
     else
-        publish $VERSION
+        pypi_check $VERSION
     fi
+}
+
+function pypi_check(){
+    python setup.py sdist upload -r pypitest
+    publish
 }
 
 function publish(){
     VERSION=$1
     git tag -a $VERSION -m "Automatically published from jenkins"
     git push origin --tags
-    python setup.py sdist bdist_wheel upload
+    python setup.py register -r pypi
+    python setup.py sdist upload -r pypi
 }
 
 function main(){
