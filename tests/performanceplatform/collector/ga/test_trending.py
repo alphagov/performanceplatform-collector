@@ -2,6 +2,7 @@ import unittest
 
 from freezegun import freeze_time
 from datetime import date
+from copy import copy
 
 from performanceplatform.collector.ga.trending import *
 
@@ -133,6 +134,32 @@ class test_data_calculations(unittest.TestCase):
         self.assertIn('L2Jheg==', flattened_keys)
         self.assertIn('L2Zvbw==', flattened_keys)
         self.assertIn('L2Jhcg==', flattened_keys)
+
+    @freeze_time("2014-02-12 01:00:00")
+    def test_other_data_does_not_raise_exception(self):
+        dates = get_date()
+        newdata = copy(self.data)
+        newdata.append(
+            {'metrics': {u'pageviews': u'98'},
+             'dimensions': {u'pagePath': u'/foo/page2',
+                            u'pageTitle': u'foo',
+                            u'day': u'(other)',
+                            u'month': u'(other)',
+                            u'year': u'(other)'}},
+        )
+        newdata.append(
+            {'metrics': {u'pageviews': u'98'},
+             'dimensions': {u'pagePath': u'/foo/page2',
+                            u'pageTitle': u'foo',
+                            u'day': u'1',
+                            u'month': u'(other)',
+                            u'year': u'2014'}},
+        )
+        try:
+            collapsed_data = sum_data(newdata, self.metric,
+                                      self.collapse_key, dates, self.floor)
+        except ValueError:
+            self.fail('collapsed_data does not handle (other) value')
 
 
 class test_dates(unittest.TestCase):
