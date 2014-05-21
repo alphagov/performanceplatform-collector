@@ -1,13 +1,13 @@
 from datetime import datetime
 import pytz
-from performanceplatform.utils import requests_with_backoff as requests
+from performanceplatform.utils import requests_with_backoff
 import time
 import logging
 
 
 def _send_authenticated_pingdom_request(path, user, password, app_key,
                                         url_params):
-    response = requests.get(
+    response = requests_with_backoff.get(
         url="https://api.pingdom.com/api/2.0/" + path,
         auth=(user, password),
         headers={
@@ -29,7 +29,7 @@ class Pingdom(object):
         self.API_LOCATION = "https://api.pingdom.com/api/2.0/"
 
     def _make_request(self, path, url_params={}):
-        response = requests.get(
+        response = requests_with_backoff.get(
             url=self.API_LOCATION + path,
             auth=(self.user, self.password),
             headers={
@@ -68,7 +68,7 @@ class Pingdom(object):
                 app_key=self.app_key,
                 url_params=params
             ))
-        except requests.exceptions.HTTPError as e:
+        except requests_with_backoff.exceptions.HTTPError as e:
             logging.error("Request to pingdom failed: %s" % str(e))
 
     def check_id(self, name):

@@ -1,7 +1,7 @@
 import datetime
 import logging
 import pytz
-from performanceplatform.utils import requests_with_backoff as requests
+from performanceplatform.utils import requests_with_backoff
 import json
 
 
@@ -42,7 +42,7 @@ class DataSet(object):
             logging.info(headers)
             logging.info(json_body)
         else:
-            response = requests.post(
+            response = requests_with_backoff.post(
                 url=self.url,
                 headers=headers,
                 data=json_body

@@ -5,7 +5,7 @@ from performanceplatform.utils import requests_with_backoff
 
 
 @patch('time.sleep')
-@patch('requests.request')
+@patch('performanceplatform.utils.requests_with_backoff.request')
 def _request_and_assert(request_call,
                         expected_call,
                         status_code,
@@ -48,7 +48,7 @@ def _request_and_assert(request_call,
 class TestRequestsWithBackoff(object):
 
     # tests for GET
-    @patch('requests.request')
+    @patch('performanceplatform.utils.requests_with_backoff.request')
     def test_get_proxies_requests_get(self, mock_request):
         requests_with_backoff.get('http://fake.com',
                                   kwarg1='a kwarg',
@@ -92,7 +92,7 @@ class TestRequestsWithBackoff(object):
                  kwarg2='another kwarg'),
             403)
 
-    @patch('requests.request')
+    @patch('performanceplatform.utils.requests_with_backoff.request')
     @patch('time.sleep')
     def test_get_does_not_sleep_on_404(self,
                                        mock_sleep,
@@ -117,7 +117,7 @@ class TestRequestsWithBackoff(object):
                                         kwarg1='a kwarg',
                                         kwarg2='another kwarg')
 
-    @patch('requests.request')
+    @patch('performanceplatform.utils.requests_with_backoff.request')
     @patch('time.sleep')
     def test_get_raises_error_after_5_retries(self,
                                               mock_sleep,
@@ -143,7 +143,7 @@ class TestRequestsWithBackoff(object):
                                         kwarg2='another kwarg')
 
     # tests for POST
-    @patch('requests.request')
+    @patch('performanceplatform.utils.requests_with_backoff.request')
     def test_post_proxies_requests_post(self, mock_request):
         requests_with_backoff.post('http://fake.com',
                                    data={},
@@ -195,7 +195,7 @@ class TestRequestsWithBackoff(object):
                  kwarg2='another kwarg'),
             403)
 
-    @patch('requests.request')
+    @patch('performanceplatform.utils.requests_with_backoff.request')
     @patch('time.sleep')
     def test_post_does_not_sleep_on_404(self,
                                         mock_sleep,
@@ -222,7 +222,7 @@ class TestRequestsWithBackoff(object):
                                         kwarg1='a kwarg',
                                         kwarg2='another kwarg')
 
-    @patch('requests.request')
+    @patch('performanceplatform.utils.requests_with_backoff.request')
     @patch('time.sleep')
     def test_post_raises_error_after_5_retries(self,
                                                mock_sleep,

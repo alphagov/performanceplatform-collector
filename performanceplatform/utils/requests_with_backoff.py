@@ -1,26 +1,26 @@
 import logging
-import requests
 import time
+
+# import everything from requests so that other code can import this package
+# instead of requests
+from requests import *
 
 _MAX_RETRIES = 5
 
-# for code that wants to import exceptions from this file
-exceptions = requests.exceptions
-
 
 def get(url, *args, **kwargs):
-    request_with_backoff('GET', url, **kwargs)
+    __request_with_backoff('GET', url, *args, **kwargs)
 
 
 def post(url, *args, **kwargs):
-    request_with_backoff('POST', url, **kwargs)
+    __request_with_backoff('POST', url, *args, **kwargs)
 
 
-def request_with_backoff(method, url, **kwargs):
+def __request_with_backoff(method, url, *args, **kwargs):
     delay = 10
 
     for n in range(_MAX_RETRIES):
-        response = requests.request(method, url, **kwargs)
+        response = request(method, url, *args, **kwargs)
         code = response.status_code
         if code in [403, 502, 503]:
             logging.info('{} request for {} failed with code {}. Retrying in '
