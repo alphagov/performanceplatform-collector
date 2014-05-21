@@ -23,6 +23,7 @@ function publish_or_die(){
 function publish(){
     VERSION=$1
     git tag -a $VERSION -m "Automatically published from jenkins"
+    git push origin --tags
     python setup.py sdist bdist_wheel upload
 }
 
