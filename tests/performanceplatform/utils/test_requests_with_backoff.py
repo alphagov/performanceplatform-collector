@@ -4,19 +4,6 @@ import requests
 from performanceplatform.utils import requests_with_backoff
 
 
-def _response_generator(bad_status_code):
-    bad_response = requests.Response()
-    bad_response.status_code = bad_status_code
-
-    good_response = requests.Response()
-    good_response.status_code = 200
-    good_response._content = str('Hello')
-
-    yield bad_response
-    yield bad_response
-    yield good_response
-
-
 @patch('time.sleep')
 @patch('requests.request')
 def _request_and_assert(request_call,
@@ -24,6 +11,26 @@ def _request_and_assert(request_call,
                         status_code,
                         mock_request,
                         mock_sleep):
+
+    """
+    Send a passed in request to requests_with_backoff and check
+    that the wrapped requests package makes an equivalent request
+    with identical parameters. Also check that sleep was called
+    in the way expected when the first two requests are bad and
+    have the passed in status_code.
+    """
+    def _response_generator(bad_status_code):
+        bad_response = requests.Response()
+        bad_response.status_code = bad_status_code
+
+        good_response = requests.Response()
+        good_response.status_code = 200
+        good_response._content = str('Hello')
+
+        yield bad_response
+        yield bad_response
+        yield good_response
+
     mock_request.side_effect = _response_generator(status_code)
     request_call()
 
