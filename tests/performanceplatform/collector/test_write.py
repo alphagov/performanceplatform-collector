@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 import mock
 from nose.tools import eq_
@@ -49,6 +51,37 @@ class TestDataSet(unittest.TestCase):
             headers=mock.ANY,
             data='{"key": "2012-12-12T00:00:00+00:00"}'
         )
+
+    @mock.patch('performanceplatform.collector.write.requests_with_backoff')
+    def test_post_large_data_is_compressed(self, mock_requests_with_backoff):
+        data_set = DataSet(None, None)
+
+        big_string = "x" * 3000
+        data_set.post({'key': big_string})
+
+        mock_requests_with_backoff.post.assert_called_with(
+            url=mock.ANY,
+            headers=
+            {
+                'Content-type': 'application/json',
+                'Authorization': 'Bearer None',
+                'Content-Encoding': 'gzip',
+            },
+            data=mock.ANY
+        )
+
+        call_args = mock_requests_with_backoff.post.call_args
+
+        gzipped_bytes = call_args[1]["data"].getvalue()
+
+        # large repeated string compresses really well – who knew?
+        self.assertEqual(52, len(gzipped_bytes))
+
+        # Does it look like a gzipped stream of bytes?
+        # http://tools.ietf.org/html/rfc1952#page-5
+        self.assertEqual(b'\x1f', gzipped_bytes[0])
+        self.assertEqual(b'\x8b', gzipped_bytes[1])
+        self.assertEqual(b'\x08', gzipped_bytes[2])
 
     @mock.patch('performanceplatform.utils.requests_with_backoff.post')
     def test_raises_error_on_4XX_or_5XX_responses(self, mock_post):
