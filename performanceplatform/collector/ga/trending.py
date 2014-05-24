@@ -67,6 +67,10 @@ def sum_data(data, metric, collapse_key, dates, floor):
             d['week2'] = 0
             collapsed[k] = d
 
+        date_list = [dimensions['day'],
+                     dimensions['month'], dimensions['year']]
+        if '(other)' in date_list:
+            continue
         week = 'week%d' % assign_day_to_week(dimensions['day'],
                                              dimensions['month'],
                                              dimensions['year'], dates)
