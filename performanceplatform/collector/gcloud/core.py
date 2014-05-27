@@ -1,50 +1,19 @@
-#!/usr/bin/env python
 # encoding: utf-8
 
 from __future__ import unicode_literals
 
-import codecs
 import json
 import logging
-import os
 import re
-import sys
 
 import scraperwiki
-from dshelpers import (update_status, download_url, install_cache,
-                       batch_processor)
+from dshelpers import batch_processor
 
-from backdrop.collector.write import Bucket
-from backdrop.collector.write import JsonEncoder
+from performanceplatform.collector.write import JsonEncoder
 
-from sales_parser import process_csv, get_latest_csv_url
+from sales_parser import process_csv
 from table_names import _RAW_SALES_TABLE, _AGGREGATED_SALES_TABLE
 from aggregate import calculate_aggregated_sales, make_spending_group_keys
-
-
-INDEX_URL = ('https://digitalmarketplace.blog.gov.uk'
-             '/sales-accreditation-information/')
-
-
-def main(filename=None):
-    logging.basicConfig(level=logging.INFO)
-    install_cache()
-
-    nuke_local_database()
-
-    if filename:
-        with open(filename, 'r') as f:
-            save_raw_data(f)
-    else:
-        save_raw_data(download_url(get_latest_csv_url(INDEX_URL)))
-
-    aggregate_and_save()
-
-    save_to_json()
-
-    push_aggregates()
-
-    update_status(_RAW_SALES_TABLE, 'date')
 
 
 def nuke_local_database():
@@ -77,14 +46,10 @@ def aggregate_and_save():
             saver.push(row)
 
 
-def push_aggregates():
+def push_aggregates(data_set):
     table = _AGGREGATED_SALES_TABLE
-    url = _SALES_WRITE_URL
-    token = _SALES_TOKEN
 
-    bucket = Bucket(url, token)
-
-    with batch_processor(bucket.post) as uploader:
+    with batch_processor(data_set.post) as uploader:
         for row in scraperwiki.sqlite.select('* FROM {}'.format(table)):
             uploader.push(row)
 
@@ -114,15 +79,3 @@ def normalise(name):
     u'baz jim south ltd'
     """
     return re.sub('[^a-z]+', ' ', name.lower()).strip()
-
-
-if __name__ == '__main__':
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-
-    _SALES_WRITE_URL = os.environ['GCLOUD_SALES_WRITE_URL']
-    _SALES_TOKEN = os.environ['GCLOUD_SALES_BEARER_TOKEN']
-
-    if len(sys.argv) > 1:
-        main(sys.argv[1])
-    else:
-        main()
