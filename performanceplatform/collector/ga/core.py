@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 import re
+from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 
 from gapy.client import from_private_key, from_secrets_file
 
@@ -13,14 +14,15 @@ def create_client(credentials):
     if "CLIENT_SECRETS" in credentials:
         return from_secrets_file(
             credentials['CLIENT_SECRETS'],
-            storage_path=credentials['STORAGE_PATH']
-
+            storage_path=credentials['STORAGE_PATH'],
+            http_client=HttpWithBackoff(),
         )
     else:
         return from_private_key(
             credentials['ACCOUNT_NAME'],
             private_key_path=credentials['PRIVATE_KEY'],
-            storage_path=credentials['STORAGE_PATH']
+            storage_path=credentials['STORAGE_PATH'],
+            http_client=HttpWithBackoff(),
         )
 
 
