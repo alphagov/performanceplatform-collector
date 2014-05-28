@@ -9,11 +9,11 @@ _MAX_RETRIES = 5
 
 
 def get(url, *args, **kwargs):
-    __request_with_backoff('GET', url, *args, **kwargs)
+    return __request_with_backoff('GET', url, *args, **kwargs)
 
 
 def post(url, *args, **kwargs):
-    __request_with_backoff('POST', url, *args, **kwargs)
+    return __request_with_backoff('POST', url, *args, **kwargs)
 
 
 def __request_with_backoff(method, url, *args, **kwargs):
