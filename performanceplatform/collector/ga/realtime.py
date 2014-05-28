@@ -1,5 +1,4 @@
 from apiclient.discovery import build
-from httplib2 import Http
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import run
@@ -7,6 +6,7 @@ from datetime import datetime
 import pytz
 
 from performanceplatform.collector.write import DataSet
+from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 
 
 GOOGLE_API_SCOPE = "https://www.googleapis.com/auth/analytics"
@@ -51,7 +51,7 @@ class Realtime(object):
         self.service = build(
             serviceName="analytics",
             version="v3",
-            http=credentials.authorize(Http())
+            http=credentials.authorize(HttpWithBackoff())
         )
 
     def execute_ga_query(self, query):

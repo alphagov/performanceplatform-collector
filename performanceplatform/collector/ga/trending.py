@@ -1,9 +1,9 @@
 import base64
-import json
 from datetime import date, timedelta
 import gapy.client
 
 from performanceplatform.collector.write import DataSet
+from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 
 ga_date_keys = ['day', 'month', 'year']
 
@@ -67,6 +67,10 @@ def sum_data(data, metric, collapse_key, dates, floor):
             d['week2'] = 0
             collapsed[k] = d
 
+        date_list = [dimensions['day'],
+                     dimensions['month'], dimensions['year']]
+        if '(other)' in date_list:
+            continue
         week = 'week%d' % assign_day_to_week(dimensions['day'],
                                              dimensions['month'],
                                              dimensions['year'], dates)
@@ -106,7 +110,8 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
     credentials = credentials
     client = gapy.client.from_secrets_file(
         credentials['CLIENT_SECRETS'],
-        storage_path=credentials['STORAGE_PATH']
+        storage_path=credentials['STORAGE_PATH'],
+        http_client=HttpWithBackoff(),
     )
 
     ga_query = parse_query(query)

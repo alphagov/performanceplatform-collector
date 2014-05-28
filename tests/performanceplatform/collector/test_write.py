@@ -23,13 +23,13 @@ class TestDataSet(unittest.TestCase):
         eq_(data_set.token, 'bar')
         eq_(data_set.dry_run, True)
 
-    @mock.patch('performanceplatform.collector.write.requests')
-    def test_post_data_to_data_set(self, requests):
+    @mock.patch('performanceplatform.collector.write.requests_with_backoff')
+    def test_post_data_to_data_set(self, mock_requests_with_backoff):
         data_set = DataSet('foo', 'bar')
 
         data_set.post({'key': 'value'})
 
-        requests.post.assert_called_with(
+        mock_requests_with_backoff.post.assert_called_with(
             url='foo',
             headers={
                 'Authorization': 'Bearer bar',
@@ -38,19 +38,19 @@ class TestDataSet(unittest.TestCase):
             data='{"key": "value"}'
         )
 
-    @mock.patch('performanceplatform.collector.write.requests')
-    def test_post_to_data_set(self, requests):
+    @mock.patch('performanceplatform.collector.write.requests_with_backoff')
+    def test_post_to_data_set(self, mock_requests_with_backoff):
         data_set = DataSet(None, None)
 
         data_set.post({'key': datetime(2012, 12, 12)})
 
-        requests.post.assert_called_with(
+        mock_requests_with_backoff.post.assert_called_with(
             url=mock.ANY,
             headers=mock.ANY,
             data='{"key": "2012-12-12T00:00:00+00:00"}'
         )
 
-    @mock.patch('requests.post')
+    @mock.patch('performanceplatform.utils.requests_with_backoff.post')
     def test_raises_error_on_4XX_or_5XX_responses(self, mock_post):
         data_set = DataSet(None, None)
         response = Response()
@@ -58,11 +58,11 @@ class TestDataSet(unittest.TestCase):
         mock_post.return_value = response
         self.assertRaises(HTTPError, data_set.post, {'key': 'foo'})
 
-    @mock.patch('performanceplatform.collector.write.requests')
+    @mock.patch('performanceplatform.collector.write.requests_with_backoff')
     @mock.patch('performanceplatform.collector.write.logging')
-    def test_logs_on_dry_run(self, mock_logging, mock_requests):
+    def test_logs_on_dry_run(self, mock_logging, mock_requests_with_backoff):
         data_set = DataSet(None, None, dry_run=True)
         data_set.post({'key': datetime(2012, 12, 12)})
 
         eq_(mock_logging.info.call_count, 3)
-        eq_(mock_requests.post.call_count, 0)
+        eq_(mock_requests_with_backoff.post.call_count, 0)
