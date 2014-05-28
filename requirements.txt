@@ -5,3 +5,7 @@ python-dateutil
 logstash_formatter
 gapy
 google-api-python-client==1.0
+lxml>=3.2.0
+dshelpers>=1.0.4
+unicodecsv
+requests>=1.2.0
