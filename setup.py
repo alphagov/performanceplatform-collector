@@ -1,4 +1,6 @@
+import io
 import os
+import re
 from setuptools import setup, find_packages
 
 from performanceplatform import collector
@@ -8,56 +10,75 @@ from performanceplatform import collector
 # http://bugs.python.org/issue15881#msg170215
 import multiprocessing
 
-requirements = [
-    'requests',
-    'pytz==2013d',
-    'argparse',
-    'python-dateutil',
-    'logstash_formatter',
-    'gapy',
-    'google-api-python-client==1.0',
-]
 
-test_requirements = [
-    'PyHamcrest',
-    'nose',
-    'mock',
-    'pep8',
-    'coverage',
-    'freezegun',
-]
+def _read(fname, fail_silently=False):
+    """
+    Read the content of the given file. The path is evaluated from the
+    directory containing this file.
+    """
+    try:
+        filepath = os.path.join(os.path.dirname(__file__), fname)
+        with io.open(filepath, 'rt', encoding='utf8') as f:
+            return f.read()
+    except:
+        if not fail_silently:
+            raise
+        return ''
 
-HERE = os.path.dirname(__file__)
-try:
-    long_description = open(os.path.join(HERE, 'README.rst')).read()
-except:
-    long_description = None
 
-setup(
-    name='performanceplatform-collector',
-    version=collector.__VERSION__,
-    packages=find_packages(exclude=['test*']),
+def _get_version():
+    data = _read(
+        'performanceplatform/collector/__init__.py'
+    )
+    version = re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]",
+        data,
+        re.M | re.I
+    ).group(1).strip()
+    return version.encode('ascii')
 
-    # metadata for upload to PyPI
-    author=collector.__AUTHOR__,
-    author_email=collector.__AUTHOR_EMAIL__,
-    maintainer='Government Digital Service',
-    url='https://github.com/alphagov/performanceplatform-collector',
 
-    description='performanceplatform-collector: tools for sending'
-        'data to the Performance Platform',
-    long_description=long_description,
-    license='MIT',
-    keywords='api data performance_platform',
+def _get_requirements(fname):
+    """
+    Create a list of requirements from the output of the pip freeze command
+    saved in a text file.
+    """
+    packages = _read(fname).split('\n')
+    packages = (p.strip() for p in packages)
+    packages = (p for p in packages if p and not p.startswith('#'))
+    return list(packages)
 
-    install_requires=requirements,
-    tests_require=test_requirements,
 
-    test_suite='nose.collector',
+def _get_long_description():
+    return _read('README.rst')
 
-    entry_points={
-        'console_scripts': [
-            'pp-collector=performanceplatform.collector.main:main'
-        ]
-    }
-)
+
+if __name__ == '__main__':
+    setup(
+        name='performanceplatform-collector',
+        version=_get_version(),
+        packages=find_packages(exclude=['test*']),
+
+        # metadata for upload to PyPI
+        author=collector.__author__,
+        author_email=collector.__author_email__,
+        maintainer='Government Digital Service',
+        url='https://github.com/alphagov/performanceplatform-collector',
+
+        description='performanceplatform-collector: tools for sending'
+            'data to the Performance Platform',
+        long_description=_get_long_description(),
+        license='MIT',
+        keywords='api data performance_platform',
+
+        install_requires=_get_requirements('requirements.txt'),
+        tests_require=_get_requirements('requirements_for_tests.txt'),
+
+        test_suite='nose.collector',
+
+        entry_points={
+            'console_scripts': [
+                'pp-collector=performanceplatform.collector.main:main'
+            ]
+        }
+    )
