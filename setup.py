@@ -5,6 +5,11 @@ from setuptools import setup, find_packages
 
 from performanceplatform import collector
 
+# multiprocessing and logging don't get on with each other in Python
+# vesions < 2.7.4. The following unused import is a workaround. See:
+# http://bugs.python.org/issue15881#msg170215
+import multiprocessing
+
 
 def _read(fname, fail_silently=False):
     """
