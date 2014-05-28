@@ -43,7 +43,7 @@ class Setup(object):
         Create a list of requirements from the output of the pip freeze command
         saved in a text file.
         """
-        packages = Setup.read(fname, fail_silently=True).split('\n')
+        packages = Setup.read(fname).split('\n')
         packages = (p.strip() for p in packages)
         packages = (p for p in packages if p and not p.startswith('#'))
         return list(packages)
