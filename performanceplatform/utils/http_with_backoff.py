@@ -19,14 +19,15 @@ class HttpWithBackoff(Http):
         delay = 10
 
         for n in range(_MAX_RETRIES):
-            (response, content) = super(HttpWithBackoff, self).request(
+            response = super(HttpWithBackoff, self).request(
                 uri,
                 method,
                 body,
                 headers,
                 redirections,
                 connection_type)
-            code = response.status
+            response_headers = response[0]
+            code = response_headers.status
             if code in [403, 502, 503]:
                 logging.info('{} request for {} failed with code {}. '
                              'Retrying in {} seconds...'.format(
