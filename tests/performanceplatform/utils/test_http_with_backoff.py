@@ -28,10 +28,11 @@ def _request_and_assert(request_call,
 
         good_response = Response({})
         good_response.status = 200
+        content = 'some content'
 
-        return [bad_response,
-                bad_response,
-                good_response]
+        return [(bad_response, content),
+                (bad_response, content),
+                (good_response, content)]
 
     mock_request.side_effect = _response_generator(status_code)
     request_call()
@@ -53,6 +54,10 @@ class TestHttpWithBackoff(object):
     def test_request_with_only_uri_calls_Http_with_default_params(
             self,
             mock_request):
+
+        response = Response({})
+        response.status = 200
+        mock_request.return_value = (response, 'content')
         HttpWithBackoff().request('http://fake.com')
 
         mock_request.assert_called_with('http://fake.com',
@@ -66,6 +71,10 @@ class TestHttpWithBackoff(object):
     def test_request_with_full_args_calls_Http_with_args(
             self,
             mock_request):
+
+        response = Response({})
+        response.status = 200
+        mock_request.return_value = (response, 'content')
         HttpWithBackoff().request('http://fake.com',
                                   method="PUT",
                                   body="bar",
@@ -118,7 +127,9 @@ class TestHttpWithBackoff(object):
 
         not_found_response = Response({})
         not_found_response.status = 404
-        mock_request.return_value = not_found_response
+        content = 'content'
+        mock_request.return_value = (not_found_response,
+                                     content)
 
         HttpWithBackoff().request('http://fake.com',
                                   method="PUT",
@@ -141,7 +152,9 @@ class TestHttpWithBackoff(object):
 
         service_unavailable_response = Response({})
         service_unavailable_response.status = 503
-        mock_request.return_value = service_unavailable_response
+        content = 'content'
+        mock_request.return_value = (service_unavailable_response,
+                                     content)
 
         response = HttpWithBackoff().request('http://fake.com',
                                              method="PUT",
