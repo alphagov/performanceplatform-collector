@@ -1,5 +1,5 @@
 from mock import patch, call
-from nose.tools import assert_equal, assert_raises
+from nose.tools import assert_equal
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 from httplib2 import Response
 
@@ -142,7 +142,12 @@ class TestHttpWithBackoff(object):
             [],
             mock_sleep.call_args_list)
 
-        mock_request.assert_called_with('http://fake.com', "PUT", "bar", "foo", 10, "wibble")
+        mock_request.assert_called_with('http://fake.com',
+                                        "PUT",
+                                        "bar",
+                                        "foo",
+                                        10,
+                                        "wibble")
 
     @patch('performanceplatform.utils.http_with_backoff.Http.request')
     @patch('time.sleep')
@@ -163,10 +168,16 @@ class TestHttpWithBackoff(object):
                                              redirections=10,
                                              connection_type="wibble")
 
-        assert_equal(response, service_unavailable_response)
+        assert_equal(response, (service_unavailable_response,
+                                content))
 
         assert_equal(
             [call(10), call(20), call(40), call(80), call(160)],
             mock_sleep.call_args_list)
 
-        mock_request.assert_called_with('http://fake.com', "PUT", "bar", "foo", 10, "wibble")
+        mock_request.assert_called_with('http://fake.com',
+                                        "PUT",
+                                        "bar",
+                                        "foo",
+                                        10,
+                                        "wibble")

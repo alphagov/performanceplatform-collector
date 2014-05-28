@@ -1,4 +1,3 @@
-requests
 pytz==2013d
 argparse
 python-dateutil
