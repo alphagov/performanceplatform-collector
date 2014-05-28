@@ -6,56 +6,52 @@ from setuptools import setup, find_packages
 from performanceplatform import collector
 
 
-class Setup(object):
+def _read(fname, fail_silently=False):
+    """
+    Read the content of the given file. The path is evaluated from the
+    directory containing this file.
+    """
+    try:
+        filepath = os.path.join(os.path.dirname(__file__), fname)
+        with io.open(filepath, 'rt', encoding='utf8') as f:
+            return f.read()
+    except:
+        if not fail_silently:
+            raise
+        return ''
 
-    """A series of helpers for getting the setup looking buff"""
 
-    @staticmethod
-    def read(fname, fail_silently=False):
-        """
-        Read the content of the given file. The path is evaluated from the
-        directory containing this file.
-        """
-        try:
-            filepath = os.path.join(os.path.dirname(__file__), fname)
-            with io.open(filepath, 'rt', encoding='utf8') as f:
-                return f.read()
-        except:
-            if not fail_silently:
-                raise
-            return ''
+def _get_version():
+    data = _read(
+        'performanceplatform/collector/__init__.py'
+    )
+    version = re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]",
+        data,
+        re.M | re.I
+    ).group(1).strip()
+    return version.encode('ascii')
 
-    @staticmethod
-    def version():
-        data = Setup.read(
-            'performanceplatform/collector/__init__.py'
-        )
-        version = re.search(
-            r"^__version__ = ['\"]([^'\"]*)['\"]",
-            data,
-            re.M | re.I
-        ).group(1).strip()
-        return version.encode('ascii')
 
-    @staticmethod
-    def requirements(fname):
-        """
-        Create a list of requirements from the output of the pip freeze command
-        saved in a text file.
-        """
-        packages = Setup.read(fname).split('\n')
-        packages = (p.strip() for p in packages)
-        packages = (p for p in packages if p and not p.startswith('#'))
-        return list(packages)
+def _get_requirements(fname):
+    """
+    Create a list of requirements from the output of the pip freeze command
+    saved in a text file.
+    """
+    packages = _read(fname).split('\n')
+    packages = (p.strip() for p in packages)
+    packages = (p for p in packages if p and not p.startswith('#'))
+    return list(packages)
 
-    @staticmethod
-    def long_description():
-        return Setup.read('README.rst')
+
+def _get_long_description():
+    return _read('README.rst')
+
 
 if __name__ == '__main__':
     setup(
         name='performanceplatform-collector',
-        version=Setup.version(),
+        version=_get_version(),
         packages=find_packages(exclude=['test*']),
 
         # metadata for upload to PyPI
@@ -66,12 +62,12 @@ if __name__ == '__main__':
 
         description='performanceplatform-collector: tools for sending'
             'data to the Performance Platform',
-        long_description=Setup.long_description(),
+        long_description=_get_long_description(),
         license='MIT',
         keywords='api data performance_platform',
 
-        install_requires=Setup.requirements('requirements.txt'),
-        tests_require=Setup.requirements('requirements_for_tests.txt'),
+        install_requires=_get_requirements('requirements.txt'),
+        tests_require=_get_requirements('requirements_for_tests.txt'),
 
         test_suite='nose.collector',
 
