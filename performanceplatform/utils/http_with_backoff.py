@@ -19,7 +19,7 @@ class HttpWithBackoff(Http):
         delay = 10
 
         for n in range(_MAX_RETRIES):
-            response = super(HttpWithBackoff, self).request(
+            (response, content) = super(HttpWithBackoff, self).request(
                 uri,
                 method,
                 body,
