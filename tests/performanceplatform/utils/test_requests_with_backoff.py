@@ -1,7 +1,20 @@
 from mock import patch, call
-from nose.tools import assert_equal, assert_raises
+from nose.tools import assert_equal, assert_raises, assert_is
 import requests
 from performanceplatform.utils import requests_with_backoff
+
+
+def _make_good_response():
+    good_response = requests.Response()
+    good_response.status_code = 200
+    good_response._content = str('Hello')
+    return good_response
+
+
+def _make_bad_response(bad_status_code):
+    bad_response = requests.Response()
+    bad_response.status_code = bad_status_code
+    return bad_response
 
 
 @patch('time.sleep')
@@ -20,12 +33,8 @@ def _request_and_assert(request_call,
     have the passed in status_code.
     """
     def _response_generator(bad_status_code):
-        bad_response = requests.Response()
-        bad_response.status_code = bad_status_code
-
-        good_response = requests.Response()
-        good_response.status_code = 200
-        good_response._content = str('Hello')
+        bad_response = _make_bad_response(bad_status_code)
+        good_response = _make_good_response()
 
         yield bad_response
         yield bad_response
@@ -50,9 +59,13 @@ class TestRequestsWithBackoff(object):
     # tests for GET
     @patch('performanceplatform.utils.requests_with_backoff.request')
     def test_get_proxies_requests_get(self, mock_request):
-        requests_with_backoff.get('http://fake.com',
-                                  kwarg1='a kwarg',
-                                  kwarg2='another kwarg')
+        good_response = _make_good_response()
+        mock_request.return_value = good_response
+
+        response = requests_with_backoff.get('http://fake.com',
+                                             kwarg1='a kwarg',
+                                             kwarg2='another kwarg')
+        assert_is(response, good_response)
 
         mock_request.assert_called_with('GET',
                                         'http://fake.com',
@@ -145,11 +158,15 @@ class TestRequestsWithBackoff(object):
     # tests for POST
     @patch('performanceplatform.utils.requests_with_backoff.request')
     def test_post_proxies_requests_post(self, mock_request):
-        requests_with_backoff.post('http://fake.com',
-                                   data={},
-                                   kwarg1='a kwarg',
-                                   kwarg2='another kwarg')
+        good_response = _make_good_response()
+        mock_request.return_value = good_response
 
+        response = requests_with_backoff.post('http://fake.com',
+                                              data={},
+                                              kwarg1='a kwarg',
+                                              kwarg2='another kwarg')
+
+        assert_is(response, good_response)
         mock_request.assert_called_with('POST',
                                         'http://fake.com',
                                         data={},
