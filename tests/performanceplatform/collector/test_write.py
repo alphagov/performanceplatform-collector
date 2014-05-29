@@ -76,5 +76,5 @@ class TestDataSet(unittest.TestCase):
         data_set = DataSet(None, None, dry_run=True)
         data_set.post({'key': datetime(2012, 12, 12)})
 
-        eq_(mock_logging.info.call_count, 3)
+        eq_(mock_logging.info.call_count, 1)
         eq_(mock_requests_with_backoff.post.call_count, 0)
