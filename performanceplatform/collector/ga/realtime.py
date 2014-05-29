@@ -3,7 +3,9 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import run
 from datetime import datetime
+import logging
 import pytz
+import sys
 
 from performanceplatform.collector.write import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
@@ -77,5 +79,10 @@ def _timestamp():
 
 
 def main(credentials, data_set, query, options, start_at, end_at):
+    if credentials is None:
+        logging.error('{0} requires credentials, see the README'.format(
+            __name__))
+        sys.exit()
+
     collector = Collector(credentials)
     collector.send_records_for(query, data_set)

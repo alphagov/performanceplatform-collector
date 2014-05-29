@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import json
 import logging
+import sys
 
 from performanceplatform.collector.write import DataSet
 
@@ -10,6 +11,11 @@ _EARLIEST_DATE = datetime(2005, 1, 1)
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):
+    if credentials is None:
+        logging.error('{0} requires credentials, see the README'.format(
+            __name__))
+        sys.exit()
+
     start_dt, end_dt = parse_time_range(start_at, end_at)
 
     pingdom = Pingdom(credentials)

@@ -1,4 +1,7 @@
 import base64
+import logging
+import sys
+
 from datetime import date, timedelta
 import gapy.client
 
@@ -106,6 +109,10 @@ def flatten_data_and_assign_ids(data):
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):
+    if credentials is None:
+        logging.error('{0} requires credentials, see the README'.format(
+            __name__))
+        sys.exit()
 
     credentials = credentials
     client = gapy.client.from_secrets_file(
