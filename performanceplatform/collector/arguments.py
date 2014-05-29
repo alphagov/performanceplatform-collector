@@ -17,8 +17,7 @@ def parse_args(name="", args=None):
     parser.add_argument('-c', '--credentials', dest='credentials',
                         type=_load_json_file,
                         help='JSON file containing credentials '
-                             'for the collector',
-                        required=True)
+                             'for the collector')
     parser.add_argument('-q', '--query', dest='query',
                         type=_load_json_file,
                         help='JSON file containing details '

@@ -20,12 +20,14 @@ class TestParseArgs(object):
                                               "-t", config_path,
                                               "-b", config_path])
 
-    def test_config_path_is_required(self):
-        with json_file({}) as query_path:
-            assert_raises(
-                SystemExit, parse_args, args=["-q", query_path,
-                                              "-t", query_path,
-                                              "-b", query_path])
+    def test_credentials_are_optional(self):
+        with json_file({}) as config_path:
+            with json_file({}) as query_path:
+                parse_args(
+                    args=["-q", query_path,
+                          "-t", config_path,
+                          "-b", config_path]
+                )
 
     def test_start_and_end_fields_are_allowed(self):
         with json_file({}) as config_path:
