@@ -31,4 +31,5 @@ def main(credentials, data_set_config, query, options, start_at, end_at,
     aggregate_and_save()
 
     data_set = DataSet.from_config(data_set_config)
+    data_set.empty_data_set()
     push_aggregates(data_set)
