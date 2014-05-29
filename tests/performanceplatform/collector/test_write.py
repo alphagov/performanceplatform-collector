@@ -23,6 +23,18 @@ class TestDataSet(unittest.TestCase):
         eq_(data_set.token, 'bar')
         eq_(data_set.dry_run, True)
 
+    @mock.patch('performanceplatform.collector.write.requests')
+    def test_empty_data_set(self, mock_requests):
+        data_set = DataSet('some-url', 'some-token')
+        data_set.empty_data_set()
+        mock_requests.put.assert_called_with(
+            url='some-url',
+            headers={
+                'Authorization': 'Bearer some-token',
+                'Content-type': 'application/json'
+            },
+            data='[]')
+
     @mock.patch('performanceplatform.collector.write.requests_with_backoff')
     def test_post_data_to_data_set(self, mock_requests_with_backoff):
         data_set = DataSet('foo', 'bar')
