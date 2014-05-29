@@ -35,9 +35,14 @@ Usage
 
 ::
 
-    $ pp-collect -q [query_path] -c [credentials_path] -t [token_path] -b [backdrop_path]
+    $ pp-collect -q [query_path] -t [token_path] -b [backdrop_path]
 
 There are also some optional command line arguments you can provide pp-collect::
+
+    -c [credentials_path]
+    Some entrypoints will require credentials in order to authenticate with the 3rd party
+    services they pull data from. If it is required and you haven't provided a credentials
+    file pp-collector will log an error and exit.
 
     --console-logging
     Rather than logging out to log/collector.log it will output all logs to stdout/err
