@@ -1,5 +1,6 @@
 import datetime
 import logging
+import requests
 import pytz
 from performanceplatform.utils import requests_with_backoff
 import json
@@ -30,17 +31,28 @@ class DataSet(object):
         self.token = token
         self.dry_run = dry_run
 
-    def post(self, records):
-        headers = {
-            "Authorization": "Bearer %s" % self.token,
+    @staticmethod
+    def _make_headers(token):
+        return {
+            "Authorization": "Bearer {}".format(token),
             "Content-type": "application/json"
         }
-        json_body = json.dumps(records, cls=JsonEncoder)
+
+    @staticmethod
+    def _encode_json(data):
+        return json.dumps(data, cls=JsonEncoder)
+
+    @staticmethod
+    def _log_request(method, url, headers, body):
+        logging.info("HTTP {} to '{}'\nheaders: {}\nbody: {}".format(
+            method, url, headers, body))
+
+    def post(self, records):
+        headers = DataSet._make_headers(self.token)
+        json_body = DataSet._encode_json(records)
 
         if self.dry_run:
-            logging.info(self.url)
-            logging.info(headers)
-            logging.info(json_body)
+            DataSet._log_request('POST', self.url, headers, json_body)
         else:
             response = requests_with_backoff.post(
                 url=self.url,
@@ -57,3 +69,14 @@ class DataSet(object):
                 raise
 
             logging.debug("[PP] " + response.text)
+
+    def empty_data_set(self):
+        headers = DataSet._make_headers(self.token)
+        json_body = DataSet._encode_json([])
+
+        if self.dry_run:
+            DataSet._log_request('PUT', self.url, headers, json_body)
+        else:
+            response = requests.put(
+                url=self.url, headers=headers, data=json_body)
+            response.raise_for_status()
