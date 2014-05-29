@@ -96,7 +96,17 @@ The following entrypoints are currently available::
     performanceplatform.collector.ga.realtime
     performanceplatform.collector.pingdom
 
-
-
 Extending performanceplatform-collector
-========================================
+=======================================
+
+performanceplatform-collector can be extended to support new types of
+collector. To do so you'll need to add new entrypoints. For each new type of
+collector create a file at::
+
+    performanceplatform/collector/mycollectortype/__init__.py
+
+Inside that file add a ``main`` function which has the following signature::
+
+    main(credentials, data_set_config, query, options, start_at, end_at)
+
+These arguments are all strings which are forwarded from the command line.
