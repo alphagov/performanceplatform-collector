@@ -1,5 +1,6 @@
 import datetime
 import logging
+import requests
 import pytz
 from performanceplatform.utils import requests_with_backoff
 import json
@@ -68,3 +69,14 @@ class DataSet(object):
                 raise
 
             logging.debug("[PP] " + response.text)
+
+    def empty_data_set(self):
+        headers = DataSet._make_headers(self.token)
+        json_body = DataSet._encode_json([])
+
+        if self.dry_run:
+            DataSet._log_request('PUT', self.url, headers, json_body)
+        else:
+            response = requests.put(
+                url=self.url, headers=headers, data=json_body)
+            response.raise_for_status()
