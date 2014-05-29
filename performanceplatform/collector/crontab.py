@@ -49,6 +49,16 @@ def parse_job_line(line):
     return parsed
 
 
+def generate_creds_option(path_to_app, credentials):
+    if len(credentials) > 0:
+        credentials_option = \
+            '-c {0}/config/{1}'.format(path_to_app, credentials)
+    else:
+        credentials_option = ''
+
+    return credentials_option
+
+
 def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
     """Returns a crontab with jobs from job path
 
@@ -57,7 +67,7 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
     """
     job_template = '{schedule} {app_path}/venv/bin/pp-collector ' \
                    '-q {app_path}/config/{query} ' \
-                   '-c {app_path}/config/{credentials} ' \
+                   '{credentials_option} ' \
                    '-t {app_path}/config/{token} ' \
                    '-b {app_path}/config/{performanceplatform} ' \
                    '>> {app_path}/log/out.log 2>> {app_path}/log/error.log'
@@ -78,7 +88,8 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
                         schedule=schedule,
                         app_path=path_to_app,
                         query=query,
-                        credentials=credentials,
+                        credentials_option=generate_creds_option(
+                            path_to_app, credentials),
                         token=token,
                         performanceplatform=performanceplatform
                     )

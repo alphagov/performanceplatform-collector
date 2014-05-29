@@ -155,6 +155,22 @@ class TestGenerateCrontab(object):
                         has_item(
                             contains_string(job_contains)))
 
+    def test_can_handle_lack_of_credentials(self):
+        temp_contents = ("# some comment\n"
+                         "          \n"
+                         "schedule,query,,token,performanceplatforn\n")
+
+        with temp_file(temp_contents) as something:
+            generated_jobs = crontab.generate_crontab(
+                [],
+                something,
+                "/path/to/my-app",
+                "unique-id-of-my-app"
+            )
+            assert_that(generated_jobs,
+                        has_item(
+                            is_not(contains_string('-c'))))
+
 
 class ProcessFailureError(StandardError):
     def __init__(self, code, command, output):
