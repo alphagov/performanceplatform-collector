@@ -89,17 +89,14 @@ will find much more indepth information about the collector configuration in the
 Entrypoints
 ===========
 
-performanceplatform.collector.ga
---------------------------------
+The following entrypoints are currently available::
 
-performanceplatform.collector.ga.trending
------------------------------------------
+    performanceplatform.collector.ga
+    performanceplatform.collector.ga.trending
+    performanceplatform.collector.ga.realtime
+    performanceplatform.collector.pingdom
 
-performanceplatform.collector.ga.realtime
------------------------------------------
 
-performanceplatform.collector.pingdom
--------------------------------------
 
 Extending performanceplatform-collector
 ========================================
