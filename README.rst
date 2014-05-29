@@ -33,11 +33,11 @@ From source
 Usage
 =====
 
-::
+pp-collector takes paths to various JSON files as arguments::
 
-    $ pp-collect -q [query_path] -c [credentials_path] -t [token_path] -b [backdrop_path]
+    $ pp-collector -q [query file] -c [credentials file] -t [token file] -b [backdrop file]
 
-There are also some optional command line arguments you can provide pp-collect::
+There are also some optional command line arguments you can provide pp-collector::
 
     --console-logging
     Rather than logging out to log/collector.log it will output all logs to stdout/err
@@ -49,11 +49,11 @@ There are also some optional command line arguments you can provide pp-collect::
 Configuration
 -------------
 
-There are four configuration files that get injected into pp-collect and are the four required
+There are four configuration files that get injected into pp-collector and are the four required
 parameters:
 
 - Query, contains everything about what the collector will do during execution. It provides an entrypoint
-  that pp-collect will execute and provide the query and options k-v pairs::
+  that pp-collector will execute and provide the query and options k-v pairs::
 
       {
         "entrypoint": "performanceplatform.collector.pingdom",
