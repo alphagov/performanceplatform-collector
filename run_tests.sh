@@ -46,7 +46,7 @@ function run_style_checks {
 }
 
 function run_unit_tests {
-    python setup.py test
+    NOSE_WITH_DOCTEST=1 python setup.py test
     display_result $? 1 "Unit tests"
 }
 

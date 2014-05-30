@@ -56,7 +56,7 @@ def _get_data_group_data_type(query):
 
 def _get_query_params(query):
     """
-    >>> _get_data_group_data_type({'query': {'a': 1, 'c': 3, 'b': 5}})
+    >>> _get_query_params({'query': {'a': 1, 'c': 3, 'b': 5}})
     'a=1 b=5 c=3'
     """
     query_params = OrderedDict(sorted(query['query'].items()))
