@@ -3,6 +3,7 @@ import json
 import logging
 import re
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
+from performanceplatform.utils import statsd
 
 from gapy.client import from_private_key, from_secrets_file
 
@@ -16,6 +17,7 @@ def create_client(credentials):
             credentials['CLIENT_SECRETS'],
             storage_path=credentials['STORAGE_PATH'],
             http_client=HttpWithBackoff(),
+            ga_hook=track_ga_api_usage,
         )
     else:
         return from_private_key(
@@ -23,9 +25,14 @@ def create_client(credentials):
             private_key_path=credentials['PRIVATE_KEY'],
             storage_path=credentials['STORAGE_PATH'],
             http_client=HttpWithBackoff(),
+            ga_hook=track_ga_api_usage,
         )
 
 
+def track_ga_api_usage(kwargs):
+    statsd.incr('ga.core.{}.count'.format(kwargs['ids'].replace(':', '')))
+
+        
 def query_ga(client, config, start_date, end_date):
     logging.info("Querying GA for data in the period: %s - %s"
                  % (str(start_date), str(end_date)))
