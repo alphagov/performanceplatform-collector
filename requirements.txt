@@ -8,3 +8,4 @@ lxml>=3.2.0
 dshelpers>=1.0.4
 unicodecsv
 requests>=1.2.0
+statsd==3.0
