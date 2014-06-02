@@ -54,6 +54,17 @@ class DataSet(object):
         if self.dry_run:
             DataSet._log_request('POST', self.url, headers, json_body)
         else:
+            if len(json_body) > 2048:
+                # compress the request
+                headers["Content-Encoding"] = "gzip"
+                import gzip
+                from io import BytesIO
+                bio = BytesIO()
+                f = gzip.GzipFile(filename='', mode='wb', fileobj=bio)
+                f.write(json_body)
+                f.close()
+                json_body = bio
+
             response = requests_with_backoff.post(
                 url=self.url,
                 headers=headers,
