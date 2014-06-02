@@ -33,11 +33,11 @@ From source
 Usage
 =====
 
-::
+pp-collector takes paths to various JSON files as arguments::
 
-    $ pp-collect -q [query_path] -c [credentials_path] -t [token_path] -b [backdrop_path]
+    $ pp-collector -q [query file] -c [credentials file] -t [token file] -b [backdrop file]
 
-There are also some optional command line arguments you can provide pp-collect::
+There are also some optional command line arguments you can provide pp-collector::
 
     --console-logging
     Rather than logging out to log/collector.log it will output all logs to stdout/err
@@ -49,11 +49,11 @@ There are also some optional command line arguments you can provide pp-collect::
 Configuration
 -------------
 
-There are four configuration files that get injected into pp-collect and are the four required
+There are four configuration files that get injected into pp-collector and are the four required
 parameters:
 
 - Query, contains everything about what the collector will do during execution. It provides an entrypoint
-  that pp-collect will execute and provide the query and options k-v pairs::
+  that pp-collector will execute and provide the query and options k-v pairs::
 
       {
         "entrypoint": "performanceplatform.collector.pingdom",
@@ -89,17 +89,24 @@ will find much more indepth information about the collector configuration in the
 Entrypoints
 ===========
 
-performanceplatform.collector.ga
---------------------------------
+The following entrypoints are currently available::
 
-performanceplatform.collector.ga.trending
------------------------------------------
-
-performanceplatform.collector.ga.realtime
------------------------------------------
-
-performanceplatform.collector.pingdom
--------------------------------------
+    performanceplatform.collector.ga
+    performanceplatform.collector.ga.trending
+    performanceplatform.collector.ga.realtime
+    performanceplatform.collector.pingdom
 
 Extending performanceplatform-collector
-========================================
+=======================================
+
+performanceplatform-collector can be extended to support new types of
+collector. To do so you'll need to add new entrypoints. For each new type of
+collector create a file at::
+
+    performanceplatform/collector/mycollectortype/__init__.py
+
+Inside that file add a ``main`` function which has the following signature::
+
+    main(credentials, data_set_config, query, options, start_at, end_at)
+
+These arguments are all strings which are forwarded from the command line.
