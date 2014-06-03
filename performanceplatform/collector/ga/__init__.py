@@ -12,8 +12,8 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
 
     documents = query_documents_for(
         client, query, options,
-        data_set_config['data-type'], start_at, end_at
-    )
+        options.get('dataType', data_set_config['data-type']),
+        start_at, end_at)
 
     data_set = DataSet.from_config(data_set_config)
     send_data(data_set, documents)
