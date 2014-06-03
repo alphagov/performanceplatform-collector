@@ -207,6 +207,7 @@ def query_documents_for(client, query, options,
                         data_type, start_date, end_date):
     results = query_for_range(client, query, start_date, end_date)
 
+    data_type = options.get('dataType', data_type)
     mappings = options.get("mappings", {})
     idMapping = options.get("idMapping", None)
 

@@ -350,6 +350,60 @@ def test_plugin():
     assert_not_in("customVarValue9", result[0])
 
 
+def test_data_type_can_be_overriden():
+    ga_response = {
+        "metrics": {"visits": "12345"},
+        "dimensions": {"date": "2014-04-02"},
+        "start_date": date(2013, 4, 1)
+    }
+
+    client = mock.Mock()
+    client.query.get.return_value = [
+        ga_response
+    ]
+
+    query = {
+        "id": "ga:123",
+        "metrics": ["visits"],
+        "dimensions": ["date"],
+    }
+    data_type = "original"
+    options = {"dataType": "overriden"}
+
+    start, end = date(2013, 4, 1), date(2014, 4, 7)
+
+    result = query_documents_for(client, query, options, data_type, start, end)
+
+    eq_(result[0]['dataType'], 'overriden')
+
+
+def test_data_type_defaults_to_passed_in_data_type():
+    ga_response = {
+        "metrics": {"visits": "12345"},
+        "dimensions": {"date": "2014-04-02"},
+        "start_date": date(2013, 4, 1)
+    }
+
+    client = mock.Mock()
+    client.query.get.return_value = [
+        ga_response
+    ]
+
+    query = {
+        "id": "ga:123",
+        "metrics": ["visits"],
+        "dimensions": ["date"],
+    }
+    data_type = "original"
+    options = {}
+
+    start, end = date(2013, 4, 1), date(2014, 4, 7)
+
+    result = query_documents_for(client, query, options, data_type, start, end)
+
+    eq_(result[0]['dataType'], 'original')
+
+
 def test_query_ga_with_sort():
     config = {
         "id": "ga:123",
