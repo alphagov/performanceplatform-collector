@@ -8,6 +8,7 @@ import json
 import os
 from datetime import date, timedelta
 import subprocess
+from os.path import join
 
 # These ones do not have data sets in stagecraft
 # driving-test-practical-public/device-usage
@@ -39,21 +40,27 @@ def load_json(path):
     with open(path) as f:
         return json.load(f)
 
+
 def get_token_path(config_path, token_id):
-    return os.path.join(config_path, 'tokens', '{}.json'.format(token_id))
+    return join(config_path, 'tokens', '{}.json'.format(token_id))
+
 
 def get_token(config_path, token_id):
     token_path = get_token_path(config_path, token_id)
     return load_json(token_path)['token']
 
+
 def get_query_path(config_path, config_id):
-    return os.path.join(config_path, 'queries', '{}.json'.format(config_id))
+    return join(config_path, 'queries', '{}.json'.format(config_id))
+
 
 def get_config(config_path, config_id):
     return load_json(get_query_path(config_path, config_id))
 
+
 def get_base_url(config_path):
-    return load_json(os.path.join(config_path, 'performanceplatform.json'))['url']
+    return load_json(join(config_path, 'performanceplatform.json'))['url']
+
 
 def empty_dataset(config_path, data_set, token):
     url = '{}/{}/{}'.format(
@@ -70,7 +77,8 @@ def empty_dataset(config_path, data_set, token):
 
 
 def months_ago(n):
-    return date.today() - timedelta(days=31*n)
+    return date.today() - timedelta(days=31 * n)
+
 
 def run_initial_backfill(config_path, config_id, config):
     print("BACKFILL ONE: {}".format(config_id))
@@ -85,15 +93,17 @@ def run_further_backfill(config_path, config_id, config):
     end_at = months_ago(2)
     run_backfill(config_path, config_id, config, start_at, end_at)
 
+
 def run_backfill(config_path, config_id, config, start_at, end_at):
-    collector_path = '/opt/performanceplatform-collector/shared/venv/bin/pp-collector'
+    collector_path = '/opt/performanceplatform-collector/shared/' \
+                     'venv/bin/pp-collector'
     collector_path = '/home/vagrant/.virtualenvs/collector/bin/pp-collector'
     query_path = get_query_path(config_path, config_id)
-    credentials_path = os.path.join(config_path, 'credentials', 'ga.json')
+    credentials_path = join(config_path, 'credentials', 'ga.json')
     token_path = get_token_path(config_path, config['token'])
-    platform_path = os.path.join(config_path, 'performanceplatform.json')
+    platform_path = join(config_path, 'performanceplatform.json')
 
-    command = [collector_path, 
+    command = [collector_path,
                '-q', query_path,
                '-c', credentials_path,
                '-t', token_path,
@@ -131,7 +141,5 @@ def main(argv):
         run_further_backfill(args.config_path, config_id, config)
 
 
-
 if __name__ == '__main__':
     main(sys.argv)
-
