@@ -103,7 +103,13 @@ def run_backfill(config_path, config_id, config, start_at, end_at):
     if end_at is not None:
         command += ['-e', end_at.isoformat()]
 
-    subprocess.call(command)
+    status = subprocess.call(command,
+                             stderr=sys.stdout.fileno(),
+                             stdout=sys.stdout.fileno())
+
+    if status != 0:
+        print("Failed!")
+        raise SystemExit(1)
 
 
 def main(argv):
