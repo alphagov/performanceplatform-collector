@@ -179,12 +179,12 @@ def build_document_set(results, data_type, mappings, idMapping=None):
             for item in results]
 
 
-def query_for_range(client, query, period_start, period_end):
+def query_for_range(client, query, range_start, range_end):
     items = []
-    extend = items.extend
+    frequency = query.get('frequency', 'weekly')
 
-    for start, end in period_range(period_start, period_end):
-        extend(query_ga(client, query, start, end))
+    for start, end in period_range(range_start, range_end, frequency):
+        items.extend(query_ga(client, query, start, end))
 
     return items
 
