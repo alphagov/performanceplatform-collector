@@ -25,11 +25,11 @@ def to_utc(a_datetime):
     return a_datetime.astimezone(pytz.UTC)
 
 
-def period_range(start_date, end_date, repeat):
-    #and start_date/end_date currently never passed in
+def period_range(start, end, repeat=None):
+    # and start_date/end_date currently never passed in
     if not repeat:
-        start_date = to_date(start_date) or a_week_ago()
-        end_date = to_date(end_date) or a_week_ago()
+        start_date = to_date(start) or a_week_ago()
+        end_date = to_date(end) or a_week_ago()
 
         if start_date > end_date:
             raise ValueError("Bad period: !(start_date={0} <= end_date={1})"
@@ -42,28 +42,35 @@ def period_range(start_date, end_date, repeat):
         while start_date <= end_date:
             yield (start_date, start_date + timedelta(days=6))
             start_date += period
-    if repeat == 'day'
-        #two because with weekly we collect last week again every day
-        #with this we will collect last two days every day
-        #two days ago should return start of day
-        #passed in dates must be verified 2 days apart otherwise generate them
-        start_date = to_date(start_date) or two_days_ago()
-        end_date = to_date(end_date) or two_days_ago()
+    if repeat == 'daily':
+        start_date = to_date(start) or a_day_ago()
+        end_date = to_date(end) or a_day_ago()
 
         if start_date > end_date:
             raise ValueError("Bad period: !(start_date={0} <= end_date={1})"
                              .format(start_date, end_date))
 
-        start_date.to_start_of_day()
-
-        #don't go over sensible end date
         period = timedelta(days=2)
         while start_date <= end_date:
             yield (start_date, start_date + timedelta(days=1))
             start_date += period
-    if repeat == 'hour'
-        #etc. do some stuff
+    if repeat == 'hourly':
+        start_time = start or an_hour_ago()
+        end_time = end or an_hour_ago()
+
+        if start_time > end_time:
+            raise ValueError("Bad period: !(start_date={0} <= end_date={1})"
+                             .format(start_date, end_date))
+
+        period = timedelta(days=2)
+        while start_date <= end_date:
+            yield (start_date, start_date + timedelta(days=1))
+            start_date += period
 
 
 def a_week_ago():
     return date.today() - timedelta(days=7)
+
+
+def a_day_ago():
+    return date.today() - timedelta(days=1)
