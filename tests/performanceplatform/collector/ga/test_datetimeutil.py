@@ -1,8 +1,12 @@
 from datetime import date, datetime
+import pytz
 from hamcrest import assert_that, only_contains, is_, equal_to
 from nose.tools import raises
 from freezegun import freeze_time
-from performanceplatform.collector.ga.datetimeutil import period_range, to_date
+from performanceplatform.collector.ga.datetimeutil import(
+    period_range,
+    to_date,
+    to_datetime)
 
 
 def test_to_date_passes_none_through():
@@ -72,4 +76,88 @@ def test_period_range_returns_the_containing_week_when_start_equals_end():
     range = period_range(date(2013, 4, 8), date(2013, 4, 8))
     assert_that(range, only_contains(
         (date(2013, 4, 8), date(2013, 4, 14))
+    ))
+
+
+# daily
+@freeze_time("2013-04-2")
+def test_daily_period_range_defaults_to_a_day_ago():
+    range = period_range(None, None, 'daily')
+    assert_that(range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2))
+    ))
+
+
+def test_daily_period_range():
+    range = period_range(date(2013, 4, 1), date(2013, 4, 2), 'daily')
+    assert_that(range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2))
+    ))
+
+    another_range = period_range(date(2013, 4, 1), date(2013, 4, 3), 'daily')
+    assert_that(another_range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2)),
+        (date(2013, 4, 3), date(2013, 4, 4)),
+        (date(2013, 4, 5), date(2013, 4, 6)),
+    ))
+
+
+def test_daily_period_range_between_datetime_and_date():
+    range = period_range(datetime(2013, 4, 1), date(2013, 4, 2), 'daily')
+    assert_that(range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2))
+    ))
+
+
+@raises(ValueError)
+def test_daily_period_range_fails_when_end_is_before_start():
+    list(period_range(date(2013, 4, 8), date(2013, 4, 1), 'daily'))
+
+
+def test_daily_period_range_returns_the_containing_day_when_start_equals_end():
+    range = period_range(date(2013, 4, 8), date(2013, 4, 8), 'daily')
+    assert_that(range, only_contains(
+        (date(2013, 4, 8), date(2013, 4, 9))
+    ))
+
+
+# hourly, something to worry about with utc
+@freeze_time("2013-04-2")
+def test_hourly_period_range_defaults_to_a_day_ago():
+    range = period_range(None, None, 'hourly')
+    assert_that(range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2))
+    ))
+
+
+def test_hourly_period_range():
+    range = period_range(date(2013, 4, 1), date(2013, 4, 2), 'hourly')
+    assert_that(range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2))
+    ))
+
+    another_range = period_range(date(2013, 4, 1), date(2013, 4, 3), 'hourly')
+    assert_that(another_range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2)),
+        (date(2013, 4, 3), date(2013, 4, 4)),
+        (date(2013, 4, 5), date(2013, 4, 6)),
+    ))
+
+
+def test_hourly_period_range_between_datetime_and_date():
+    range = period_range(datetime(2013, 4, 1), date(2013, 4, 2), 'hourly')
+    assert_that(range, only_contains(
+        (date(2013, 4, 1), date(2013, 4, 2))
+    ))
+
+
+@raises(ValueError)
+def test_hourly_period_range_fails_when_end_is_before_start():
+    list(period_range(date(2013, 4, 8), date(2013, 4, 1), 'hourly'))
+
+
+def test_hourly_period_range_returns_the_containing_day_when_start_equals_end():
+    range = period_range(date(2013, 4, 8), date(2013, 4, 8), 'hourly')
+    assert_that(range, only_contains(
+        (date(2013, 4, 8), date(2013, 4, 9))
     ))
