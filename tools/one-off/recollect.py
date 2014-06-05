@@ -8,7 +8,7 @@ import json
 import os
 from datetime import date, timedelta
 import subprocess
-from os.path import join
+from os.path import join, dirname
 
 # These ones do not have data sets in stagecraft
 # driving-test-practical-public/device-usage
@@ -95,9 +95,7 @@ def run_further_backfill(config_path, config_id, config):
 
 
 def run_backfill(config_path, config_id, config, start_at, end_at):
-    collector_path = '/opt/performanceplatform-collector/shared/' \
-                     'venv/bin/pp-collector'
-    collector_path = '/home/vagrant/.virtualenvs/collector/bin/pp-collector'
+    collector_path = join(dirname(sys.executable), 'pp-collector')
     query_path = get_query_path(config_path, config_id)
     credentials_path = join(config_path, 'credentials', 'ga.json')
     token_path = get_token_path(config_path, config['token'])
