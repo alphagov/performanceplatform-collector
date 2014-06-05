@@ -54,7 +54,7 @@ class DataSet(object):
         if self.dry_run:
             DataSet._log_request('POST', self.url, headers, json_body)
         else:
-            if len(json_body) > 2048:
+            if False and len(json_body) > 2048:
                 # compress the request
                 headers["Content-Encoding"] = "gzip"
                 import gzip
