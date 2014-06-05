@@ -58,14 +58,18 @@ def period_range(start, end, repeat=None):
         start_time = start or an_hour_ago()
         end_time = end or an_hour_ago()
 
-        if start_time > end_time:
-            raise ValueError("Bad period: !(start_date={0} <= end_date={1})"
-                             .format(start_date, end_date))
+        start_time = to_start_of_hour(start_time)
+        end_time = to_start_of_hour(end_time)
 
-        period = timedelta(days=2)
-        while start_date <= end_date:
-            yield (start_date, start_date + timedelta(days=1))
-            start_date += period
+        if start_time > end_time:
+            raise ValueError("Bad period: !(start_time={0} <= end_time={1})"
+                             .format(start_time, end_time))
+
+        period = timedelta(hours=2)
+        while start_time <= end_time:
+            print start_time, start_time + timedelta(hours=1)
+            yield (start_time, start_time + timedelta(hours=1))
+            start_time += period
 
 
 def a_week_ago():
@@ -74,3 +78,13 @@ def a_week_ago():
 
 def a_day_ago():
     return date.today() - timedelta(days=1)
+
+
+def an_hour_ago():
+    return datetime.now() - timedelta(hours=1)
+
+
+def to_start_of_hour(datetime):
+    return datetime - timedelta(
+        minutes=datetime.minute,
+        seconds=datetime.second)
