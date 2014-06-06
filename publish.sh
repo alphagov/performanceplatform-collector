@@ -40,7 +40,6 @@ function pypi_check(){
 }
 
 function publish(){
-    VERSION=$1
     git tag -a $VERSION -m "Automatically published from jenkins"
     echo "Pushing tags to github and publishing ${VERSION} to PyPI" | pretty
     git push origin --tags
