@@ -1,4 +1,6 @@
 from datetime import datetime, time, timedelta, date
+# from dateutil.relativedata import relativedelta
+from dateutil.relativedelta import *
 import pytz
 
 
@@ -70,6 +72,19 @@ def period_range(start, end, repeat=None):
             # print start_time, start_time + timedelta(hours=1)
             yield (start_time, start_time + timedelta(hours=1))
             start_time += period
+    if repeat == 'monthly':
+        start_time = start_of_previous_month(start)
+        end_time = end_of_previous_month(end)
+
+        if start_time > end_time:
+            raise ValueError("Bad period: !(start_time={0} <= end_time={1})"
+                             .format(start_time, end_time))
+
+        while start_time <= end_time:
+            period = start_time + relativedelta(months=+1)
+            yield (to_date(start_time),
+                   to_date(period - timedelta(days=1)))
+            start_time = period
 
 
 def a_week_ago():
@@ -83,6 +98,20 @@ def a_day_ago():
 def an_hour_ago():
     return datetime.now() - timedelta(hours=1)
 
+def a_month_ago():
+    pass
+
+def end_of_previous_month(date):
+    if not date:
+        date = to_date(datetime.now())
+    return date.replace(day=1) - timedelta(days=1)
+
+def number_of_days_in_month():
+    pass
+
+
+def start_of_previous_month(date):
+    return end_of_previous_month(date).replace(day=1)
 
 def to_start_of_hour(datetime):
     return datetime - timedelta(

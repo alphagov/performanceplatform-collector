@@ -59,7 +59,7 @@ def test_period_range_adjusts_dates():
     ))
 
 
-@freeze_time("2013-04-10")
+@freeze_time("2013-04-11")
 def test_period_range_defaults_to_a_week_ago():
     range = period_range(None, None)
     assert_that(range, only_contains(
@@ -121,6 +121,33 @@ def test_daily_period_range_returns_the_containing_day_when_start_equals_end():
         (date(2013, 4, 8), date(2013, 4, 8))
     ))
 
+@freeze_time("2013-04-02", tz_offset=0)
+def test_monthly_period_range_defaults_to_a_month_ago():
+    range = period_range(None, None, 'monthly')
+    # from pprint import pprint
+    # pprint(range)
+    assert_that(range, only_contains(
+        (date(2013, 3, 1), date(2013, 3, 31))
+    ))
+
+def test_monthly_period_range():
+    range = period_range(date(2013, 3, 1), date(2013, 3, 31), 'monthly')
+    assert_that(range, only_contains(
+        (date(2013, 2, 1), date(2013, 2, 28))
+    ))
+
+    another_range = list(period_range(date(2012, 12, 1), date(2013, 2, 28), 'monthly'))
+    print another_range
+    assert_that(another_range, only_contains(
+        (date(2012, 11, 1), date(2012, 11, 30)),
+        (date(2012, 12, 1), date(2012, 12, 31)),
+        (date(2013, 1, 1), date(2013, 1, 31)),
+    ))
+
+
+@raises(ValueError)
+def test_monthly_period_range_fails_when_end_is_before_start():
+    list(period_range(date(2013, 4, 8), date(2013, 4, 1), 'daily'))
 
 # hourly, something to worry about with utc
 @freeze_time("2013-04-02 11:53:00", tz_offset=0)
