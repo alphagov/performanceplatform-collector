@@ -84,28 +84,29 @@ def test_period_range_returns_the_containing_week_when_start_equals_end():
 def test_daily_period_range_defaults_to_a_day_ago():
     range = period_range(None, None, 'daily')
     assert_that(range, only_contains(
-        (date(2013, 4, 1), date(2013, 4, 2))
+        (date(2013, 4, 1), date(2013, 4, 1))
     ))
 
 
 def test_daily_period_range():
-    range = period_range(date(2013, 4, 1), date(2013, 4, 2), 'daily')
+    range = period_range(date(2013, 4, 1), date(2013, 4, 1), 'daily')
     assert_that(range, only_contains(
-        (date(2013, 4, 1), date(2013, 4, 2))
+        (date(2013, 4, 1), date(2013, 4, 1))
     ))
 
     another_range = period_range(date(2013, 4, 1), date(2013, 4, 3), 'daily')
     assert_that(another_range, only_contains(
-        (date(2013, 4, 1), date(2013, 4, 2)),
-        (date(2013, 4, 3), date(2013, 4, 4)),
-        (date(2013, 4, 5), date(2013, 4, 6)),
+        (date(2013, 4, 1), date(2013, 4, 1)),
+        (date(2013, 4, 2), date(2013, 4, 2)),
+        (date(2013, 4, 3), date(2013, 4, 3)),
     ))
 
 
 def test_daily_period_range_between_datetime_and_date():
     range = period_range(datetime(2013, 4, 1), date(2013, 4, 2), 'daily')
     assert_that(range, only_contains(
-        (date(2013, 4, 1), date(2013, 4, 2))
+        (date(2013, 4, 1), date(2013, 4, 1)),
+        (date(2013, 4, 2), date(2013, 4, 2))
     ))
 
 
@@ -117,7 +118,7 @@ def test_daily_period_range_fails_when_end_is_before_start():
 def test_daily_period_range_returns_the_containing_day_when_start_equals_end():
     range = period_range(date(2013, 4, 8), date(2013, 4, 8), 'daily')
     assert_that(range, only_contains(
-        (date(2013, 4, 8), date(2013, 4, 9))
+        (date(2013, 4, 8), date(2013, 4, 8))
     ))
 
 

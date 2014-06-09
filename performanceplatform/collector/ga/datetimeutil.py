@@ -50,9 +50,9 @@ def period_range(start, end, repeat=None):
             raise ValueError("Bad period: !(start_date={0} <= end_date={1})"
                              .format(start_date, end_date))
 
-        period = timedelta(days=2)
+        period = timedelta(days=1)
         while start_date <= end_date:
-            yield (start_date, start_date + timedelta(days=1))
+            yield (start_date, start_date)
             start_date += period
     if repeat == 'hourly':
         start_time = start or an_hour_ago()
@@ -67,7 +67,7 @@ def period_range(start, end, repeat=None):
 
         period = timedelta(hours=2)
         while start_time <= end_time:
-            print start_time, start_time + timedelta(hours=1)
+            # print start_time, start_time + timedelta(hours=1)
             yield (start_time, start_time + timedelta(hours=1))
             start_time += period
 
