@@ -88,13 +88,24 @@ The query file contains everything about what the collector will do during execu
 
 **Entrypoints:**
 
+Entrypoints describe a python package path
+
 The following entrypoints are currently available::
 
-  performanceplatform.collector.ga
-  performanceplatform.collector.ga.trending
-  performanceplatform.collector.ga.realtime
-  performanceplatform.collector.pingdom
+`performanceplatform.collector.ga`_
+`performanceplatform.collector.ga.trending`_
+`performanceplatform.collector.ga.realtime`_
+`performanceplatform.collector.pingdom`_
 
+ .. _performanceplatform.collector.ga: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga
+ .. _performanceplatform.collector.ga.trending: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/trending.py
+ .. _performanceplatform.collector.ga.realtime: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/realtime.py
+ .. _performanceplatform.collector.pingdom: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/pingdom
+
+
+`link_variable_name`_
+
+.. _link_variable_name: http://
 Backdrop file
 ~~~~~~~~~~~~~
 
