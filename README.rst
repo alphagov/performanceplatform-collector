@@ -74,7 +74,7 @@ The query file contains everything about what the collector will do during execu
       "additionalFields": {
         # Every record sent to backdrop will have these additional fields
         "foo": "bar",
-        "sentAt": "my-nice-time-function"
+        "sentAt": "specific-formatted-time-value"
       }
     },
     "plugins": [
