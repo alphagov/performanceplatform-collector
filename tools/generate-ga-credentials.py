@@ -29,20 +29,20 @@ def copy_json(input_path, output_path):
                 indent=2)
 
 
-def generate_stuff(client_secret):
+def generate_google_credentials(client_secret):
     # Prevent oauth2client from trying to open a browser
     # This is run from inside the VM so there is no browser
     oauth2client.tools.FLAGS.auth_local_webserver = False
 
-    storage_path = abspath("./config/storage.db")
-    secret_path = abspath("./config/client_secret.json")
+    storage_path = abspath("./creds/ga/storage.db")
+    secret_path = abspath("./creds/ga/client_secret.json")
     from_secrets_file(
         client_secret,
         storage_path=storage_path)
 
     copy_json(client_secret, secret_path)
 
-    with open('./config/credentials.json', 'w+') as f:
+    with open('./creds/ga.json', 'w+') as f:
         credentials = {
             "CLIENT_SECRETS": secret_path,
             "STORAGE_PATH": storage_path,
@@ -61,4 +61,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    generate_stuff(args.client_secret)
+    generate_google_credentials(args.client_secret)
