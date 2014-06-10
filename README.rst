@@ -4,7 +4,7 @@ the result through to the Performance Platform (see http://alphagov.github.io/pe
 for more details). This tool will currently interface with Google Analytics
 and Pingdom to retrieve data.
 
-.. image:: https://travis-ci.org/alphagov/performanceplatform-collector.svg
+.. image:: https://travis-ci.org/alphagov/performanceplatform-collector.svg?branch=master
    :target: https://travis-ci.org/alphagov/performanceplatform-collector
 
 .. contents:: :local:
