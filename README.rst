@@ -1,8 +1,10 @@
+.. _Google Analytics: http://www.google.com/analytics/
+.. _Pingdom: https://www.pingdom.com/
 
 A python command line tool that aggregates data from third party sources and pushes
 the result through to the Performance Platform (see http://alphagov.github.io/performanceplatform-documentation/
-for more details). This tool will currently interface with Google Analytics
-and Pingdom to retrieve data.
+for more details). This tool will currently interface with `Google Analytics`_
+and `Pingdom`_ to retrieve data.
 
 .. image:: https://travis-ci.org/alphagov/performanceplatform-collector.svg
    :target: https://travis-ci.org/alphagov/performanceplatform-collector
