@@ -14,7 +14,7 @@ updated.
 """
 import argparse
 import json
-from os.path import abspath
+from os.path import abspath, makedirs, exists as path_exists
 
 from gapy.client import from_secrets_file
 import oauth2client.tools
@@ -34,6 +34,8 @@ def generate_google_credentials(client_secret):
     # This is run from inside the VM so there is no browser
     oauth2client.tools.FLAGS.auth_local_webserver = False
 
+    if not path_exists(abspath("./creds/ga/")):
+        makedirs("./creds/ga")
     storage_path = abspath("./creds/ga/storage.db")
     secret_path = abspath("./creds/ga/client_secret.json")
     from_secrets_file(
