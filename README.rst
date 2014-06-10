@@ -51,8 +51,7 @@ There are also some optional command line arguments you can provide pp-collector
 Configuration
 -------------
 
-For our deployment of performanceplatform-collector we pull in deployment from the performanceplatform-collector-config_ repo. You
-will find much more indepth information about the collector configuration in the README file there.
+For our deployment of performanceplatform-collector we pull in deployment from the performanceplatform-collector-config_ repo. The structure of our deployment configuration can be found there.
 
 .. _performanceplatform-collector-config: https://github.com/alphagov/performanceplatform-collector-config
 
