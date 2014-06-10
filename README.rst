@@ -51,38 +51,68 @@ There are also some optional command line arguments you can provide pp-collector
 Configuration
 -------------
 
-For our deployment of performanceplatform-collector we pull in deployment from the performanceplatform-collector-config_ repo. The structure of our deployment configuration can be found there.
+.. note:: For our deployment of performanceplatform-collector we pull in deployment from the performanceplatform-collector-config_ repo. The structure of our deployment configuration can be found there.
 
 .. _performanceplatform-collector-config: https://github.com/alphagov/performanceplatform-collector-config
 
-There are four configuration files that get injected into pp-collector and are the four required
-parameters:
+There are four configuration files that get injected into pp-collector, each file is a required parameter.
 
-- Query, contains everything about what the collector will do during execution. It provides an entrypoint
-  that pp-collector will execute and provide the query and options k-v pairs::
+## Query File
+The query file contains everything about what the collector will do during execution. It provides an entrypoint that pp-collector will execute and provide the query and options k-v pairs::
 
+      # pingdom example
       {
         "entrypoint": "performanceplatform.collector.pingdom",
         "query": {
           "name": "govuk"
         },
-        "options": { },
+        "options": {
+          "additionalFields": {
+            # Every record sent to backdrop will have these additional fields
+            "foo": "bar",
+            "sentAt": "my-nice-time-function"
+          }
+        },
+        "plugins": [
+          "Comment('Pingdom stats are aggregated using mycustomtemplate.py')
+        ],
         "data-set": {
           "data-group": "my-data-group",
           "data-set": "my-data-set"
         }
       }
 
-- Token, this holds the bearer token to be used by this collector when POSTing to the Performance Platform::
+Entrypoints
+===========
+
+The following entrypoints are currently available::
+
+    performanceplatform.collector.ga
+    performanceplatform.collector.ga.trending
+    performanceplatform.collector.ga.realtime
+    performanceplatform.collector.pingdom
+
+
+
+## Token File file holds the bearer token to be used by this collector when POSTing to the Performance Platform::
 
       {
         "token": "some long hex value"
       }
 
-.. note:: Tokens
-  Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
+  .. note::
+      Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
 
-- Credentials file: pass through any usernames, passwords, API keys etc that are required to communicate to the third party service you desire.::
+## Backdrop file:
+  This is a simple pointer to the performance platform's data-store application. It will define the endpoint for your collector to send all data to.::
+
+      {
+        "url": "https://www.performance.service.gov.uk/data"
+      }
+
+
+## Credentials file:
+  The credentials file is used to pass through any usernames, passwords, API keys etc that are required to communicate to the third party service you desire.::
 
       # Google analytics Specific example
       credentials = {
@@ -105,21 +135,6 @@ To retrieve accurate paths for secrets (google analytics pathway):
     + Copy and paste back into the CLI
     + This will default to creating google credentials in `./creds/ga.json`
 
-- Backdrop, where backdrop lives (this is the endpoint for your collector to send all data to)::
-
-      {
-        "url": "https://www.performance.service.gov.uk/data"
-      }
-
-Entrypoints
-===========
-
-The following entrypoints are currently available::
-
-    performanceplatform.collector.ga
-    performanceplatform.collector.ga.trending
-    performanceplatform.collector.ga.realtime
-    performanceplatform.collector.pingdom
 
 Extending performanceplatform-collector
 =======================================
