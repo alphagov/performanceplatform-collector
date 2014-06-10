@@ -70,15 +70,32 @@ parameters:
       }
 
 - Token, this holds the bearer token to be used by this collector when POSTing to the Performance Platform::
-  
+
       {
         "token": "some long hex value"
       }
 
-- Credentials, passes through any usernames, passwords, API keys etc... that are required to communicate
-  to the third party service you desire.
-- Backdrop, where backdrop lives::
-  
+.. note:: Tokens
+  Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
+
+- Credentials file: pass through any usernames, passwords, API keys etc that are required to communicate to the third party service you desire.::
+
+      # Google analytics Specific example
+      credentials = {
+          "CLIENT_SECRETS": path/to/client_secret.json,
+          "STORAGE_PATH": path/to/oauth/db,
+      }
+
+To retrieve accurate paths for secrets (google analytics pathway):
+
+  .. image:: http://cl.ly/image/2W0M191L3L1O/Screen%20Shot%202014-06-10%20at%2011.11.21.png
+
+  - Go to the `Google API Console <https://code.google.com/apis/console>`_ and create a new client ID (APIs & Auth > Credentials > OAuth > Create New Client ID) for an installed application.
+  - Once created click the Download JSON link. **This is your client secrets file.**
+  - To generate the storage path you can run ``https://github.com/alphagov/performanceplatform-collector/blob/master/tools/generate-credentials.py path/to/client/secrets.json``
+
+- Backdrop, where backdrop lives (this is the endpoint for your collector to send all data to)::
+
       {
         "url": "https://www.performance.service.gov.uk/data"
       }
