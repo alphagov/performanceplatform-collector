@@ -37,7 +37,7 @@ Usage
 
 pp-collector takes paths to various JSON files as arguments::
 
-    $ pp-collector -q [query file] -c [credentials file] -t [token file] -b [backdrop file]
+    $ pp-collector -q [query file] -b [backdrop file] -c [credentials file] -t [token file]
 
 There are also some optional command line arguments you can provide pp-collector::
 
