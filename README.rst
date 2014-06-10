@@ -19,25 +19,25 @@ Using pip
 
 ::
 
-    $ pip install performanceplatform-collector
+  $ pip install performanceplatform-collector
 
 From source
 -----------
 
 ::
 
-    $ git clone https://github.com/alphagov/performanceplatform-collector.git
-    $ cd performanceplatform-collector
-    $ virtualenv venv
-    $ source venv/bin/activate
-    $ python setup.py install
+  $ git clone https://github.com/alphagov/performanceplatform-collector.git
+  $ cd performanceplatform-collector
+  $ virtualenv venv
+  $ source venv/bin/activate
+  $ python setup.py install
 
 Usage
 =====
 
 pp-collector takes paths to various JSON files as arguments::
 
-    $ pp-collector -q [query file] -b [backdrop file] -c [credentials file] -t [token file]
+  $ pp-collector -q [query file] -b [backdrop file] -c [credentials file] -t [token file]
 
 There are also some optional command line arguments you can provide pp-collector::
 
@@ -51,74 +51,85 @@ There are also some optional command line arguments you can provide pp-collector
 Configuration
 -------------
 
-.. note:: For our deployment of performanceplatform-collector we pull in deployment from the performanceplatform-collector-config_ repo. The structure of our deployment configuration can be found there.
+::
+
+    For our deployment of the performanceplatform-collector we pull in configuration files from the performanceplatform-collector-config_ repo.
+    The structure of our deployment configuration can be found there if more detailed examples are required.
 
 .. _performanceplatform-collector-config: https://github.com/alphagov/performanceplatform-collector-config
 
 There are four configuration files that get injected into pp-collector, each file is a required parameter.
 
-## Query File
+Query File
+~~~~~~~~~~
 The query file contains everything about what the collector will do during execution. It provides an entrypoint that pp-collector will execute and provide the query and options k-v pairs::
 
-      # pingdom example
-      {
-        "entrypoint": "performanceplatform.collector.pingdom",
-        "query": {
-          "name": "govuk"
-        },
-        "options": {
-          "additionalFields": {
-            # Every record sent to backdrop will have these additional fields
-            "foo": "bar",
-            "sentAt": "my-nice-time-function"
-          }
-        },
-        "plugins": [
-          "Comment('Pingdom stats are aggregated using mycustomtemplate.py')
-        ],
-        "data-set": {
-          "data-group": "my-data-group",
-          "data-set": "my-data-set"
-        }
+  # pingdom example
+  {
+    "entrypoint": "performanceplatform.collector.pingdom",
+    "query": {
+      "name": "govuk"
+    },
+    "options": {
+      "additionalFields": {
+        # Every record sent to backdrop will have these additional fields
+        "foo": "bar",
+        "sentAt": "my-nice-time-function"
       }
+    },
+    "plugins": [
+      "Comment('Pingdom stats are aggregated using mycustomtemplate.py')
+    ],
+    "data-set": {
+      "data-group": "my-data-group",
+      "data-set": "my-data-set"
+    }
+  }
 
-Entrypoints
-===========
+**Entrypoints:**
 
 The following entrypoints are currently available::
 
-    performanceplatform.collector.ga
-    performanceplatform.collector.ga.trending
-    performanceplatform.collector.ga.realtime
-    performanceplatform.collector.pingdom
+  performanceplatform.collector.ga
+  performanceplatform.collector.ga.trending
+  performanceplatform.collector.ga.realtime
+  performanceplatform.collector.pingdom
+
+Backdrop file
+~~~~~~~~~~~~~
+
+This is a simple pointer to the performance platform's data-store application. It will define the endpoint for your collector to send all data to.::
+
+  {
+    "url": "https://www.performance.service.gov.uk/data"
+  }
 
 
+Token File
+~~~~~~~~~~
 
-## Token File file holds the bearer token to be used by this collector when POSTing to the Performance Platform::
+::
 
-      {
-        "token": "some long hex value"
-      }
+  Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
 
-  .. note::
-      Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
+The token file file holds the bearer token to be used by this collector when POSTing to the Performance Platform::
 
-## Backdrop file:
-  This is a simple pointer to the performance platform's data-store application. It will define the endpoint for your collector to send all data to.::
+  {
+    "token": "some long hex value"
+  }
 
-      {
-        "url": "https://www.performance.service.gov.uk/data"
-      }
+Credentials file
+~~~~~~~~~~~~~~~~
+The credentials file is used to pass through any usernames, passwords, API keys etc that are required to communicate to the third party service you desire.::
 
+  # Google analytics Specific example
+  credentials = {
+      "CLIENT_SECRETS": path/to/client_secret.json,
+      "STORAGE_PATH": path/to/oauth/db,
+  }
 
-## Credentials file:
-  The credentials file is used to pass through any usernames, passwords, API keys etc that are required to communicate to the third party service you desire.::
-
-      # Google analytics Specific example
-      credentials = {
-          "CLIENT_SECRETS": path/to/client_secret.json,
-          "STORAGE_PATH": path/to/oauth/db,
-      }
+Google Analytics
+================
 
 Setting up Google Analytics Credentials:
 ----------------------------------------
@@ -150,3 +161,4 @@ Inside that file add a ``main`` function which has the following signature::
     main(credentials, data_set_config, query, options, start_at, end_at)
 
 These arguments are all strings which are forwarded from the command line.
+
