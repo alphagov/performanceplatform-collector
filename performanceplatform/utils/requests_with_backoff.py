@@ -23,8 +23,12 @@ def __request_with_backoff(method, url, *args, **kwargs):
         response = request(method, url, *args, **kwargs)
         code = response.status_code
         if code in [403, 502, 503]:
-            logging.info('{} request for {} failed with code {}. Retrying in '
-                         '{} seconds...'.format(method, url, code, delay))
+            retry_info = ('{} request for {} failed with code {} '
+                          '(Attempt {} of {}).'.format(method, url, code,
+                                                       n + 1, _MAX_RETRIES))
+            if n + 1 < _MAX_RETRIES:
+                retry_info += ' Retrying in {} seconds...'.format(delay)
+            logging.info(retry_info)
             time.sleep(delay)
             delay *= 2
         else:
