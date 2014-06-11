@@ -14,7 +14,8 @@ updated.
 """
 import argparse
 import json
-from os.path import abspath, makedirs, exists as path_exists
+from os.path import abspath, exists as path_exists
+from os import makedirs
 
 from gapy.client import from_secrets_file
 import oauth2client.tools
