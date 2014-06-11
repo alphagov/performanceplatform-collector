@@ -156,6 +156,11 @@ To retrieve accurate paths for secrets (google analytics pathway):
     + Follow the link to get the correct auth code
     + Copy and paste back into the CLI
     + This will default to creating google credentials in `./creds/ga.json`
+    + **Error**::
+
+      * If you get an 'invalid client error', adding a name and support email under the ""APIs & auth" -> "Consent screen" Should fix this.
+      * See http://stackoverflow.com/questions/18677244/error-invalid-client-no-application-name for more.
+
 
 
 Extending performanceplatform-collector
