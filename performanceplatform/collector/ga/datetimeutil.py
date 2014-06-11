@@ -1,4 +1,5 @@
 from datetime import datetime, time, timedelta, date
+from dateutil.relativedelta import relativedelta
 import pytz
 
 
@@ -25,22 +26,63 @@ def to_utc(a_datetime):
     return a_datetime.astimezone(pytz.UTC)
 
 
-def period_range(start_date, end_date):
-    start_date = to_date(start_date) or a_week_ago()
-    end_date = to_date(end_date) or a_week_ago()
-
+def period_range(start, end, frequency):
+    start_date = to_date(start)
+    end_date = to_date(end)
     if start_date > end_date:
-        raise ValueError("Bad period: !(start_date={0} <= end_date={1})"
+        raise ValueError("Bad dates: !(start_date={0} <= end_date={1})"
                          .format(start_date, end_date))
+    if frequency == 'daily':
+        start_date = start_date or a_day_ago()
+        end_date = end_date or a_day_ago()
+        period = timedelta(days=1)
+        return generate_date_range(start_date, end_date, period)
+    elif frequency == 'weekly':
+        start_date = start_date or a_week_ago()
+        start_date = start_of_week(start_date)
+        end_date = end_date or a_week_ago()
+        period = timedelta(days=7)
+        return generate_date_range(start_date, end_date, period)
+    elif frequency == 'monthly':
+        start_date = start_date or a_month_ago()
+        start_date = start_of_month(start_date)
+        end_date = end_date or a_month_ago()
+        period = relativedelta(months=+1)
+        return generate_date_range(start_date, end_date, period)
+    else:
+        raise ValueError('Bad value of frequency, should be daily, weekly '
+                         'or monthly')
 
-    if start_date.weekday != MONDAY:
-        start_date = start_date - timedelta(days=start_date.weekday())
 
-    period = timedelta(days=7)
+def generate_date_range(start_date, end_date, period):
     while start_date <= end_date:
-        yield (start_date, start_date + timedelta(days=6))
-        start_date += period
+        next_start_date = start_date + period
+        yield (to_date(start_date),
+               to_date(next_start_date - timedelta(days=1)))
+        start_date = next_start_date
 
 
 def a_week_ago():
     return date.today() - timedelta(days=7)
+
+
+def a_day_ago():
+    return date.today() - timedelta(days=1)
+
+
+def an_hour_ago():
+    return datetime.now() - timedelta(hours=1)
+
+
+def start_of_month(date):
+    return date.replace(day=1)
+
+
+def a_month_ago():
+    return date.today() + relativedelta(months=-1)
+
+
+def start_of_week(date):
+    if date.weekday != MONDAY:
+        return date - timedelta(days=date.weekday())
+    return date
