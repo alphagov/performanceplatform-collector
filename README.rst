@@ -51,7 +51,7 @@ There are also some optional command line arguments you can provide pp-collector
 Configuration
 -------------
 
-::
+**Note on our configuation**
 
     For our deployment of the performanceplatform-collector we pull in configuration files from the performanceplatform-collector-config_ repo.
     The structure of our deployment configuration can be found there if more detailed examples are required.
@@ -115,7 +115,8 @@ This is a simple pointer to the performance platform's data-store application. I
 Token File
 ~~~~~~~~~~
 
-::
+
+**A Note on Tokens**
 
   Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
 
