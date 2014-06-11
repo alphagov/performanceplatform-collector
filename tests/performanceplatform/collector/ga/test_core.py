@@ -490,6 +490,42 @@ def test_additional_fields():
     assert_that(result[0]["foo"], equal_to("bar"))
 
 
+def test_daily_repeat():
+
+    input_document = {
+        "metrics": {"visits": "12345"},
+        "dimensions": {"date": "2013-04-02", "customVarValue9": "foo"},
+        "start_date": date(2013, 4, 1),
+    }
+
+    client = mock.Mock()
+    client.query.get.return_value = [
+        input_document,
+    ]
+
+    query = {
+        "id": "ga:123",
+        "metrics": ["visits"],
+        "dimensions": ["date", "customVarValue9"],
+        "frequency": 'daily'
+    }
+    data_type = "test"
+    options = {
+    }
+
+    start, end = date(2013, 4, 1), date(2013, 4, 1)
+
+    # Check that foo is set on the output document
+    result = query_documents_for(client, query, options, data_type, start, end)
+    (output_document,) = result
+    assert_that(result[0]["timeSpan"], equal_to("day"))
+    query['frequency'] = 'monthly'
+    start, end = date(2013, 4, 1), date(2013, 4, 30)
+    result = query_documents_for(client, query, options, data_type, start, end)
+    (output_document,) = result
+    assert_that(result[0]["timeSpan"], equal_to("month"))
+
+
 def test_float_number():
     query = {
         "id": "12345",
