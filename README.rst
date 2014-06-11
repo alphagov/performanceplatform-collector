@@ -149,7 +149,7 @@ Setting up Google Analytics Credentials:
 
 To retrieve accurate paths for secrets (google analytics pathway):
   - Go to the `Google API Console <https://code.google.com/apis/console>`_ and create a new client ID (APIs & Auth > Credentials > OAuth > Create New Client ID)
-  - Choose **installed application**.
+  - Choose **installed application** > "other".
   - Once created click the Download JSON link. **This is your client secrets file.**
   - To generate the storage path you can run ``https://github.com/alphagov/performanceplatform-collector/blob/master/tools/generate-ga-credentials.py path/to/client/secrets.json``
 
