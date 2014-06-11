@@ -102,10 +102,6 @@ The following entrypoints are currently available::
  .. _performanceplatform.collector.ga.realtime: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/realtime.py
  .. _performanceplatform.collector.pingdom: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/pingdom
 
-
-`link_variable_name`_
-
-.. _link_variable_name: http://
 Backdrop file
 ~~~~~~~~~~~~~
 
