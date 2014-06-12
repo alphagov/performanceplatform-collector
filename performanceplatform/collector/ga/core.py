@@ -132,12 +132,11 @@ def try_number(value):
 
 
 def build_document(item, data_type,
-                   mappings=None, idMapping=None):
+                   mappings=None, idMapping=None, timespan='week'):
     if data_type is None:
         raise ValueError("Must provide a data type")
     if mappings is None:
         mappings = {}
-    period = "week"
 
     if idMapping is not None:
         if isinstance(idMapping, list):
@@ -151,14 +150,14 @@ def build_document(item, data_type,
         (_id, human_id) = data_id(
             data_type,
             to_datetime(item["start_date"]),
-            period,
+            timespan,
             item.get('dimensions', {}).values())
 
     base_properties = {
         "_id": _id,
         "_timestamp": to_datetime(item["start_date"]),
         "humanId": human_id,
-        "timeSpan": period,
+        "timeSpan": timespan,
         "dataType": data_type
     }
     dimensions = apply_key_mapping(
@@ -174,8 +173,10 @@ def pretty_print(obj):
     return json.dumps(obj, indent=2)
 
 
-def build_document_set(results, data_type, mappings, idMapping=None):
-    return [build_document(item, data_type, mappings, idMapping)
+def build_document_set(results, data_type, mappings, idMapping=None,
+                       timespan='week'):
+    return [build_document(item, data_type, mappings, idMapping,
+                           timespan=timespan)
             for item in results]
 
 
@@ -218,7 +219,16 @@ def query_documents_for(client, query, options,
     mappings = options.get("mappings", {})
     idMapping = options.get("idMapping", None)
 
-    docs = build_document_set(results, data_type, mappings, idMapping)
+    frequency = query.get('frequency', 'weekly')
+    frequency_to_timespan_mapping = {
+        'daily': 'day',
+        'weekly': 'week',
+        'monthly': 'month',
+    }
+    timespan = frequency_to_timespan_mapping[frequency]
+
+    docs = build_document_set(results, data_type, mappings, idMapping,
+                              timespan=timespan)
 
     if "additionalFields" in options:
         additional_fields = options["additionalFields"]
