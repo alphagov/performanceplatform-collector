@@ -11,7 +11,8 @@ from performanceplatform.collector.logging_setup import set_up_logging
 def logging_for_entrypoint(entrypoint, json_fields):
     logfile_path = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), '..', '..', 'log')
-    set_up_logging(entrypoint, logging.INFO, logfile_path, json_fields)
+    loglevel = getattr(logging, os.environ.get('LOGLEVEL', 'INFO').upper())
+    set_up_logging(entrypoint, loglevel, logfile_path, json_fields)
 
 
 def merge_performanceplatform_config(
