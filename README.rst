@@ -139,16 +139,16 @@ The credentials file is used to pass through any usernames, passwords, API keys 
 Google Analytics
 ================
 
-Setting up Google Analytics Credentials:
+Setting up Google Analytics credentials:
 ----------------------------------------
 
   .. image:: http://cl.ly/image/2W0M191L3L1O/Screen%20Shot%202014-06-10%20at%2011.11.21.png
 
-To retrieve accurate paths for secrets (google analytics pathway):
+To retrieve accurate paths for secrets (Google Analytics pathway):
   - Go to the `Google API Console <https://code.google.com/apis/console>`_ and create a new client ID (APIs & Auth > Credentials > OAuth > Create New Client ID)
   - Choose **installed application** > "other".
   - Once created click the Download JSON link. **This is your client secrets file.**
-  - To generate the storage path you can run ``https://github.com/alphagov/performanceplatform-collector/blob/master/tools/generate-ga-credentials.py path/to/client/secrets.json``
+  - To generate the storage path you can run ``python tools/generate-ga-credentials.py path/to/client/secrets.json``
 
     + Follow the link to get the correct auth code
     + Copy and paste back into the CLI
