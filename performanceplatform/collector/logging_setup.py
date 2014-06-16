@@ -24,7 +24,12 @@ def get_json_log_handler(path, app_name, json_fields):
 
 def uncaught_exception_handler(*exc_info):
     text = "".join(traceback.format_exception(*exc_info))
-    logging.error("Unhandled exception: %s", text)
+    (exc_class, exc_message, _) = exc_info
+    extra = {
+        'exception_class': exc_class.__name__,
+        'exception_message': exc_message
+    }
+    logging.error("Unhandled exception: %s", text, extra=extra)
 
 
 def set_up_logging(app_name, log_level, logfile_path, json_fields=None):
