@@ -9,7 +9,9 @@ def parse_args(name="", args=None):
     Returns an argparse.Namespace with 'config' and 'query' options"""
     def _load_json_file(path):
         with open(path) as f:
-            return json.load(f)
+            json_data = json.load(f)
+            json_data['path_to_query'] = path
+            return json_data
 
     parser = argparse.ArgumentParser(description="%s collector for sending"
                                                  " data to the performance"
