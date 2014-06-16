@@ -40,6 +40,7 @@ def make_extra_json_fields(args):
         'data_type': _get_data_type(args.query),
         'data_group_data_type': _get_data_group_data_type(args.query),
         'query': _get_query_params(args.query),
+        'path_to_query': _get_path_to_json_file(args.query),
     }
 
 
@@ -62,6 +63,10 @@ def _get_query_params(query):
     """
     query_params = OrderedDict(sorted(query['query'].items()))
     return ' '.join(['{}={}'.format(k, v) for k, v in query_params.items()])
+
+
+def _get_path_to_json_file(query):
+    return query['path_to_json_file']
 
 
 def main():
