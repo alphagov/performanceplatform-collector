@@ -43,3 +43,15 @@ def set_up_logging(app_name, log_level, logfile_path, json_fields=None):
         app_name,
         json_fields=json_fields if json_fields else {}))
     logger.info("{0} logging started".format(app_name))
+
+
+def extra_fields_from_exception(exception):
+    """Exception into a dict to be passed to logger
+
+    Standardise the way we send exception messages so they can be filtered in
+    kibana, also make it easy to add extra information in future.
+    """
+    return {
+        'exception_class': type(exception).__name__,
+        'exception_message': exception.message
+    }
