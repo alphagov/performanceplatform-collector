@@ -1,6 +1,8 @@
 from datetime import datetime
 import pytz
 from performanceplatform.utils import requests_with_backoff
+from performanceplatform.collector.logging_setup import (
+    extra_fields_from_exception )
 import time
 import logging
 
@@ -69,7 +71,8 @@ class Pingdom(object):
                 url_params=params
             ))
         except requests_with_backoff.exceptions.HTTPError as e:
-            logging.error("Request to pingdom failed: %s" % str(e))
+            logging.error("Request to pingdom failed: %s" % str(e),
+                          extra=extra_fields_from_exception(e))
 
     def check_id(self, name):
         checks = _send_authenticated_pingdom_request(
