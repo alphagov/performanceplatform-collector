@@ -58,6 +58,7 @@ if __name__ == '__main__':
         name='performanceplatform-collector',
         version=_get_version(),
         packages=find_packages(exclude=['test*']),
+        namespace_packages=['performanceplatform'],
 
         # metadata for upload to PyPI
         author=collector.__author__,
