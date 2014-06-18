@@ -2,6 +2,8 @@ from httplib2 import *
 from httplib2 import DEFAULT_MAX_REDIRECTS
 import logging
 import time
+from performanceplatform.collector.logging_setup import (
+    extra_fields_from_exception)
 
 _MAX_RETRIES = 5
 
@@ -44,5 +46,12 @@ class HttpWithBackoff(Http):
                 return response
 
         # we made _MAX_RETRIES requests but none worked
-        logging.error('Max retries exceeded for {}'.format(uri))
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            extra = extra_fields_from_exception(e)
+            logging.error(
+                'Max retries exceeded for {}'.format(uri),
+                extra=extra
+            )
         return response

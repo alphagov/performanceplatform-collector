@@ -1,5 +1,7 @@
 import logging
 import time
+from performanceplatform.collector.logging_setup import (
+    extra_fields_from_exception)
 
 # import everything from requests so that other code can import this package
 # instead of requests
@@ -37,4 +39,11 @@ def __request_with_backoff(method, url, *args, **kwargs):
 
     # we made _MAX_RETRIES requests but none worked
     logging.error('Max retries exceeded for {}'.format(url))
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except Exception as e:
+        logging.error('Requests Error: {}'.format(
+            e.message,
+            extra=extra_fields_from_exception(e)
+        ))
+        raise

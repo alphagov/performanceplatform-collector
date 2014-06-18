@@ -3,6 +3,8 @@ import logging
 import requests
 import pytz
 from performanceplatform.utils import requests_with_backoff
+from performanceplatform.collector.logging_setup import (
+    extra_fields_from_exception)
 import json
 
 
@@ -73,10 +75,12 @@ class DataSet(object):
 
             try:
                 response.raise_for_status()
-            except:
+            except Exception as e:
                 logging.error('[PP: {}]\n{}'.format(
                     self.url,
-                    response.text))
+                    response.text),
+                    extra=extra_fields_from_exception(e),
+                )
                 raise
 
             logging.debug("[PP] " + response.text)

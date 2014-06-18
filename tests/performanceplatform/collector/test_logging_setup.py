@@ -2,7 +2,9 @@ from hamcrest import assert_that, has_entries
 import os
 import logging
 import json
-from performanceplatform.collector.logging_setup import set_up_logging
+from performanceplatform.collector.logging_setup import (
+    set_up_logging,
+    extra_fields_from_exception)
 import unittest
 
 
@@ -30,3 +32,12 @@ class TestJsonLogging(unittest.TestCase):
         # Only remove file if assertion passes
         os.remove('log/collector.log.json')
         os.remove('log/collector.log')
+
+    def test_extra_fields_from_exception(self):
+        try:
+            raise Exception('test')
+        except Exception as e:
+            assert_that(extra_fields_from_exception(e), has_entries({
+                'exception_class': 'Exception',
+                'exception_message': 'test'
+            }))
