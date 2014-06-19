@@ -5,22 +5,6 @@ import time
 import logging
 
 
-def _send_authenticated_pingdom_request(path, user, password, app_key,
-                                        url_params):
-    response = requests_with_backoff.get(
-        url="https://api.pingdom.com/api/2.0/" + path,
-        auth=(user, password),
-        headers={
-            'App-key': app_key
-        },
-        params=url_params
-    )
-
-    response.raise_for_status()
-
-    return response.json()
-
-
 class Pingdom(object):
     def __init__(self, config):
         self.user = config['user']
@@ -28,7 +12,9 @@ class Pingdom(object):
         self.app_key = config['app_key']
         self.API_LOCATION = "https://api.pingdom.com/api/2.0/"
 
-    def _make_request(self, path, url_params={}):
+    def _make_request(self, path, url_params=None):
+        if url_params is None:
+            url_params = {}
         response = requests_with_backoff.get(
             url=self.API_LOCATION + path,
             auth=(self.user, self.password),
@@ -37,10 +23,12 @@ class Pingdom(object):
             },
             params=url_params
         )
-        return response
+        response.raise_for_status()
 
-    def _build_response(self, response):
-        hours = response['summary']['hours']
+        return response.json()
+
+    def _build_response(self, data):
+        hours = data['summary']['hours']
         new_hours = []
         for hour in hours:
             hour.update({'starttime': datetime.fromtimestamp(
@@ -61,31 +49,17 @@ class Pingdom(object):
         path = "summary.performance/" + str(app_code)
 
         try:
-            return self._build_response(_send_authenticated_pingdom_request(
+            return self._build_response(self._make_request(
                 path=path,
-                user=self.user,
-                password=self.password,
-                app_key=self.app_key,
                 url_params=params
             ))
         except requests_with_backoff.exceptions.HTTPError as e:
             logging.error("Request to pingdom failed: %s" % str(e))
 
     def check_id(self, name):
-        checks = _send_authenticated_pingdom_request(
-            path="checks",
-            user=self.user,
-            password=self.password,
-            app_key=self.app_key,
-            url_params=None
-        )
+        checks = self._make_request(path="checks")
 
         check_to_find = [check for check in checks["checks"]
                          if check["name"] == name]
 
         return check_to_find[0]["id"]
-
-
-class Collector(object):
-    def __init__(self, config):
-        pass
