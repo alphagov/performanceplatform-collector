@@ -2,7 +2,7 @@ import base64
 from datetime import date, timedelta
 import gapy.client
 
-from performanceplatform.collector.write import DataSet
+from performanceplatform.client import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 
 ga_date_keys = ['day', 'month', 'year']
