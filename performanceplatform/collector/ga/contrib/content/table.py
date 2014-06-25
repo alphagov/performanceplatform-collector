@@ -4,7 +4,7 @@ from performanceplatform.collector.ga.plugins.department import \
 from performanceplatform.collector.ga import \
     create_client, query_documents_for, send_data
 
-from performanceplatform.collector.write import DataSet
+from performanceplatform.client import DataSet
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):

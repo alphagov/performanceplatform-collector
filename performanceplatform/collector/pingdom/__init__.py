@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import json
 import logging
 
-from performanceplatform.collector.write import DataSet
+from performanceplatform.client import DataSet
 
 from performanceplatform.collector.pingdom.core import Pingdom
 

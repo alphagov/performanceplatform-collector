@@ -19,25 +19,25 @@ Using pip
 
 ::
 
-  $ pip install performanceplatform-collector
+  pip install performanceplatform-collector
 
 From source
 -----------
 
 ::
 
-  $ git clone https://github.com/alphagov/performanceplatform-collector.git
-  $ cd performanceplatform-collector
-  $ virtualenv venv
-  $ source venv/bin/activate
-  $ python setup.py install
+  git clone https://github.com/alphagov/performanceplatform-collector.git
+  cd performanceplatform-collector
+  virtualenv venv
+  source venv/bin/activate
+  python setup.py install
 
 Usage
 =====
 
 pp-collector takes paths to various JSON files as arguments::
 
-  $ pp-collector -q [query file] -b [backdrop file] -c [credentials file] -t [token file]
+  pp-collector -q [query file] -b [backdrop file] -c [credentials file] -t [token file]
 
 There are also some optional command line arguments you can provide pp-collector::
 
@@ -175,3 +175,26 @@ Inside that file add a ``main`` function which has the following signature::
 
 These arguments are all strings which are forwarded from the command line.
 
+Developing performanceplatform-collector
+========================================
+
+To begin working on the code
+
+::
+  git clone https://github.com/alphagov/performanceplatform-collector.git
+  cd performanceplatform-collector
+  virtualenv venv
+  source venv/bin/activate
+  python setup.py develop
+
+Due to the use of namespace packages, you must not install requirements with
+
+::
+  pip install -r requirements.txt
+
+If you have run this command, your virtualenv may be broken - you can fix by 
+running
+
+::
+  pip uninstall performanceplatform-client
+  python setup.py develop

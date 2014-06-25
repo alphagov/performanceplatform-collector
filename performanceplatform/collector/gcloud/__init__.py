@@ -10,7 +10,7 @@ from performanceplatform.collector.gcloud.core import (
 from performanceplatform.collector.gcloud.sales_parser import (
     get_latest_csv_url)
 
-from performanceplatform.collector.write import DataSet
+from performanceplatform.client import DataSet
 
 
 INDEX_URL = ('https://digitalmarketplace.blog.gov.uk'

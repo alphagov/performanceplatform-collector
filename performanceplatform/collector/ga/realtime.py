@@ -5,7 +5,7 @@ from oauth2client.tools import run
 from datetime import datetime
 import pytz
 
-from performanceplatform.collector.write import DataSet
+from performanceplatform.client import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 
 

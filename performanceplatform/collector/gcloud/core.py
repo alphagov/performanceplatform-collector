@@ -9,7 +9,7 @@ import re
 import scraperwiki
 from dshelpers import batch_processor
 
-from performanceplatform.collector.write import JsonEncoder
+from performanceplatform.client import JsonEncoder
 
 from sales_parser import process_csv
 from table_names import _RAW_SALES_TABLE, _AGGREGATED_SALES_TABLE
