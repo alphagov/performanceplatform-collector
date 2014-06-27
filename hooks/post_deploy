@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+set -o pipefail
 
 PATH_TO_APP="$(pwd)"
 PATH_TO_PYTHON="$PATH_TO_APP/venv/bin/python"
