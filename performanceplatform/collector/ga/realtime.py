@@ -4,6 +4,8 @@ from oauth2client.file import Storage
 from oauth2client.tools import run
 from datetime import datetime
 import pytz
+import logging
+import sys
 
 from performanceplatform.client import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
@@ -77,5 +79,8 @@ def _timestamp():
 
 
 def main(credentials, data_set, query, options, start_at, end_at):
+    if start_at or end_at:
+        print 'Cannot backfill realtime collectors'
+        sys.exit(1)
     collector = Collector(credentials)
     collector.send_records_for(query, data_set)
