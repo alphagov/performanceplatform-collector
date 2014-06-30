@@ -39,7 +39,11 @@ pp-collector takes paths to various JSON files as arguments::
 
   pp-collector -q [query file] -b [backdrop file] -c [credentials file] -t [token file]
 
-There are also some optional command line arguments you can provide pp-collector::
+All the target files are likely to be located in the performanceplatform-collector-config
+repo. Make sure you update the content of the token file to match the token expected
+by the Backdrop dataset.
+
+There are also some optional command line arguments you can provide pp-collect::
 
     --console-logging
     Rather than logging out to log/collector.log it will output all logs to stdout/err
@@ -47,6 +51,10 @@ There are also some optional command line arguments you can provide pp-collector
     --dry-run
     When it comes to submitting the gathered data to the Performance Platform it will skip
     making the POST requests and instead log out the url, headers and body to your terminal.
+
+    --start-date
+    If you want the collector to gather past data, you can specify a start date, e.g.
+    "10-01-2013".
 
 Configuration
 -------------
