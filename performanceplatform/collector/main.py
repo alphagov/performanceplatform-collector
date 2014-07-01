@@ -75,8 +75,7 @@ def main():
     entrypoint = args.query['entrypoint']
 
     if args.console_logging:
-        logger = logging.getLogger()
-        logger.setLevel(logging.INFO)
+        logging.basicConfig(level=logging.INFO)
     else:
         logging_for_entrypoint(entrypoint, make_extra_json_fields(args))
 
