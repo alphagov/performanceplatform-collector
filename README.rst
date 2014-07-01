@@ -52,9 +52,9 @@ There are also some optional command line arguments you can provide pp-collect::
     When it comes to submitting the gathered data to the Performance Platform it will skip
     making the POST requests and instead log out the url, headers and body to your terminal.
 
-    --start-date
+    --start, --end
     If you want the collector to gather past data, you can specify a start date, e.g.
-    "10-01-2013".
+    "10-01-2013". You must also specify an end date.
 
 Configuration
 -------------
