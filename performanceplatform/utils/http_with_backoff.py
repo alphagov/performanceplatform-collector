@@ -46,12 +46,14 @@ class HttpWithBackoff(Http):
                 return response
 
         # we made _MAX_RETRIES requests but none worked
-        try:
-            response.raise_for_status()
-        except Exception as e:
-            extra = extra_fields_from_exception(e)
-            logging.error(
-                'Max retries exceeded for {}'.format(uri),
-                extra=extra
-            )
+        logging.error(
+            'Max retries exceeded for {}'.format(uri),
+            # HttpLibException doesnt exist but this fits with the format
+            # for logging other request failures
+            extra={
+                'exception_class': 'HttpLibException',
+                'exception_message': '{}: {}'.format(response[0].status,
+                                                     response[0].reason)
+            }
+        )
         return response
