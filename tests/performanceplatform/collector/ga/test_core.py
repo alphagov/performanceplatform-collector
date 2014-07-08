@@ -11,7 +11,8 @@ from nose.tools import (assert_in, assert_not_in, assert_is_instance,
 from performanceplatform.collector.ga.core import \
     query_ga, build_document, data_id, apply_key_mapping, \
     build_document_set, query_for_range, \
-    query_documents_for, map_multi_value_fields
+    query_documents_for, map_multi_value_fields, \
+    convert_durations
 
 from tests.performanceplatform.collector.ga import dt
 
@@ -552,3 +553,20 @@ def test_float_number():
     (doc_0,) = build_document_set(items, "", None, None)
 
     assert_that(doc_0['rate'], is_(23.4))
+
+
+def test_convert_duration():
+    query_0 = ('avgSessionDuration', 400.0)
+    expected_response_0 = ('avgSessionDuration', 400000.0)
+    query_1 = ('avgSessionDuration', None)
+    expected_response_1 = ('avgSessionDuration', None)
+    query_2 = ('uniquePageviews', 400)
+    expected_response_2 = ('uniquePageviews', 400)
+
+    response_0 = convert_durations(query_0)
+    response_1 = convert_durations(query_1)
+    response_2 = convert_durations(query_2)
+
+    assert_that(response_0, is_(expected_response_0))
+    assert_that(response_1, is_(expected_response_1))
+    assert_that(response_2, is_(expected_response_2))
