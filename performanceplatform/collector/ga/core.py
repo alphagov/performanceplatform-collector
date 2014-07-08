@@ -131,6 +131,17 @@ def try_number(value):
                      .format(value))
 
 
+def convert_durations(metric):
+    """
+    Convert session duration metrics from seconds to milliseconds.
+    """
+    if metric[0] == 'avgSessionDuration' and metric[1]:
+        new_metric = (metric[0], metric[1] * 1000)
+    else:
+        new_metric = metric
+    return new_metric
+
+
 def build_document(item, data_type,
                    mappings=None, idMapping=None, timespan='week'):
     if data_type is None:
@@ -166,6 +177,7 @@ def build_document(item, data_type,
 
     metrics = [(key, try_number(value))
                for key, value in item["metrics"].items()]
+    metrics = [convert_durations(metric) for metric in metrics]
     return dict(base_properties.items() + dimensions + metrics)
 
 
