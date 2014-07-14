@@ -69,15 +69,8 @@ def _get_path_to_json_file(query):
     return query['path_to_json_file']
 
 
-def main():
-    args = arguments.parse_args('Performance Platform Collector')
-
+def _run_collector(args):
     entrypoint = args.query['entrypoint']
-
-    if args.console_logging:
-        logging.basicConfig(level=logging.INFO)
-    else:
-        logging_for_entrypoint(entrypoint, make_extra_json_fields(args))
 
     entrypoint_module = importlib.import_module(entrypoint)
     entrypoint_module.main(
@@ -93,6 +86,29 @@ def main():
         args.start_at,
         args.end_at
     )
+
+
+def _log_collector_instead_of_running(args):
+    logged_args = {
+        'start_at': args.start_at,
+        'end_at': args.end_at,
+        'query': {k: args.query[k] for k in ('data-set', 'query', 'options')}
+    }
+    logging.info('Collector NOT run with the following {}'.format(logged_args))
+
+
+def main():
+    args = arguments.parse_args('Performance Platform Collector')
+
+    if args.console_logging:
+        logging.basicConfig(level=logging.INFO)
+    else:
+        logging_for_entrypoint(entrypoint, make_extra_json_fields(args))
+
+    if os.environ.get('DISABLE_COLLECTORS', 'false') == 'true':
+        _log_collector_instead_of_running(args)
+    else:
+        _run_collector(args)
 
 
 if __name__ == '__main__':
