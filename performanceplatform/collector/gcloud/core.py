@@ -8,6 +8,7 @@ import re
 
 import scraperwiki
 from dshelpers import batch_processor
+from dateutil.parser import parse as parse_datetime
 
 from performanceplatform.client import JsonEncoder
 
@@ -51,7 +52,16 @@ def push_aggregates(data_set):
 
     with batch_processor(data_set.post) as uploader:
         for row in scraperwiki.sqlite.select('* FROM {}'.format(table)):
-            uploader.push(row)
+            uploader.push(format_timestamp(row))
+
+
+def format_timestamp(row):
+    """
+    >>> format_timestamp({'_timestamp': '2012-12-12 00:00'})
+    {u'_timestamp': u'2012-12-12T00:00:00Z'}
+    """
+    row['_timestamp'] = parse_datetime(row['_timestamp']).isoformat() + 'Z'
+    return row
 
 
 def save_to_json():
