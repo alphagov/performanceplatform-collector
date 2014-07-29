@@ -8,3 +8,4 @@ creds/
 out
 venv
 *.egg
+scraperwiki.sqlite
