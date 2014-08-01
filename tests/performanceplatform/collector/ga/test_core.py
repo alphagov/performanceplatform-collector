@@ -250,6 +250,27 @@ def test_map_available_multi_value_fields():
     assert_that(document, is_({'one': 'foo', 'two': 'bar'}))
 
 
+def test_mapping_is_applied_to_whole_document():
+    mappings = {
+        'visits': 'count',
+        'customVarValue1': 'name',
+        'timeSpan': 'period',
+    }
+    gapy_response = {
+        "metrics": {"visits": "12345"},
+        "dimensions": {"customVarValue1": "Jane"},
+        "start_date": date(2013, 4, 1),
+    }
+
+    doc = build_document(gapy_response, "people",  mappings)
+
+    assert_that(doc, has_entries({
+        "count": 12345,
+        "name": "Jane",
+        "period": "week",
+    }))
+
+
 def test_build_document_set():
     def build_gapy_response(visits, name, start_date):
         return {

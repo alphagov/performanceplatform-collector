@@ -171,14 +171,17 @@ def build_document(item, data_type,
         "timeSpan": timespan,
         "dataType": data_type
     }
-    dimensions = apply_key_mapping(
-        mappings,
-        item.get("dimensions", {})).items()
 
     metrics = [(key, try_number(value))
                for key, value in item["metrics"].items()]
     metrics = [convert_durations(metric) for metric in metrics]
-    return dict(base_properties.items() + dimensions + metrics)
+
+    doc = dict(base_properties.items() +
+               item.get("dimensions", {}).items() +
+               metrics)
+    doc = apply_key_mapping(mappings, doc)
+
+    return doc
 
 
 def pretty_print(obj):
