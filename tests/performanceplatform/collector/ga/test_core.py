@@ -342,6 +342,17 @@ def test_if_we_provide_id_field_it_uses_the_whole_doc():
     eq_(doc["_id"], "Zm9v")
 
 
+def test_if_we_provide_id_field_it_includes_additional_fields():
+    doc = build_document({"dimensions": {},
+                          "metrics": {"some_metric": 123},
+                          "start_date": date(2014, 2, 19)},
+                         "data_type",
+                         idMapping="idVar",
+                         additionalFields={"idVar": "foo"})
+
+    eq_(doc["_id"], "Zm9v")
+
+
 def test_plugin():
 
     input_document = {

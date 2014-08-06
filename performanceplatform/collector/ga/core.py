@@ -143,7 +143,8 @@ def convert_durations(metric):
 
 
 def build_document(item, data_type,
-                   mappings=None, idMapping=None, timespan='week'):
+                   mappings=None, idMapping=None,
+                   timespan='week', additionalFields={}):
     if data_type is None:
         raise ValueError("Must provide a data type")
     if mappings is None:
@@ -160,14 +161,14 @@ def build_document(item, data_type,
     metrics = [convert_durations(metric) for metric in metrics]
 
     doc = dict(base_properties.items() +
+               additionalFields.items() +
                item.get("dimensions", {}).items() +
                metrics)
     doc = apply_key_mapping(mappings, doc)
 
     if idMapping is not None:
         if isinstance(idMapping, list):
-            values_for_id = map(lambda d: doc[d], idMapping)
-            print values_for_id
+            values_for_id = map(lambda d: unicode(doc[d]), idMapping)
             value_for_id = "".join(values_for_id)
         else:
             value_for_id = doc[idMapping]
@@ -191,9 +192,10 @@ def pretty_print(obj):
 
 
 def build_document_set(results, data_type, mappings, idMapping=None,
-                       timespan='week'):
-    return [build_document(item, data_type, mappings, idMapping,
-                           timespan=timespan)
+                       timespan='week', additionalFields={}):
+    return [build_document(item, data_type, mappings,
+                           idMapping, timespan=timespan,
+                           additionalFields=additionalFields)
             for item in results]
 
 
@@ -244,13 +246,10 @@ def query_documents_for(client, query, options,
     }
     timespan = frequency_to_timespan_mapping[frequency]
 
-    docs = build_document_set(results, data_type, mappings, idMapping,
-                              timespan=timespan)
-
-    if "additionalFields" in options:
-        additional_fields = options["additionalFields"]
-        for doc in docs:
-            doc.update(additional_fields)
+    additionalFields = options.get('additionalFields', {})
+    docs = build_document_set(results, data_type, mappings,
+                              idMapping, timespan=timespan,
+                              additionalFields=additionalFields)
 
     if "plugins" in options:
         docs = run_plugins(options["plugins"], docs)
