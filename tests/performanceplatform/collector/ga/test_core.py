@@ -332,6 +332,16 @@ def test_if_we_provide_id_field_array_it_is_used():
     eq_(doc["_id"], "MdiBMg==")
 
 
+def test_if_we_provide_id_field_it_uses_the_whole_doc():
+    doc = build_document({"dimensions": {"var": "f"},
+                          "metrics": {"some_metric": 123},
+                          "start_date": date(2014, 2, 19)},
+                         "oo",
+                         idMapping=["var", "dataType"])
+
+    eq_(doc["_id"], "Zm9v")
+
+
 def test_plugin():
 
     input_document = {

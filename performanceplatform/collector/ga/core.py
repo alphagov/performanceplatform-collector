@@ -149,25 +149,8 @@ def build_document(item, data_type,
     if mappings is None:
         mappings = {}
 
-    if idMapping is not None:
-        if isinstance(idMapping, list):
-            values_for_id = map(lambda d: item['dimensions'][d], idMapping)
-            value_for_id = "".join(values_for_id)
-        else:
-            value_for_id = item['dimensions'][idMapping]
-
-        (_id, human_id) = value_id(value_for_id)
-    else:
-        (_id, human_id) = data_id(
-            data_type,
-            to_datetime(item["start_date"]),
-            timespan,
-            item.get('dimensions', {}).values())
-
     base_properties = {
-        "_id": _id,
         "_timestamp": to_datetime(item["start_date"]),
-        "humanId": human_id,
         "timeSpan": timespan,
         "dataType": data_type
     }
@@ -180,6 +163,25 @@ def build_document(item, data_type,
                item.get("dimensions", {}).items() +
                metrics)
     doc = apply_key_mapping(mappings, doc)
+
+    if idMapping is not None:
+        if isinstance(idMapping, list):
+            values_for_id = map(lambda d: doc[d], idMapping)
+            print values_for_id
+            value_for_id = "".join(values_for_id)
+        else:
+            value_for_id = doc[idMapping]
+
+        (_id, human_id) = value_id(value_for_id)
+    else:
+        (_id, human_id) = data_id(
+            data_type,
+            to_datetime(item["start_date"]),
+            timespan,
+            item.get('dimensions', {}).values())
+
+    doc['humanId'] = human_id
+    doc['_id'] = _id
 
     return doc
 
