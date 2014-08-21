@@ -4,6 +4,8 @@ import gapy.client
 
 from performanceplatform.client import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
+from performanceplatform.collector.ga.datetimeutil \
+    import to_datetime
 
 ga_date_keys = ['day', 'month', 'year']
 
@@ -65,6 +67,7 @@ def sum_data(data, metric, collapse_key, dates, floor):
                     d[dim] = dimensions[dim]
             d['week1'] = 0
             d['week2'] = 0
+            d['_timestamp'] = to_datetime(dates[0])
             collapsed[k] = d
 
         date_list = [dimensions['day'],
