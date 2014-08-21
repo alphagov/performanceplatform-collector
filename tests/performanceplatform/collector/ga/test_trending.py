@@ -4,7 +4,10 @@ from freezegun import freeze_time
 from datetime import date
 from copy import copy
 
-from performanceplatform.collector.ga.trending import *
+from tests.performanceplatform.collector.ga import dt
+from performanceplatform.collector.ga.trending import encode_id, get_date, \
+    sum_data, get_trends, flatten_data_and_assign_ids, assign_day_to_week, \
+    parse_query
 
 
 class test_data_calculations(unittest.TestCase):
@@ -94,15 +97,24 @@ class test_data_calculations(unittest.TestCase):
                                   dates, self.floor)
 
         self.assertEqual(len(collapsed_data), 3)
-        self.assertEqual(collapsed_data['foo'], {u'pageTitle': u'foo',
-                                                 'week1': 1389, 'week2': 718,
-                                                 u'pagePath': u'/foo'})
-        self.assertEqual(collapsed_data['bar'], {u'pageTitle': u'bar',
-                                                 'week1': 520, 'week2': 1209,
-                                                 u'pagePath': u'/bar'})
-        self.assertEqual(collapsed_data['baz'], {u'pageTitle': u'baz',
-                                                 'week1': 500, 'week2': 500,
-                                                 u'pagePath': u'/baz'})
+        self.assertEqual(
+            collapsed_data['foo'],
+            {u'pageTitle': u'foo',
+             u'_timestamp': dt(2014, 1, 29, 0, 0, 0, 'UTC'),
+             'week1': 1389, 'week2': 718,
+             u'pagePath': u'/foo'})
+        self.assertEqual(
+            collapsed_data['bar'],
+            {u'pageTitle': u'bar',
+             u'_timestamp': dt(2014, 1, 29, 0, 0, 0, 'UTC'),
+             'week1': 520, 'week2': 1209,
+             u'pagePath': u'/bar'})
+        self.assertEqual(
+            collapsed_data['baz'],
+            {u'pageTitle': u'baz',
+             u'_timestamp': dt(2014, 1, 29, 0, 0, 0, 'UTC'),
+             'week1': 500, 'week2': 500,
+             u'pagePath': u'/baz'})
 
     @freeze_time("2014-02-12 01:00:00")
     def test_get_percentage_trends(self):
@@ -156,8 +168,8 @@ class test_data_calculations(unittest.TestCase):
                             u'year': u'2014'}},
         )
         try:
-            collapsed_data = sum_data(newdata, self.metric,
-                                      self.collapse_key, dates, self.floor)
+            sum_data(newdata, self.metric,
+                     self.collapse_key, dates, self.floor)
         except ValueError:
             self.fail('collapsed_data does not handle (other) value')
 
