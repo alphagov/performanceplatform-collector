@@ -139,4 +139,5 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
 
     data_set = DataSet.from_config(data_set_config)
 
+    data_set.empty_data_set()
     data_set.post(flattened_data)
