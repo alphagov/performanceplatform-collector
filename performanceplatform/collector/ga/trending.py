@@ -1,9 +1,11 @@
 import base64
 from datetime import date, timedelta
+from apiclient.errors import HttpError
 import gapy.client
 
 from performanceplatform.client import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
+from performanceplatform.utils import statsd
 from performanceplatform.collector.ga.datetimeutil \
     import to_datetime
 
@@ -109,35 +111,38 @@ def flatten_data_and_assign_ids(data):
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):
+    try:
+        credentials = credentials
+        client = gapy.client.from_secrets_file(
+            credentials['CLIENT_SECRETS'],
+            storage_path=credentials['STORAGE_PATH'],
+            http_client=HttpWithBackoff(),
+        )
 
-    credentials = credentials
-    client = gapy.client.from_secrets_file(
-        credentials['CLIENT_SECRETS'],
-        storage_path=credentials['STORAGE_PATH'],
-        http_client=HttpWithBackoff(),
-    )
+        ga_query = parse_query(query)
 
-    ga_query = parse_query(query)
+        collapse_key = "pageTitle"
 
-    collapse_key = "pageTitle"
+        (start, middle, end) = get_date()
 
-    (start, middle, end) = get_date()
+        data = client.query.get(
+            ga_query['id'],
+            start,
+            end,
+            [ga_query['metric']],
+            ga_query['dimensions'],
+            ga_query['filters'] if 'filters' in ga_query else None
+        )
 
-    data = client.query.get(
-        ga_query['id'],
-        start,
-        end,
-        [ga_query['metric']],
-        ga_query['dimensions'],
-        ga_query['filters'] if 'filters' in ga_query else None
-    )
+        collapsed_data = sum_data(data, ga_query['metric'], collapse_key,
+                                  (start, middle, end), 500)
+        trended_data = get_trends(collapsed_data)
+        flattened_data = flatten_data_and_assign_ids(trended_data)
 
-    collapsed_data = sum_data(data, ga_query['metric'], collapse_key,
-                              (start, middle, end), 500)
-    trended_data = get_trends(collapsed_data)
-    flattened_data = flatten_data_and_assign_ids(trended_data)
+        data_set = DataSet.from_config(data_set_config)
 
-    data_set = DataSet.from_config(data_set_config)
-
-    data_set.empty_data_set()
-    data_set.post(flattened_data)
+        data_set.empty_data_set()
+        data_set.post(flattened_data)
+    except HttpError as e:
+        statsd.incr('ga.trending.errors.{}.count'.format(e.resp.status))
+        raise

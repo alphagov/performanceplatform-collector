@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 import re
+from apiclient.errors import HttpError
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 from performanceplatform.utils import statsd
 
@@ -12,21 +13,25 @@ from performanceplatform.collector.ga.datetimeutil \
 
 
 def create_client(credentials):
-    if "CLIENT_SECRETS" in credentials:
-        return from_secrets_file(
-            credentials['CLIENT_SECRETS'],
-            storage_path=credentials['STORAGE_PATH'],
-            http_client=HttpWithBackoff(),
-            ga_hook=track_ga_api_usage,
-        )
-    else:
-        return from_private_key(
-            credentials['ACCOUNT_NAME'],
-            private_key_path=credentials['PRIVATE_KEY'],
-            storage_path=credentials['STORAGE_PATH'],
-            http_client=HttpWithBackoff(),
-            ga_hook=track_ga_api_usage,
-        )
+    try:
+        if "CLIENT_SECRETS" in credentials:
+            return from_secrets_file(
+                credentials['CLIENT_SECRETS'],
+                storage_path=credentials['STORAGE_PATH'],
+                http_client=HttpWithBackoff(),
+                ga_hook=track_ga_api_usage,
+            )
+        else:
+            return from_private_key(
+                credentials['ACCOUNT_NAME'],
+                private_key_path=credentials['PRIVATE_KEY'],
+                storage_path=credentials['STORAGE_PATH'],
+                http_client=HttpWithBackoff(),
+                ga_hook=track_ga_api_usage,
+            )
+    except HttpError as e:
+        statsd.incr('ga.core.errors.{}.count'.format(e.resp.status))
+        raise
 
 
 def track_ga_api_usage(kwargs):
@@ -48,16 +53,20 @@ def query_ga(client, config, start_date, end_date):
     if sort == []:
         sort = None
 
-    return client.query.get(
-        config["id"].replace("ga:", ""),
-        start_date,
-        end_date,
-        config["metrics"],
-        config.get("dimensions"),
-        config.get("filters"),
-        maxResults,
-        sort,
-    )
+    try:
+        return client.query.get(
+            config["id"].replace("ga:", ""),
+            start_date,
+            end_date,
+            config["metrics"],
+            config.get("dimensions"),
+            config.get("filters"),
+            maxResults,
+            sort,
+        )
+    except HttpError as e:
+        statsd.incr('ga.core.errors.{}.count'.format(e.resp.status))
+        raise
 
 
 def send_data(data_set, documents):

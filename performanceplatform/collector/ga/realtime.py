@@ -1,14 +1,15 @@
 from apiclient.discovery import build
+from apiclient.errors import HttpError
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from oauth2client.tools import run
 from datetime import datetime
 import pytz
-import logging
 import sys
 
 from performanceplatform.client import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
+from performanceplatform.utils import statsd
 
 
 GOOGLE_API_SCOPE = "https://www.googleapis.com/auth/analytics"
@@ -44,17 +45,22 @@ class Realtime(object):
                            credentials["STORAGE_PATH"])
 
     def _authenticate(self, client_secrets, storage_path):
-        flow = flow_from_clientsecrets(client_secrets, scope=GOOGLE_API_SCOPE)
-        storage = Storage(storage_path)
-        credentials = storage.get()
-        if credentials is None or credentials.invalid:
-            credentials = run(flow, storage)
+        try:
+            flow = flow_from_clientsecrets(client_secrets,
+                                           scope=GOOGLE_API_SCOPE)
+            storage = Storage(storage_path)
+            credentials = storage.get()
+            if credentials is None or credentials.invalid:
+                credentials = run(flow, storage)
 
-        self.service = build(
-            serviceName="analytics",
-            version="v3",
-            http=credentials.authorize(HttpWithBackoff())
-        )
+            self.service = build(
+                serviceName="analytics",
+                version="v3",
+                http=credentials.authorize(HttpWithBackoff())
+            )
+        except HttpError as e:
+            statsd.incr('ga.realtime.errors.{}.count'.format(e.resp.status))
+            raise
 
     def execute_ga_query(self, query):
         return self.service.data().realtime().get(
@@ -62,14 +68,18 @@ class Realtime(object):
         ).execute()
 
     def query(self, query):
-        response = self.execute_ga_query(query)
+        try:
+            response = self.execute_ga_query(query)
 
-        if "rows" in response:
-            visitor_count = int(response["rows"][0][0])
-        else:
-            visitor_count = 0
+            if "rows" in response:
+                visitor_count = int(response["rows"][0][0])
+            else:
+                visitor_count = 0
 
-        return visitor_count
+            return visitor_count
+        except HttpError as e:
+            statsd.incr('ga.realtime.errors.{}.count'.format(e.resp.status))
+            raise
 
 
 def _timestamp():
