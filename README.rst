@@ -53,8 +53,10 @@ There are also some optional command line arguments you can provide pp-collect::
     making the POST requests and instead log out the url, headers and body to your terminal.
 
     --start, --end
-    If you want the collector to gather past data, you can specify a start date, e.g.
-    "10-01-2013". You must also specify an end date.
+    If you want the collector to gather past data, you can specify a start date in the format
+    "YYYY-MM-DD". You must also specify an end date. e.g.
+
+    --start=2014-08-03 --end=2014-09-03
 
 Configuration
 -------------
