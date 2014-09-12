@@ -9,7 +9,12 @@ and `Pingdom`_ to retrieve data.
 .. image:: https://travis-ci.org/alphagov/performanceplatform-collector.svg?branch=master
    :target: https://travis-ci.org/alphagov/performanceplatform-collector
 
+.. image:: https://landscape.io/github/alphagov/performanceplatform-collector/master/landscape.png
+   :target: https://landscape.io/github/alphagov/performanceplatform-collector/master
+   :alt: Code Health
+
 .. contents:: :local:
+
 
 Installation
 ============
