@@ -193,20 +193,18 @@ def pretty_print(obj):
 
 def build_document_set(results, data_type, mappings, idMapping=None,
                        timespan='week', additionalFields={}):
-    return [build_document(item, data_type, mappings,
+    return (build_document(item, data_type, mappings,
                            idMapping, timespan=timespan,
                            additionalFields=additionalFields)
-            for item in results]
+            for item in results)
 
 
 def query_for_range(client, query, range_start, range_end):
-    items = []
     frequency = query.get('frequency', 'weekly')
 
     for start, end in period_range(range_start, range_end, frequency):
-        items.extend(query_ga(client, query, start, end))
-
-    return items
+        for record in query_ga(client, query, start, end):
+            yield record
 
 
 def run_plugins(plugins_strings, results):
@@ -252,6 +250,6 @@ def query_documents_for(client, query, options,
                               additionalFields=additionalFields)
 
     if "plugins" in options:
-        docs = run_plugins(options["plugins"], docs)
+        docs = run_plugins(options["plugins"], list(docs))
 
     return docs
