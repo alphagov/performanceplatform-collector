@@ -9,4 +9,4 @@ dshelpers>=1.0.4
 unicodecsv
 requests>=1.2.0
 statsd==3.0
-performanceplatform-client==0.0.4
+performanceplatform-client==0.2.2

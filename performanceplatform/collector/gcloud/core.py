@@ -10,7 +10,7 @@ import scraperwiki
 from dshelpers import batch_processor
 from dateutil.parser import parse as parse_datetime
 
-from performanceplatform.client import JsonEncoder
+from performanceplatform.client.base import JsonEncoder
 
 from sales_parser import process_csv
 from table_names import _RAW_SALES_TABLE, _AGGREGATED_SALES_TABLE
