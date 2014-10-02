@@ -116,7 +116,7 @@ def test_query_for_range():
         [expected_response_1],
     ]
 
-    items = query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 8))
+    items = list(query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 8)))
 
     assert_that(len(items), is_(2))
 
@@ -377,8 +377,7 @@ def test_plugin():
     start, end = date(2013, 4, 1), date(2013, 4, 7)
 
     # Check that without a plugin, we have customVarValue9.
-    result = query_documents_for(client, query, options, data_type, start, end)
-    (output_document,) = result
+    result = list(query_documents_for(client, query, options, data_type, start, end))
     assert_in("customVarValue9", result[0])
 
     # Add the plugin
@@ -388,8 +387,7 @@ def test_plugin():
     ]
 
     # Check that plugin has desired effect
-    result = query_documents_for(client, query, options, data_type, start, end)
-    (output_document,) = result
+    result = list(query_documents_for(client, query, options, data_type, start, end))
     assert_not_in("customVarValue9", result[0])
 
 
@@ -415,7 +413,7 @@ def test_data_type_can_be_overriden():
 
     start, end = date(2013, 4, 1), date(2014, 4, 7)
 
-    result = query_documents_for(client, query, options, data_type, start, end)
+    result = list(query_documents_for(client, query, options, data_type, start, end))
 
     eq_(result[0]['dataType'], 'overriden')
 
@@ -442,7 +440,7 @@ def test_data_type_defaults_to_passed_in_data_type():
 
     start, end = date(2013, 4, 1), date(2014, 4, 7)
 
-    result = query_documents_for(client, query, options, data_type, start, end)
+    result = list(query_documents_for(client, query, options, data_type, start, end))
 
     eq_(result[0]['dataType'], 'original')
 
@@ -458,7 +456,7 @@ def test_query_ga_with_sort():
     client = mock.Mock()
     client.query.get.return_value = []
 
-    response = query_ga(client, config, date(2013, 4, 1), date(2013, 4, 7))
+    response = list(query_ga(client, config, date(2013, 4, 1), date(2013, 4, 7)))
 
     client.query.get.assert_called_once_with(
         "123",
@@ -527,8 +525,7 @@ def test_additional_fields():
     start, end = date(2013, 4, 1), date(2013, 4, 7)
 
     # Check that foo is set on the output document
-    result = query_documents_for(client, query, options, data_type, start, end)
-    (output_document,) = result
+    result = list(query_documents_for(client, query, options, data_type, start, end))
     assert_in("foo", result[0])
     assert_that(result[0]["foo"], equal_to("bar"))
 
@@ -559,13 +556,11 @@ def test_daily_repeat():
     start, end = date(2013, 4, 1), date(2013, 4, 1)
 
     # Check that foo is set on the output document
-    result = query_documents_for(client, query, options, data_type, start, end)
-    (output_document,) = result
+    result = list(query_documents_for(client, query, options, data_type, start, end))
     assert_that(result[0]["timeSpan"], equal_to("day"))
     query['frequency'] = 'monthly'
     start, end = date(2013, 4, 1), date(2013, 4, 30)
-    result = query_documents_for(client, query, options, data_type, start, end)
-    (output_document,) = result
+    result = list(query_documents_for(client, query, options, data_type, start, end))
     assert_that(result[0]["timeSpan"], equal_to("month"))
 
 
@@ -586,7 +581,7 @@ def test_float_number():
         [expected_response_0],
     ]
 
-    items = query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 7))
+    items = list(query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 7)))
 
     assert_that(len(items), is_(1))
     (response_0,) = items
