@@ -61,10 +61,6 @@ def query_ga(client, config, start_date, end_date):
 
 
 def send_data(data_set, documents, chunk_size):
-    if len(documents) == 0:
-        logging.info("No data returned with current configuration")
-        return
-
     data_set.post(documents, chunk_size=chunk_size)
 
 
