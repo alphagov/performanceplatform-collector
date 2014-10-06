@@ -16,6 +16,6 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
         start_at, end_at)
 
     data_set = DataSet.from_config(data_set_config)
-    chunk_size = options.get('chunk-size', 0)
+    chunk_size = options.get('chunk-size', 100)
 
     send_data(data_set, documents, chunk_size)
