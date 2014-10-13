@@ -51,4 +51,5 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
 
         documents.extend(ds)
 
-    send_data(DataSet.from_config(data_set_config), documents)
+    chunk_size = options.get('chunk-size', 100)
+    send_data(DataSet.from_config(data_set_config), documents, chunk_size)
