@@ -1,0 +1,68 @@
+{
+  "definition": {
+    "name": "GDS Browsers", 
+    "language": null, 
+    "measures": [
+      {
+        "Sortable": false, 
+        "columnID": 0, 
+        "measureFormatType": null, 
+        "accumulationType": null, 
+        "AllowTotals": true, 
+        "ID": "Visits-0", 
+        "name": "Visits"
+      }
+    ], 
+    "isRealtime": false, 
+    "properties": {
+      "LastUpdate": "10/17/2014 05:10:29", 
+      "ProfileCategory": "NVS", 
+      "intervalsEnabled": false, 
+      "totals": "all", 
+      "isHierarchy": false, 
+      "IsRealTimeCompatible": false, 
+      "enginesearchtime": "421.2027", 
+      "IsSearchable": true, 
+      "ContainsRealtimeData": false, 
+      "datasource": "engine"
+    }, 
+    "profileID": "JkVVAoASUb7", 
+    "dimension": {
+      "name": "Time", 
+      "SubDimension": {
+        "name": "Browser", 
+        "SubDimension": null, 
+        "ID": "browser_hit", 
+        "Range": null, 
+        "type": "data", 
+        "Properties": null
+      }, 
+      "ID": "Time", 
+      "Range": {
+        "startperiod": "current_day-3", 
+        "endperiod": "current_day-2"
+      }, 
+      "type": "period", 
+      "Properties": null
+    }, 
+    "type": "dimensional", 
+    "ID": "aK4SbIcXwb7", 
+    "accountID": 1
+  }, 
+  "data": {
+    "10/14/2014-10/15/2014": {
+      "SubRows": {
+        "Google Chrome": {
+          "Attributes": null, 
+          "SubRows": null, 
+          "measures": {
+            "Visits": 18.0
+          }
+        }
+      }, 
+      "measures": {
+        "Visits": 18.0
+      }
+    }
+  }
+}
