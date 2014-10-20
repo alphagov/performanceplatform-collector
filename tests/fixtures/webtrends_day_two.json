@@ -21,7 +21,7 @@
       "totals": "all", 
       "isHierarchy": false, 
       "IsRealTimeCompatible": false, 
-      "enginesearchtime": "421.2027", 
+      "enginesearchtime": "436.8028", 
       "IsSearchable": true, 
       "ContainsRealtimeData": false, 
       "datasource": "engine"
@@ -39,8 +39,8 @@
       }, 
       "ID": "Time", 
       "Range": {
-        "startperiod": "current_day-3", 
-        "endperiod": "current_day-2"
+        "startperiod": "current_day-2", 
+        "endperiod": "current_day-1"
       }, 
       "type": "period", 
       "Properties": null
@@ -50,18 +50,25 @@
     "accountID": 1
   }, 
   "data": {
-    "10/14/2014-10/15/2014": {
+    "10/15/2014-10/16/2014": {
       "SubRows": {
+        "Mozilla": {
+          "Attributes": null, 
+          "SubRows": null, 
+          "measures": {
+            "Visits": 1.0
+          }
+        }, 
         "Google Chrome": {
           "Attributes": null, 
           "SubRows": null, 
           "measures": {
-            "Visits": 18.0
+            "Visits": 2.0
           }
         }
       }, 
       "measures": {
-        "Visits": 18.0
+        "Visits": 3.0
       }
     }
   }

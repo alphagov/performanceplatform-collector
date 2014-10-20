@@ -56,19 +56,19 @@
           "Attributes": null, 
           "SubRows": null, 
           "measures": {
-            "Visits": 1.0
+            "Visits": 2.0
           }
         }, 
         "Google Chrome": {
           "Attributes": null, 
           "SubRows": null, 
           "measures": {
-            "Visits": 19.0
+            "Visits": 20.0
           }
         }
       }, 
       "measures": {
-        "Visits": 20.0
+        "Visits": 22.0
       }
     }
   }

@@ -1,4 +1,5 @@
 from performanceplatform.utils import requests_with_backoff
+from performanceplatform.client import DataSet
 
 class Collector(object):
     def __init__(self, credentials, query, start_at, end_at):
@@ -26,7 +27,6 @@ class Collector(object):
         )
         response.raise_for_status()
         response_json = response.json()
-        print response_json
         return response_json
 
     def start_at_for_webtrends(self):
@@ -45,10 +45,35 @@ class Collector(object):
     def format(self):
         if self.format:
           return self.format
-        # this may change to csv
+        # csv format is possible but the way it's formatted is somewhat broken
+        # - quoted things are consistent
+        # we'll use json for now
         return "json"
+
+    def collect_parse_and_push(self, data_set_config, options):
+        raw_json_data = self.collect()
+        parsed_data = Parser(options).parse(raw_json_data)
+        Pusher(data_set_config, options).push(parsed_data)
+
+
+class Parser(object):
+    def __init__(self, options):
+        self.options = options
+
+    def parse(self, data):
+        return {}
+
+
+class Pusher(object):
+    def __init__(self, target_data_set_config, options):
+        self.data_set_client = DataSet.from_config(target_data_set_config)
+        self.chunk_size = options.get('chunk-size', 100)
+
+    def push(self, data):
+        self.data_set_client.post(
+            data, chunk_size=self.chunk_size)
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):
-  collector = Collector(credentials, query, start_at, end_at)
-  collector.collect()
+    collector = Collector(credentials, query, start_at, end_at)
+    collector.collect_parse_and_push(data_set_config, options)
