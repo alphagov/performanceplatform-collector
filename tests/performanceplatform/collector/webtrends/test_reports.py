@@ -1,8 +1,9 @@
 import unittest
-from performanceplatform.collector.webtrends.reports import Collector
+from performanceplatform.collector.webtrends.reports import Collector, Parser
 import performanceplatform
 import json
 from mock import patch
+from hamcrest import assert_that, equal_to
 
 def build_collector():
     credentials = {
@@ -61,6 +62,13 @@ class TestCollector(unittest.TestCase):
         pass
 
 class TestParser(unittest.TestCase):
+    def test_handles_returned_date_format_correctly(self):
+        from tests.performanceplatform.collector.ga import dt
+        assert_that(
+            Parser.to_datetime(
+                "10/14/2014-10/15/2014"),
+                equal_to(dt(2014, 10, 14, 0, 0, 0, "UTC")))
+
     def test_handles_ids_to_prevent_duplication_correctly(self):
         pass
 

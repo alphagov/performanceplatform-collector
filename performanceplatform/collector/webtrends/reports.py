@@ -1,5 +1,7 @@
 from performanceplatform.utils import requests_with_backoff
 from performanceplatform.client import DataSet
+from datetime import datetime, time
+import pytz
 
 class Collector(object):
     def __init__(self, credentials, query, start_at, end_at):
@@ -57,11 +59,17 @@ class Collector(object):
 
 
 class Parser(object):
+    # loads common with ga here
     def __init__(self, options):
         self.options = options
 
     def parse(self, data):
         return {}
+
+    @classmethod
+    def to_datetime(cls, webtrends_formatted_date):
+        start_of_period = webtrends_formatted_date.split("-")[0]
+        return datetime.strptime(start_of_period, "%m/%d/%Y").replace(tzinfo=pytz.UTC)
 
 
 class Pusher(object):
