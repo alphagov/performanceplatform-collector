@@ -1,15 +1,14 @@
 from performanceplatform.utils import requests_with_backoff
 from performanceplatform.client import DataSet
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 import pytz
 
 class Collector(object):
     def __init__(self, credentials, query, start_at, end_at):
         # CAN ONLY COLLECT UP TO DAILY?
+        # blow up if not?
         # period type doesn't work so only daily?
         # query should make up not be broken down - passed whole sale to params?
-        print start_at
-        print end_at
         self.start_at = start_at
         self.end_at = end_at
         self.user = credentials['user']
@@ -22,14 +21,29 @@ class Collector(object):
             self.query_format = 'json'
 
     @classmethod
-    def parse_date_for_query(cls, date_string):
-        date = datetime.strptime(date_string, "%Y-%m-%d")
+    def parse_date_for_query(cls, date):
         return date.strftime("%Ym%md%d")
+
+    @classmethod
+    def parse_standard_date_string_to_date(cls, date_string):
+        return datetime.strptime(date_string, "%Y-%m-%d")
 
     @classmethod
     def date_range_for_webtrends(cls, start_at=None, end_at=None):
         if start_at and end_at:
-            return [("current_day-2", "current_day-1")]
+            start_date = cls.parse_standard_date_string_to_date(
+                start_at)
+            end_date = cls.parse_standard_date_string_to_date(
+                end_at)
+            numdays = (end_date - start_date).days + 1
+            end_dates = [(end_date + timedelta(1)) - timedelta(days=x) for x in reversed(range(0, numdays))]
+            start_dates = [end_date - timedelta(days=x) for x in reversed(range(0, numdays))]
+            date_range = []
+            for i, date in enumerate(start_dates):
+                date_range.append((
+                    cls.parse_date_for_query(date),
+                    cls.parse_date_for_query(end_dates[i])))
+            return date_range
         else:
             return [("current_day-2", "current_day-1")]
 
@@ -71,7 +85,7 @@ class Collector(object):
 
     def get_date_range_for_webtrends(self):
         #don't do it if hourly - only daily
-        return Collector.date_range_for_webtrends()
+        return Collector.date_range_for_webtrends(self.start_at, self.end_at)
 
     def collect_parse_and_push(self, data_set_config, options):
         raw_json_data = self.collect()

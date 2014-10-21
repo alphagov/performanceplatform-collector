@@ -83,7 +83,7 @@ class TestCollector(unittest.TestCase):
         mock_get.json.return_value = get_fake_response()
         collector = build_collector("2014-08-03", "2014-08-05")
         collector.collect()
-        mock_get.assert_has_calls([
+        calls = [
             call(
                  url="http://this.com/whoop",
                  auth=('abc', 'def'),
@@ -108,7 +108,10 @@ class TestCollector(unittest.TestCase):
                      'end_period': "2014m08d06",
                      'format': 'json'
             })
-        ])
+        ]
+        assert_that(mock_get.call_args_list[0], equal_to(calls[0]))
+        assert_that(mock_get.call_args_list[1], equal_to(calls[1]))
+        assert_that(mock_get.call_args_list[2], equal_to(calls[2]))
 
     @patch("performanceplatform.collector.webtrends.reports.requests_with_backoff.get")
     def test_collect_when_no_specified_start_and_end(self, mock_get):
@@ -134,8 +137,10 @@ class TestCollector(unittest.TestCase):
         assert_raises(requests.exceptions.HTTPError, collector.collect)
 
     def test_collect_parses_start_and_end_date_format_correctly(self):
-        assert_that(Collector.parse_date_for_query("2014-08-03"), equal_to("2014m08d03"))
-        assert_that(Collector.parse_date_for_query("2014-12-19"), equal_to("2014m12d19"))
+        date = Collector.parse_standard_date_string_to_date("2014-08-03")
+        assert_that(Collector.parse_date_for_query(date), equal_to("2014m08d03"))
+        date = Collector.parse_standard_date_string_to_date("2014-12-19")
+        assert_that(Collector.parse_date_for_query(date), equal_to("2014m12d19"))
 
     def test_collect_builds_date_ranges_correctly_when_start_and_end_given(self):
         assert_that(Collector.date_range_for_webtrends(
