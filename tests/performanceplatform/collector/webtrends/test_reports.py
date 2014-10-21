@@ -2,19 +2,19 @@ import unittest
 from performanceplatform.collector.webtrends.reports import Collector, Parser
 import performanceplatform
 import json
-from mock import patch
+from mock import patch, call
 import requests
 from hamcrest import assert_that, equal_to
 from nose.tools import assert_raises
 
-def build_collector():
+def build_collector(start_at=None, end_at=None):
     credentials = {
             'user': 'abc',
             'password': 'def',
             'reports_url': 'http://this.com/'
         }
     query = {'report_id': 'whoop'}
-    return Collector(credentials, query, None, None)
+    return Collector(credentials, query, start_at, end_at)
 
 def get_fake_response():
     with open("tests/fixtures/webtrends_day_one.json", "r") as f:
@@ -80,21 +80,35 @@ class TestCollector(unittest.TestCase):
 
     @patch("performanceplatform.collector.webtrends.reports.requests_with_backoff.get")
     def test_collect_when_specified_start_and_end_and_daily(self, mock_get):
-        #mock_get.json.return_value = get_fake_response()
-        #collector = build_collector()
-        #collector.collect()
-        #mock_get.assert_called_once_with(
-            #url="{base_url}{report_id}".format(
-              #base_url=self.base_url,
-              #report_id=self.report_id),
-            #auth=(self.user, self.password),
-            #params={
-                #'start_period': self.start_at_for_webtrends(),
-                #'end_period': self.end_at_for_webtrends(),
-                #'format': self.format()
-            #}
-        #)
-        pass
+        mock_get.json.return_value = get_fake_response()
+        collector = build_collector("2014-08-03", "2014-08-05")
+        collector.collect()
+        mock_get.assert_has_calls([
+            call(
+                 url="http://this.com/whoop",
+                 auth=('abc', 'def'),
+                 params={
+                     'start_period': "2014m08d03",
+                     'end_period': "2014m08d04",
+                     'format': 'json'
+            }),
+            call(
+                 url="http://this.com/whoop",
+                 auth=('abc', 'def'),
+                 params={
+                     'start_period': "2014m08d04",
+                     'end_period': "2014m08d05",
+                     'format': 'json'
+            }),
+            call(
+                 url="http://this.com/whoop",
+                 auth=('abc', 'def'),
+                 params={
+                     'start_period': "2014m08d05",
+                     'end_period': "2014m08d06",
+                     'format': 'json'
+            })
+        ])
 
     @patch("performanceplatform.collector.webtrends.reports.requests_with_backoff.get")
     def test_collect_when_no_specified_start_and_end(self, mock_get):
@@ -122,6 +136,24 @@ class TestCollector(unittest.TestCase):
     def test_collect_parses_start_and_end_date_format_correctly(self):
         assert_that(Collector.parse_date_for_query("2014-08-03"), equal_to("2014m08d03"))
         assert_that(Collector.parse_date_for_query("2014-12-19"), equal_to("2014m12d19"))
+
+    def test_collect_builds_date_ranges_correctly_when_start_and_end_given(self):
+        assert_that(Collector.date_range_for_webtrends(
+            "2014-08-03",
+            "2014-08-05"),
+            equal_to([
+                ("2014m08d03", "2014m08d04"),
+                ("2014m08d04", "2014m08d05"),
+                ("2014m08d05", "2014m08d06")
+            ])
+        )
+
+    def test_collect_builds_date_ranges_correctly_when_no_start_and_end(self):
+        assert_that(Collector.date_range_for_webtrends(),
+            equal_to([
+                ("current_day-2", "current_day-1")
+            ])
+        )
 
 
 class TestParser(unittest.TestCase):

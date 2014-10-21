@@ -8,6 +8,8 @@ class Collector(object):
         # CAN ONLY COLLECT UP TO DAILY?
         # period type doesn't work so only daily?
         # query should make up not be broken down - passed whole sale to params?
+        print start_at
+        print end_at
         self.start_at = start_at
         self.end_at = end_at
         self.user = credentials['user']
@@ -24,34 +26,52 @@ class Collector(object):
         date = datetime.strptime(date_string, "%Y-%m-%d")
         return date.strftime("%Ym%md%d")
 
-    def collect(self):
-        response = requests_with_backoff.get(
+    @classmethod
+    def date_range_for_webtrends(cls, start_at=None, end_at=None):
+        if start_at and end_at:
+            return [("current_day-2", "current_day-1")]
+        else:
+            return [("current_day-2", "current_day-1")]
+
+    def _make_request(self, start_at_for_webtrends, end_at_for_webtrends):
+        return requests_with_backoff.get(
             url="{base_url}{report_id}".format(
               base_url=self.base_url,
               report_id=self.report_id),
             auth=(self.user, self.password),
             params={
-                'start_period': self.start_at_for_webtrends(),
-                'end_period': self.end_at_for_webtrends(),
+                'start_period': start_at_for_webtrends,
+                'end_period': end_at_for_webtrends,
                 'format': self.query_format
             }
         )
-        response.raise_for_status()
-        response_json = response.json()
-        return response_json
+
+    def collect(self):
+        data = []
+        for start_at, end_at in self.get_date_range_for_webtrends():
+            response = self._make_request(
+                start_at,
+                end_at)
+            response.raise_for_status()
+            data.append(response.json()["data"])
+        return data
 
     def start_at_for_webtrends(self):
         if self.start_at:
-            self.start_at
+            return self.start_at
         #figure out formats here, how to parse standard format for this to their format?
-        # default as most of these reports are generated hourly
+        # default as most of these reports are generated daily
         return "current_day-2"
 
     def end_at_for_webtrends(self):
         if self.end_at:
             return self.end_at
-        # default as most of these reports are generated hourly
+        # default as most of these reports are generated daily
         return "current_day-1"
+
+    def get_date_range_for_webtrends(self):
+        #don't do it if hourly - only daily
+        return Collector.date_range_for_webtrends()
 
     def collect_parse_and_push(self, data_set_config, options):
         raw_json_data = self.collect()
