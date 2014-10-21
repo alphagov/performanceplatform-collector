@@ -4,6 +4,7 @@ import logging
 import re
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 from performanceplatform.utils import statsd
+from performanceplatform.utils.data_parser import DataParser
 
 from gapy.client import from_private_key, from_secrets_file
 
@@ -138,60 +139,20 @@ def convert_durations(metric):
     return new_metric
 
 
-def build_document(item, data_type,
-                   mappings=None, idMapping=None,
-                   timespan='week', additionalFields={}):
-    if data_type is None:
-        raise ValueError("Must provide a data type")
-    if mappings is None:
-        mappings = {}
-
-    base_properties = {
-        "_timestamp": to_datetime(item["start_date"]),
-        "timeSpan": timespan,
-        "dataType": data_type
-    }
-
+def build_document(item):
     metrics = [(key, try_number(value))
                for key, value in item["metrics"].items()]
     metrics = [convert_durations(metric) for metric in metrics]
 
-    doc = dict(base_properties.items() +
-               additionalFields.items() +
-               item.get("dimensions", {}).items() +
-               metrics)
-    doc = apply_key_mapping(mappings, doc)
-
-    if idMapping is not None:
-        if isinstance(idMapping, list):
-            values_for_id = map(lambda d: unicode(doc[d]), idMapping)
-            value_for_id = "".join(values_for_id)
-        else:
-            value_for_id = doc[idMapping]
-
-        (_id, human_id) = value_id(value_for_id)
-    else:
-        (_id, human_id) = data_id(
-            data_type,
-            to_datetime(item["start_date"]),
-            timespan,
-            item.get('dimensions', {}).values())
-
-    doc['humanId'] = human_id
-    doc['_id'] = _id
-
-    return doc
+    return dict(metrics)
 
 
 def pretty_print(obj):
     return json.dumps(obj, indent=2)
 
 
-def build_document_set(results, data_type, mappings, idMapping=None,
-                       timespan='week', additionalFields={}):
-    return (build_document(item, data_type, mappings,
-                           idMapping, timespan=timespan,
-                           additionalFields=additionalFields)
+def build_document_set(results):
+    return (build_document(item)
             for item in results)
 
 
@@ -228,24 +189,8 @@ def query_documents_for(client, query, options,
                         data_type, start_date, end_date):
     results = query_for_range(client, query, start_date, end_date)
 
-    data_type = options.get('dataType', data_type)
-    mappings = options.get("mappings", {})
-    idMapping = options.get("idMapping", None)
-
-    frequency = query.get('frequency', 'weekly')
-    frequency_to_timespan_mapping = {
-        'daily': 'day',
-        'weekly': 'week',
-        'monthly': 'month',
-    }
-    timespan = frequency_to_timespan_mapping[frequency]
-
-    additionalFields = options.get('additionalFields', {})
-    docs = build_document_set(results, data_type, mappings,
-                              idMapping, timespan=timespan,
-                              additionalFields=additionalFields)
-
-    if "plugins" in options:
-        docs = run_plugins(options["plugins"], list(docs))
-
-    return docs
+    results = [item for item in results]
+    special_fields = [item for item in build_document_set(results)]
+    return DataParser(results, options, query, data_type).get_data(
+        special_fields
+    )
