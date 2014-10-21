@@ -26,7 +26,7 @@ class TestCollector(unittest.TestCase):
     # any point in making generic - with requests?
     #@end_to_end_with_response('abc')
     def test_collect_parse_and_push(self, mock_get, mock_post):
-        mock_get.json.return_value = get_fake_response()
+        mock_get().json.return_value = get_fake_response()
         collector = build_collector()
         collector.collect_parse_and_push({'url': 'abc', 'token': 'def', 'dry_run': False}, {})
         posted_data = [
@@ -58,11 +58,27 @@ class TestCollector(unittest.TestCase):
         mock_post.assert_called_once_with(posted_data, chunk_size=100)
 
 
-    # test request is set up correctly
-    # test it parses proper start and end properly
     @patch("performanceplatform.collector.webtrends.reports.requests_with_backoff.get")
     def test_collect_when_specified_start_and_end_and_weekly(self, mock_get):
-        #mock_get.json.return_value = get_fake_response()
+        #mock_get().json.return_value = get_fake_response()
+        #collector = build_collector()
+        #collector.collect()
+        #mock_get.assert_called_once_with(
+            #url="{base_url}{report_id}".format(
+              #base_url=self.base_url,
+              #report_id=self.report_id),
+            #auth=(self.user, self.password),
+            #params={
+                #'start_period': self.start_at_for_webtrends(),
+                #'end_period': self.end_at_for_webtrends(),
+                #'format': self.format()
+            #}
+        #)
+        pass
+
+    @patch("performanceplatform.collector.webtrends.reports.requests_with_backoff.get")
+    def test_collect_when_specified_start_and_end_and_hourly(self, mock_get):
+        #mock_get().json.return_value = get_fake_response()
         #collector = build_collector()
         #collector.collect()
         #mock_get.assert_called_once_with(
@@ -80,9 +96,14 @@ class TestCollector(unittest.TestCase):
 
     @patch("performanceplatform.collector.webtrends.reports.requests_with_backoff.get")
     def test_collect_when_specified_start_and_end_and_daily(self, mock_get):
-        mock_get.json.return_value = get_fake_response()
+        mock_get().json.return_value = get_fake_response()
+        # as the above bit of setup is a call
+        mock_get.reset_mock()
         collector = build_collector("2014-08-03", "2014-08-05")
-        collector.collect()
+        assert_that(collector.collect(), equal_to([
+            get_fake_response()["data"],
+            get_fake_response()["data"],
+            get_fake_response()["data"]]))
         calls = [
             call(
                  url="http://this.com/whoop",
@@ -115,9 +136,11 @@ class TestCollector(unittest.TestCase):
 
     @patch("performanceplatform.collector.webtrends.reports.requests_with_backoff.get")
     def test_collect_when_no_specified_start_and_end(self, mock_get):
-        mock_get.json.return_value = get_fake_response()
+        mock_get().json.return_value = get_fake_response()
+        # as the above bit of setup is a call
+        mock_get.reset_mock()
         collector = build_collector()
-        collector.collect()
+        assert_that(collector.collect(), equal_to([get_fake_response()["data"]]))
         mock_get.assert_called_once_with(
             url="http://this.com/whoop",
             auth=('abc', 'def'),
