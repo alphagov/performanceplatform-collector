@@ -5,6 +5,8 @@ import pytz
 
 class Collector(object):
     def __init__(self, credentials, query, start_at, end_at):
+        # CAN ONLY COLLECT UP TO DAILY?
+        # period type doesn't work so only daily?
         # query should make up not be broken down - passed whole sale to params?
         self.start_at = start_at
         self.end_at = end_at
@@ -13,7 +15,14 @@ class Collector(object):
         self.base_url = credentials['reports_url']
         self.report_id = query.pop('report_id')
         if 'format' in query:
-            self.format = query['format']
+            self.query_format = query['format']
+        else:
+            self.query_format = 'json'
+
+    @classmethod
+    def parse_date_for_query(cls, date_string):
+        date = datetime.strptime(date_string, "%Y-%m-%d")
+        return date.strftime("%Ym%md%d")
 
     def collect(self):
         response = requests_with_backoff.get(
@@ -24,7 +33,7 @@ class Collector(object):
             params={
                 'start_period': self.start_at_for_webtrends(),
                 'end_period': self.end_at_for_webtrends(),
-                'format': self.format()
+                'format': self.query_format
             }
         )
         response.raise_for_status()
@@ -43,14 +52,6 @@ class Collector(object):
             return self.end_at
         # default as most of these reports are generated hourly
         return "current_day-1"
-
-    def format(self):
-        if self.format:
-          return self.format
-        # csv format is possible but the way it's formatted is somewhat broken
-        # - quoted things are consistent
-        # we'll use json for now
-        return "json"
 
     def collect_parse_and_push(self, data_set_config, options):
         raw_json_data = self.collect()
