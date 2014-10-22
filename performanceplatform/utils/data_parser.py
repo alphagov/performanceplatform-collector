@@ -1,4 +1,4 @@
-from performanceplatform.collector.ga.datetimeutil \
+from performanceplatform.utils.datetimeutil \
     import to_datetime, to_utc
 import logging
 import base64
@@ -41,13 +41,16 @@ def build_document_set(results, data_type, mappings, special_fields,
                        idMapping=None,
                        timespan='week',
                        additionalFields={}):
+    if len(results) is not len(special_fields):
+        raise ValueError(
+            "There must be same number of special fields as results")
     return (build_document(item, data_type, special_fields[i], mappings,
                            idMapping, timespan=timespan,
                            additionalFields=additionalFields)
             for i, item in enumerate(results))
 
 
-def build_document(item, data_type, special_fields,
+def build_document(item, data_type, special_fields={},
                    mappings=None, idMapping=None,
                    timespan='week', additionalFields={}):
     if data_type is None:
@@ -107,33 +110,6 @@ def run_plugins(plugins_strings, results):
         results = plugin(results)
 
     return results
-
-
-def try_number(value):
-    """
-    Attempt to cast the string `value` to an int, and failing that, a float,
-    failing that, raise a ValueError.
-    """
-
-    for cast_function in [int, float]:
-        try:
-            return cast_function(value)
-        except ValueError:
-            pass
-
-    raise ValueError("Unable to use value as int or float: {0!r}"
-                     .format(value))
-
-
-def convert_durations(metric):
-    """
-    Convert session duration metrics from seconds to milliseconds.
-    """
-    if metric[0] == 'avgSessionDuration' and metric[1]:
-        new_metric = (metric[0], metric[1] * 1000)
-    else:
-        new_metric = metric
-    return new_metric
 
 
 def apply_key_mapping(mapping, pairs):
