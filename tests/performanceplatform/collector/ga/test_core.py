@@ -4,6 +4,8 @@ from datetime import date
 from hamcrest import assert_that, is_, has_entries, has_item, equal_to
 
 import mock
+import datetime
+import pytz
 
 from nose.tools import (assert_in, assert_not_in, assert_is_instance,
                         raises, eq_)
@@ -15,6 +17,45 @@ from performanceplatform.collector.ga.core import \
     convert_durations
 
 from tests.performanceplatform.collector.ga import dt
+
+
+@mock.patch("performanceplatform.collector.ga.core.query_for_range")
+def test_parses_ga_data_correctly(mock_query_in_range):
+    ga_data = [
+        {
+            'metrics': {u'visitors': u'14'},
+            'start_date': datetime.date(2014, 10, 13),
+            'end_date': datetime.date(2014, 10, 19),
+            'dimensions': {
+                u'browserVersion': u'9.4.1.482', u'browser': u'UC Browser'
+            }
+        },
+        {
+            'metrics': {u'visitors': u'14'},
+            'start_date': datetime.date(2014, 10,     13),
+            'end_date': datetime.date(2014, 10, 19),
+            'dimensions': {
+                u'browserVersion': u'9.7.6.428', u'browser': u'UC Browser'
+            }
+        }
+    ]
+    ga_data_generator = (item for item in ga_data)
+    mock_query_in_range.return_value = ga_data_generator
+    query = {u'metrics': [u'visitors'], u'maxResults': 0, u'dimensions': [u'browser', u'browserVersion'], u'filters': [u'customVarValue9=~^<EA570>'], u'id': u'ga:74473500'}  # noqa
+    options = {u'filtersets': [[u'customVarValue9=~^<D1>'], [u'customVarValue9=~^<D2>'], [u'customVarValue9=~^<D3>'], [u'customVarValue9=~^<D4>'], [u'customVarValue9=~^<D5>'], [u'customVarValue9=~^<D6>'], [u'customVarValue9=~^<D7>'], [u'customVarValue9=~^<D8>'], [u'customVarValue9=~^<D9>'], [u'customVarValue9=~^<D10>'], [u'customVarValue9=~^<D11>'], [u'customVarValue9=~^<D12>'], [u'customVarValue9=~^<D13>'], [u'customVarValue9=~^<D14>'], [u'customVarValue9=~^<D15>'], [u'customVarValue9=~^<D16>'], [u'customVarValue9=~^<D17>'], [u'customVarValue9=~^<D18>'], [u'customVarValue9=~^<D19>'], [u'customVarValue9=~^<D23>'], [u'customVarValue9=~^<D24>'], [u'customVarValue9=~^<D25>'], [u'customVarValue9=~^<EA74>'], [u'customVarValue9=~^<EA75>'], [u'customVarValue9=~^<EA79>'], [u'customVarValue9=~^<OT532>'], [u'customVarValue9=~^<OT537>'], [u'customVarValue9=~^<D20>'], [u'customVarValue9=~^<D21>'], [u'customVarValue9=~^<D22>'], [u'customVarValue9=~^<D241>'], [u'customVarValue9=~^<D117>'], [u'customVarValue9=~^<EA199>'], [u'customVarValue9=~^<D98>'], [u'customVarValue9=~^<EA321>'], [u'customVarValue9=~^<OT554>'], [u'customVarValue9=~^<EA570>']], 'additionalFields': {'department': 'driver-and-vehicle-standards-agency'}, u'plugins': [u"Comment('department computed from filtersets by collect-content-dashboard-table.py')", u"ComputeIdFrom('_timestamp', 'timeSpan', 'dataType', 'department', 'browser', 'browserVersion')"]}  # noqa
+    data_type = "browsers"
+    start_date = None
+    end_date = None
+    results = query_documents_for(
+        {},
+        query,
+        options,
+        data_type,
+        start_date,
+        end_date)
+    expected_results = [{u'browserVersion': u'9.4.1.482', '_timestamp': datetime.datetime(2014, 10, 13, 0, 0, tzinfo=pytz.UTC), 'timeSpan': 'week', 'dataType': 'browsers', u'visitors': 14, 'humanId': '20141013000000_week_browsers_driver-and-vehicle-standards-agency_UC Browser_9.4.1.482', 'department': 'driver-and-vehicle-standards-agency', '_id': 'MjAxNDEwMTMwMDAwMDBfd2Vla19icm93c2Vyc19kcml2ZXItYW5kLXZlaGljbGUtc3RhbmRhcmRzLWFnZW5jeV9VQyBCcm93c2VyXzkuNC4xLjQ4Mg==', u'browser': u'UC Browser'}, {u'browserVersion': u'9.7.6.428', '_timestamp': datetime.datetime(2014, 10, 13, 0, 0, tzinfo=pytz.UTC), 'timeSpan': 'week', 'dataType': 'browsers', u'visitors': 14, 'humanId': '20141013000000_week_browsers_driver-and-vehicle-standards-agency_UC Browser_9.7.6.428', 'department': 'driver-and-vehicle-standards-agency', '_id': 'MjAxNDEwMTMwMDAwMDBfd2Vla19icm93c2Vyc19kcml2ZXItYW5kLXZlaGljbGUtc3RhbmRhcmRzLWFnZW5jeV9VQyBCcm93c2VyXzkuNy42LjQyOA==', u'browser': u'UC Browser'}]  # noqa
+
+    assert_that(results, equal_to(expected_results))
 
 
 def test_query_ga_with_empty_response():
@@ -116,7 +157,8 @@ def test_query_for_range():
         [expected_response_1],
     ]
 
-    items = list(query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 8)))
+    items = list(
+        query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 8)))
 
     assert_that(len(items), is_(2))
 
@@ -377,7 +419,8 @@ def test_plugin():
     start, end = date(2013, 4, 1), date(2013, 4, 7)
 
     # Check that without a plugin, we have customVarValue9.
-    result = list(query_documents_for(client, query, options, data_type, start, end))
+    result = list(
+        query_documents_for(client, query, options, data_type, start, end))
     assert_in("customVarValue9", result[0])
 
     # Add the plugin
@@ -387,7 +430,8 @@ def test_plugin():
     ]
 
     # Check that plugin has desired effect
-    result = list(query_documents_for(client, query, options, data_type, start, end))
+    result = list(
+        query_documents_for(client, query, options, data_type, start, end))
     assert_not_in("customVarValue9", result[0])
 
 
@@ -413,7 +457,8 @@ def test_data_type_can_be_overriden():
 
     start, end = date(2013, 4, 1), date(2014, 4, 7)
 
-    result = list(query_documents_for(client, query, options, data_type, start, end))
+    result = list(
+        query_documents_for(client, query, options, data_type, start, end))
 
     eq_(result[0]['dataType'], 'overriden')
 
@@ -440,7 +485,8 @@ def test_data_type_defaults_to_passed_in_data_type():
 
     start, end = date(2013, 4, 1), date(2014, 4, 7)
 
-    result = list(query_documents_for(client, query, options, data_type, start, end))
+    result = list(
+        query_documents_for(client, query, options, data_type, start, end))
 
     eq_(result[0]['dataType'], 'original')
 
@@ -456,7 +502,8 @@ def test_query_ga_with_sort():
     client = mock.Mock()
     client.query.get.return_value = []
 
-    response = list(query_ga(client, config, date(2013, 4, 1), date(2013, 4, 7)))
+    response = list(
+        query_ga(client, config, date(2013, 4, 1), date(2013, 4, 7)))
 
     client.query.get.assert_called_once_with(
         "123",
@@ -525,7 +572,8 @@ def test_additional_fields():
     start, end = date(2013, 4, 1), date(2013, 4, 7)
 
     # Check that foo is set on the output document
-    result = list(query_documents_for(client, query, options, data_type, start, end))
+    result = list(
+        query_documents_for(client, query, options, data_type, start, end))
     assert_in("foo", result[0])
     assert_that(result[0]["foo"], equal_to("bar"))
 
@@ -556,11 +604,13 @@ def test_daily_repeat():
     start, end = date(2013, 4, 1), date(2013, 4, 1)
 
     # Check that foo is set on the output document
-    result = list(query_documents_for(client, query, options, data_type, start, end))
+    result = list(
+        query_documents_for(client, query, options, data_type, start, end))
     assert_that(result[0]["timeSpan"], equal_to("day"))
     query['frequency'] = 'monthly'
     start, end = date(2013, 4, 1), date(2013, 4, 30)
-    result = list(query_documents_for(client, query, options, data_type, start, end))
+    result = list(
+        query_documents_for(client, query, options, data_type, start, end))
     assert_that(result[0]["timeSpan"], equal_to("month"))
 
 
@@ -581,7 +631,8 @@ def test_float_number():
         [expected_response_0],
     ]
 
-    items = list(query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 7)))
+    items = list(
+        query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 7)))
 
     assert_that(len(items), is_(1))
     (response_0,) = items
