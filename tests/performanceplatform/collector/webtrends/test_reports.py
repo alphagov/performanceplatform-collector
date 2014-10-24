@@ -35,7 +35,10 @@ class TestCollector(unittest.TestCase):
         mock_get().json.return_value = get_fake_response()
         collector = build_collector()
         collector.collect_parse_and_push(
-            {'url': 'abc', 'token': 'def', 'dry_run': False}, {})
+            {'data-type': 'boop',
+             'url': 'abc',
+             'token': 'def',
+             'dry_run': False}, {'row_type_name': 'abc'})
         posted_data = [
             {
                 # this side or backdrop side or not at all?
@@ -215,8 +218,16 @@ class TestParser(unittest.TestCase):
                 "test": "field"
             }
         ]
-        results = Parser({}).parse(get_fake_response)
-        assert_that(results, equal_to(posted_data))
+        query = {'report_id': 'whoop'}
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            'idMapping': ["dataType", "_timestamp", "timeSpan", "browser"]}
+        data_type = "browsers"
+        parser = Parser(options, query, data_type)
+        results = parser.parse([get_fake_response()['data']])
+        assert_that(list(results), equal_to(posted_data))
 
     def test_handles_ids_to_prevent_duplication_correctly(self):
         pass

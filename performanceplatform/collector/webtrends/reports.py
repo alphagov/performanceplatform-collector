@@ -1,20 +1,25 @@
 from performanceplatform.utils import requests_with_backoff
 from performanceplatform.client import DataSet
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 import pytz
+from performanceplatform.utils.data_parser import DataParser
+
 
 class Collector(object):
     def __init__(self, credentials, query, start_at, end_at):
         # CAN ONLY COLLECT UP TO DAILY?
         # blow up if not?
         # period type doesn't work so only daily?
-        # query should make up not be broken down - passed whole sale to params?
+        # query should make up not be broken down
+        # - passed whole sale to params?
         self.start_at = start_at
         self.end_at = end_at
         self.user = credentials['user']
         self.password = credentials['password']
         self.base_url = credentials['reports_url']
         self.report_id = query.pop('report_id')
+        self.query = query
+        #probably not necessary
         if 'format' in query:
             self.query_format = query['format']
         else:
@@ -36,8 +41,10 @@ class Collector(object):
             end_date = cls.parse_standard_date_string_to_date(
                 end_at)
             numdays = (end_date - start_date).days + 1
-            end_dates = [(end_date + timedelta(1)) - timedelta(days=x) for x in reversed(range(0, numdays))]
-            start_dates = [end_date - timedelta(days=x) for x in reversed(range(0, numdays))]
+            end_dates = [(end_date + timedelta(1)) - timedelta(days=x)
+                         for x in reversed(range(0, numdays))]
+            start_dates = [end_date - timedelta(days=x)
+                           for x in reversed(range(0, numdays))]
             date_range = []
             for i, date in enumerate(start_dates):
                 date_range.append((
@@ -50,8 +57,8 @@ class Collector(object):
     def _make_request(self, start_at_for_webtrends, end_at_for_webtrends):
         return requests_with_backoff.get(
             url="{base_url}{report_id}".format(
-              base_url=self.base_url,
-              report_id=self.report_id),
+                base_url=self.base_url,
+                report_id=self.report_id),
             auth=(self.user, self.password),
             params={
                 'start_period': start_at_for_webtrends,
@@ -73,7 +80,8 @@ class Collector(object):
     def start_at_for_webtrends(self):
         if self.start_at:
             return self.start_at
-        #figure out formats here, how to parse standard format for this to their format?
+        #figure out formats here,
+        # how to parse standard format for this to their format?
         # default as most of these reports are generated daily
         return "current_day-2"
 
@@ -89,22 +97,52 @@ class Collector(object):
 
     def collect_parse_and_push(self, data_set_config, options):
         raw_json_data = self.collect()
-        parsed_data = Parser(options).parse(raw_json_data)
+        parsed_data = Parser(
+            options, self.query, data_set_config['data-type']
+        ).parse(raw_json_data)
         Pusher(data_set_config, options).push(parsed_data)
 
 
 class Parser(object):
     # loads common with ga here
-    def __init__(self, options):
+    def __init__(self, options, query, data_type):
         self.options = options
+        self.row_type_name = options['row_type_name']
+        self.query = query
+        self.data_type = data_type
 
     def parse(self, data):
-        return {}
+        # is it right to add into list? e.g. do multiple
+        # time periods at once?
+        base_items = []
+        special_fields = []
+        for item in data:
+            res = self.parse_item(item)
+            base_items += res[0]
+            special_fields += res[1]
+        return DataParser(
+            base_items, self.options, self.query, self.data_type
+        ).get_data(special_fields)
+
+    def parse_item(self, item):
+        initial_data = []
+        special_fields = []
+        for date, data_point in item.items():
+            start_date = Parser.to_datetime(date)
+            for row_type, row in data_point['SubRows'].items():
+                initial_data.append({
+                    'start_date': start_date,
+                })
+                special_fields.append(dict({
+                    self.row_type_name: row_type
+                }.items() + row['measures'].items()))
+        return initial_data, special_fields
 
     @classmethod
     def to_datetime(cls, webtrends_formatted_date):
         start_of_period = webtrends_formatted_date.split("-")[0]
-        return datetime.strptime(start_of_period, "%m/%d/%Y").replace(tzinfo=pytz.UTC)
+        return datetime.strptime(
+            start_of_period, "%m/%d/%Y").replace(tzinfo=pytz.UTC)
 
 
 class Pusher(object):
