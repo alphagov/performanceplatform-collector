@@ -7,7 +7,37 @@ import re
 
 class DataParser(object):
     def __init__(self, data, options, query, data_type):
-        self.data = [item for item in data]
+        # it would be nice to have some json schemas or something to validate
+        # for now here are some docs
+        """
+        data: Can be any array of dicts
+        options: {
+          mappings: "a dict: converts keys matching key of the mappings dict
+              to the value in the mapping dict",
+          additionalFields: "a dict:
+              key value pairs will be added into the returned data",
+          idMappings: "a list of keys or single key string: for each key
+              the corresponding values will be concatenated in order to create
+              a unique _human_id field on the returned data and base64
+              encoded in order to create an _id field. If no idMappings
+              are provided then the item start_date and any avaiable
+              'dimensions' will be used instead",
+          dataType: "a value to be set on a dataType attribute.
+              Overrides the data_type argument"
+          plugins: "a list of string respresentations of python classes being
+              instantiated. e.g. ComputeIdFrom('_timestamp', '_timespan').
+              To be run on the passed in data to mutate it.
+              See performanceplatform.collector.ga.plugins for more details"
+        }
+        query: {
+          frequency: "a string - either daily, weekly or monthly, to be
+              converted to a timespan - either day month or week that is
+              then set as a timespan attribute on the returned data"
+        }
+        data_type: "a string - the data_type to be set as a data_type
+            attribute on the returned data unless it is overridden in options"
+        """
+        self.data = list(data)
         if "plugins" in options:
             self.plugins = options["plugins"]
         else:
@@ -26,6 +56,35 @@ class DataParser(object):
         self.timespan = frequency_to_timespan_mapping[frequency]
 
     def get_data(self, special_fields):
+        """
+        special_fields: "a dict of data specific to collector type
+            that should be added to the data returned by the parser.
+            This will also be and operated on by idMappings, mappings and
+            plugins"
+
+        This method loops through the data provided to the instance.
+        For each item it will return a dict of the format:
+        {
+            "_timestamp": "the item start_date",
+            "timeSpan": "self.timespan for the instance",
+            "dataType": "self.data_type for the instance",
+            ...
+            "any additional fields": "from self.additionalFields",
+            "any special_fields": "from special fields argument",
+            "any item dimensions": "from item.dimensions",
+            ...
+            mappings changing keys in this dict from self.mappings
+               are then applied on the above
+            ...
+            "_human_id": "derived from either the values corresponding to
+               idMappings concatenated or the data_type, item.start_date,
+               timespan and item.dimensions values if any concatenated"
+            "_id": "derived from either the values corresponding to
+               idMappings concatenated or the data_type, item.start_date,
+               timespan and item.dimensions values if any concatenated and
+               then base64 encoded"
+        }
+        """
         docs = build_document_set(self.data, self.data_type, self.mappings,
                                   special_fields,
                                   self.idMapping, timespan=self.timespan,
