@@ -18,7 +18,7 @@ class DataParser(object):
               key value pairs will be added into the returned data",
           idMapping: "a list of keys or single key string: for each key
               the corresponding values will be concatenated in order to create
-              a unique _human_id field on the returned data and base64
+              a unique _humanId field on the returned data and base64
               encoded in order to create an _id field. If no idMapping
               are provided then the item start_date and any avaiable
               'dimensions' will be used instead",
@@ -76,7 +76,7 @@ class DataParser(object):
             mappings changing keys in this dict from self.mappings
                are then applied on the above
             ...
-            "_human_id": "derived from either the values corresponding to
+            "_humanId": "derived from either the values corresponding to
                idMapping concatenated or the data_type, item.start_date,
                timespan and item.dimensions values if any concatenated"
             "_id": "derived from either the values corresponding to
@@ -139,9 +139,15 @@ def build_document(item, data_type, special_fields={},
                special_fields.items())
     doc = apply_key_mapping(mappings, doc)
 
+    def format_for_id(key):
+        value = doc[key]
+        if key is "_timestamp":
+            value = _format(value)  
+        return value
+
     if idMapping is not None:
         if isinstance(idMapping, list):
-            values_for_id = map(lambda d: unicode(doc[d]), idMapping)
+            values_for_id = map(format_for_id, idMapping)
             value_for_id = "".join(values_for_id)
         else:
             value_for_id = doc[idMapping]

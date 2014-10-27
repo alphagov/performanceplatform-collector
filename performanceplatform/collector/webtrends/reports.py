@@ -7,11 +7,6 @@ from performanceplatform.utils.data_parser import DataParser
 
 class Collector(object):
     def __init__(self, credentials, query, start_at, end_at):
-        # CAN ONLY COLLECT UP TO DAILY?
-        # blow up if not?
-        # period type doesn't work so only daily?
-        # query should make up not be broken down
-        # - passed whole sale to params?
         self.start_at = start_at
         self.end_at = end_at
         self.user = credentials['user']

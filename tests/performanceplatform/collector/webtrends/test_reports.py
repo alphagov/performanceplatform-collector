@@ -4,17 +4,22 @@ import performanceplatform
 import json
 from mock import patch, call
 import requests
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, has_entries
 from nose.tools import assert_raises
+import datetime
+import pytz
 
 
-def build_collector(start_at=None, end_at=None):
+def build_collector(start_at=None, 
+                    end_at=None, 
+                    query=None):
+    if not query:
+        query={'report_id': 'whoop'}
     credentials = {
         'user': 'abc',
         'password': 'def',
         'reports_url': 'http://this.com/'
     }
-    query = {'report_id': 'whoop'}
     return Collector(credentials, query, start_at, end_at)
 
 
@@ -29,43 +34,46 @@ class TestCollector(unittest.TestCase):
     @patch(
         "performanceplatform.collector.webtrends"
         ".reports.requests_with_backoff.get")
-    # any point in making generic - with requests?
-    # @end_to_end_with_response('abc')
     def test_collect_parse_and_push(self, mock_get, mock_post):
         mock_get().json.return_value = get_fake_response()
-        collector = build_collector()
+        query = {'frequency': 'daily', 'report_id': 'whoop'}
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            # does it matter that this is joined by blank string?
+            'idMapping': ["dataType", "_timestamp", "timeSpan", "browser"]}
+        collector = build_collector(query=query)
         collector.collect_parse_and_push(
-            {'data-type': 'boop',
+            {'data-type': 'browsers',
              'url': 'abc',
              'token': 'def',
-             'dry_run': False}, {'row_type_name': 'abc'})
+             'dry_run': False}, 
+            options)
         posted_data = [
             {
-                # this side or backdrop side or not at all?
-                "_id": "YnJvd3NlcnNfMjAx"
-                       "NDA4MTEwMDAwMDBfd2Vla19BbWF6b24gU2lsaw==",
-                "_timestamp": "2014-10-14T00:00:00+00:00",
+                "_id": "YnJvd3NlcnMyMDE0MT"
+                       "AxNDAwMDAwMGRheU1vemlsbGE=",
+                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Mozilla",
-                # this side or backdrop side or not at all?
                 "dataType": "browsers",
-                # this side or backdrop side or not at all?
-                "humanId": "browsers_20140811000000_day_Mozilla",
+                "humanId": "browsers20141014000000dayMozilla",
                 # day legit?
                 "timeSpan": "day",
                 "visitors": 1,
                 "test": "field"
             },
             {
-                "_id": "YnJvd3NlcnNfMjAx"
-                       "NDA4MTEwMDAwMDBfd2Vla19BbWF6b24gU2lsaw==",
-                "_timestamp": "2014-10-14T00:00:00+00:00",
+                "_id": "YnJvd3NlcnMyMDE0MT"
+                       "AxNDAwMDAwMGRheUdvb2dsZSBDaHJvbWU=",
+                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Google Chrome",
                 "dataType": "browsers",
-                "humanId": "browsers_20140811000000_day_Google Chrome",
+                "humanId": "browsers20141014000000dayGoogle Chrome",
                 "timeSpan": "day",
                 "visitors": 18,
                 "test": "field"
-            },
+            }
         ]
         mock_post.assert_called_once_with(posted_data, chunk_size=100)
 
@@ -192,49 +200,41 @@ class TestParser(unittest.TestCase):
     def test_parses_data_correctly(self):
         posted_data = [
             {
-                # this side or backdrop side or not at all?
-                "_id": "YnJvd3NlcnNfMjAxNDA4"
-                       "MTEwMDAwMDBfd2Vla19BbWF6b24gU2lsaw==",
-                "_timestamp": "2014-10-14T00:00:00+00:00",
+                "_id": "YnJvd3NlcnMyMDE0MT"
+                       "AxNDAwMDAwMGRheU1vemlsbGE=",
+                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Mozilla",
-                # this side or backdrop side or not at all?
                 "dataType": "browsers",
-                # this side or backdrop side or not at all?
-                "humanId": "browsers_20140811000000_day_Mozilla",
+                "humanId": "browsers20141014000000dayMozilla",
                 # day legit?
                 "timeSpan": "day",
                 "visitors": 1,
                 "test": "field"
             },
             {
-                "_id": "YnJvd3NlcnNfMjAx"
-                       "NDA4MTEwMDAwMDBfd2Vla19BbWF6b24gU2lsaw==",
-                "_timestamp": "2014-10-14T00:00:00+00:00",
+                "_id": "YnJvd3NlcnMyMDE0MT"
+                       "AxNDAwMDAwMGRheUdvb2dsZSBDaHJvbWU=",
+                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Google Chrome",
                 "dataType": "browsers",
-                "humanId": "browsers_20140811000000_day_Google Chrome",
+                "humanId": "browsers20141014000000dayGoogle Chrome",
                 "timeSpan": "day",
                 "visitors": 18,
                 "test": "field"
             }
         ]
-        query = {'report_id': 'whoop'}
+        query = {'frequency': 'daily', 'report_id': 'whoop'}
         options = {
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
+            # does it matter that this is joined by blank string?
             'idMapping': ["dataType", "_timestamp", "timeSpan", "browser"]}
         data_type = "browsers"
         parser = Parser(options, query, data_type)
-        results = parser.parse([get_fake_response()['data']])
-        assert_that(list(results), equal_to(posted_data))
-
-    def test_handles_ids_to_prevent_duplication_correctly(self):
-        pass
-
-    def test_handles_additional_fields_to_roll_many_reports_together(self):
-        pass
-
+        results = list(parser.parse([get_fake_response()['data']]))
+        assert_that(results[0], has_entries(posted_data[0]))
+        assert_that(results[1], has_entries(posted_data[1]))
 
 class TestPusher(unittest.TestCase):
     def test_handles_chunking_correctly(self):
