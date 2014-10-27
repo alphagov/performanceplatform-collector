@@ -323,10 +323,7 @@ def test_plugin():
     data_type = "test"
     options = {}
 
-    special_fields = list(ga_build_document_set(data))
-    result = list(DataParser(data, options, query, data_type).get_data(
-        special_fields
-    ))
+    result = list(DataParser(data, options, query, data_type).get_data())
 
     assert_in("customVarValue9", result[0])
 
@@ -337,10 +334,7 @@ def test_plugin():
     ]
 
     # Check that plugin has desired effect
-    special_fields = list(ga_build_document_set(data))
-    result = list(DataParser(data, options, query, data_type).get_data(
-        special_fields
-    ))
+    result = list(DataParser(data, options, query, data_type).get_data())
     assert_not_in("customVarValue9", result[0])
 
 
@@ -359,10 +353,7 @@ def test_data_type_defaults_to_passed_in_data_type():
     data_type = "original"
     options = {}
 
-    special_fields = list(ga_build_document_set(data))
-    result = list(DataParser(data, options, query, data_type).get_data(
-        special_fields
-    ))
+    result = list(DataParser(data, options, query, data_type).get_data())
 
     eq_(result[0]['dataType'], 'original')
 
@@ -386,10 +377,7 @@ def test_additional_fields():
     }
 
     # Check that foo is set on the output document
-    special_fields = list(ga_build_document_set(data))
-    result = list(DataParser(data, options, query, data_type).get_data(
-        special_fields
-    ))
+    result = list(DataParser(data, options, query, data_type).get_data())
     assert_in("foo", result[0])
     assert_that(result[0]["foo"], equal_to("bar"))
 
@@ -413,16 +401,10 @@ def test_daily_repeat():
     }
 
     # Check that foo is set on the output document
-    special_fields = list(ga_build_document_set(data))
-    result = list(DataParser(data, options, query, data_type).get_data(
-        special_fields
-    ))
+    result = list(DataParser(data, options, query, data_type).get_data())
     assert_that(result[0]["timeSpan"], equal_to("day"))
     query['frequency'] = 'monthly'
-    special_fields = list(ga_build_document_set(data))
-    result = list(DataParser(data, options, query, data_type).get_data(
-        special_fields
-    ))
+    result = list(DataParser(data, options, query, data_type).get_data())
     assert_that(result[0]["timeSpan"], equal_to("month"))
 
 
@@ -441,9 +423,6 @@ def test_data_type_can_be_overriden():
     data_type = "original"
     options = {"dataType": "overriden"}
 
-    special_fields = list(ga_build_document_set(data))
-    result = list(DataParser(data, options, query, data_type).get_data(
-        special_fields
-    ))
+    result = list(DataParser(data, options, query, data_type).get_data())
 
     eq_(result[0]['dataType'], 'overriden')
