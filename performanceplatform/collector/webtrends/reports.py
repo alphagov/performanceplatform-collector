@@ -1,8 +1,8 @@
 from performanceplatform.utils import requests_with_backoff
-from performanceplatform.client import DataSet
 from datetime import datetime, timedelta
 import pytz
 from performanceplatform.utils.data_parser import DataParser
+from performanceplatform.utils.data_pusher import Pusher
 
 
 class Collector(object):
@@ -120,16 +120,6 @@ class Parser(object):
         start_of_period = webtrends_formatted_date.split("-")[0]
         return datetime.strptime(
             start_of_period, "%m/%d/%Y").replace(tzinfo=pytz.UTC)
-
-
-class Pusher(object):
-    def __init__(self, target_data_set_config, options):
-        self.data_set_client = DataSet.from_config(target_data_set_config)
-        self.chunk_size = options.get('chunk-size', 100)
-
-    def push(self, data):
-        self.data_set_client.post(
-            data, chunk_size=self.chunk_size)
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):

@@ -10,11 +10,11 @@ import datetime
 import pytz
 
 
-def build_collector(start_at=None, 
-                    end_at=None, 
+def build_collector(start_at=None,
+                    end_at=None,
                     query=None):
     if not query:
-        query={'report_id': 'whoop'}
+        query = {'report_id': 'whoop'}
     credentials = {
         'user': 'abc',
         'password': 'def',
@@ -30,7 +30,7 @@ def get_fake_response():
 
 class TestCollector(unittest.TestCase):
     @patch.object(
-        performanceplatform.collector.webtrends.reports.DataSet, "post")
+        performanceplatform.client.DataSet, "post")
     @patch(
         "performanceplatform.collector.webtrends"
         ".reports.requests_with_backoff.get")
@@ -48,13 +48,14 @@ class TestCollector(unittest.TestCase):
             {'data-type': 'browsers',
              'url': 'abc',
              'token': 'def',
-             'dry_run': False}, 
+             'dry_run': False},
             options)
         posted_data = [
             {
                 "_id": "YnJvd3NlcnMyMDE0MT"
                        "AxNDAwMDAwMGRheU1vemlsbGE=",
-                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
+                "_timestamp": datetime.datetime(
+                    2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Mozilla",
                 "dataType": "browsers",
                 "humanId": "browsers20141014000000dayMozilla",
@@ -66,7 +67,8 @@ class TestCollector(unittest.TestCase):
             {
                 "_id": "YnJvd3NlcnMyMDE0MT"
                        "AxNDAwMDAwMGRheUdvb2dsZSBDaHJvbWU=",
-                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
+                "_timestamp": datetime.datetime(
+                    2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Google Chrome",
                 "dataType": "browsers",
                 "humanId": "browsers20141014000000dayGoogle Chrome",
@@ -196,7 +198,8 @@ class TestParser(unittest.TestCase):
             {
                 "_id": "YnJvd3NlcnMyMDE0MT"
                        "AxNDAwMDAwMGRheU1vemlsbGE=",
-                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
+                "_timestamp": datetime.datetime(
+                    2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Mozilla",
                 "dataType": "browsers",
                 "humanId": "browsers20141014000000dayMozilla",
@@ -208,7 +211,8 @@ class TestParser(unittest.TestCase):
             {
                 "_id": "YnJvd3NlcnMyMDE0MT"
                        "AxNDAwMDAwMGRheUdvb2dsZSBDaHJvbWU=",
-                "_timestamp": datetime.datetime(2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
+                "_timestamp": datetime.datetime(
+                    2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Google Chrome",
                 "dataType": "browsers",
                 "humanId": "browsers20141014000000dayGoogle Chrome",
@@ -229,7 +233,3 @@ class TestParser(unittest.TestCase):
         results = list(parser.parse([get_fake_response()['data']]))
         assert_that(results[0], has_entries(posted_data[0]))
         assert_that(results[1], has_entries(posted_data[1]))
-
-class TestPusher(unittest.TestCase):
-    def test_handles_chunking_correctly(self):
-        pass

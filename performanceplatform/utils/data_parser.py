@@ -142,7 +142,7 @@ def build_document(item, data_type, special_fields={},
     def format_for_id(key):
         value = doc[key]
         if key is "_timestamp":
-            value = _format(value)  
+            value = _format(value)
         return value
 
     if idMapping is not None:
