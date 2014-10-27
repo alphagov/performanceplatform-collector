@@ -59,10 +59,6 @@ def query_ga(client, config, start_date, end_date):
     )
 
 
-def send_data(data_set, documents, chunk_size):
-    data_set.post(documents, chunk_size=chunk_size)
-
-
 def try_number(value):
     """
     Attempt to cast the string `value` to an int, and failing that, a float,

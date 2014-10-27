@@ -2,9 +2,9 @@ from performanceplatform.collector.ga.plugins.department import \
     try_get_department
 
 from performanceplatform.collector.ga import \
-    create_client, query_documents_for, send_data
+    create_client, query_documents_for
 
-from performanceplatform.client import DataSet
+from performanceplatform.utils.data_pusher import Pusher
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):
@@ -51,5 +51,4 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
 
         documents.extend(ds)
 
-    chunk_size = options.get('chunk-size', 100)
-    send_data(DataSet.from_config(data_set_config), documents, chunk_size)
+    Pusher(data_set_config, options).push(documents)
