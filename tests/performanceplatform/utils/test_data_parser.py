@@ -419,7 +419,6 @@ def test_daily_repeat():
     ))
     assert_that(result[0]["timeSpan"], equal_to("day"))
     query['frequency'] = 'monthly'
-    start, end = date(2013, 4, 1), date(2013, 4, 30)
     special_fields = list(ga_build_document_set(data))
     result = list(DataParser(data, options, query, data_type).get_data(
         special_fields
