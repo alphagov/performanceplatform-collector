@@ -78,12 +78,6 @@ class TestCollector(unittest.TestCase):
         mock_post.assert_called_once_with(posted_data, chunk_size=100)
 
     @patch(
-        "performanceplatform.collector"
-        ".webtrends.reports.requests_with_backoff.get")
-    def test_collect_when_specified_start_and_end_and_weekly(self, mock_get):
-        pass
-
-    @patch(
         "performanceplatform.collector.webtrends"
         ".reports.requests_with_backoff.get")
     def test_collect_when_specified_start_and_end_and_hourly(self, mock_get):

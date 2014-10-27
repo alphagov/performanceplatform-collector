@@ -14,11 +14,7 @@ class Collector(object):
         self.base_url = credentials['reports_url']
         self.report_id = query.pop('report_id')
         self.query = query
-        #probably not necessary
-        if 'format' in query:
-            self.query_format = query['format']
-        else:
-            self.query_format = 'json'
+        self.query_format = 'json'
 
     @classmethod
     def parse_date_for_query(cls, date):
@@ -30,6 +26,10 @@ class Collector(object):
 
     @classmethod
     def date_range_for_webtrends(cls, start_at=None, end_at=None):
+        """
+        Get the day dates in between start and end formatted for query.
+        This returns dates inclusive e.g. final day is (end_at, end_at+1 day)
+        """
         if start_at and end_at:
             start_date = cls.parse_standard_date_string_to_date(
                 start_at)
@@ -72,22 +72,7 @@ class Collector(object):
             data.append(response.json()["data"])
         return data
 
-    def start_at_for_webtrends(self):
-        if self.start_at:
-            return self.start_at
-        #figure out formats here,
-        # how to parse standard format for this to their format?
-        # default as most of these reports are generated daily
-        return "current_day-2"
-
-    def end_at_for_webtrends(self):
-        if self.end_at:
-            return self.end_at
-        # default as most of these reports are generated daily
-        return "current_day-1"
-
     def get_date_range_for_webtrends(self):
-        #don't do it if hourly - only daily
         return Collector.date_range_for_webtrends(self.start_at, self.end_at)
 
     def collect_parse_and_push(self, data_set_config, options):
@@ -99,7 +84,6 @@ class Collector(object):
 
 
 class Parser(object):
-    # loads common with ga here
     def __init__(self, options, query, data_type):
         self.options = options
         self.row_type_name = options['row_type_name']
@@ -107,8 +91,6 @@ class Parser(object):
         self.data_type = data_type
 
     def parse(self, data):
-        # is it right to add into list? e.g. do multiple
-        # time periods at once?
         base_items = []
         special_fields = []
         for item in data:
