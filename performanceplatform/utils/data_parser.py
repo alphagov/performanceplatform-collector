@@ -16,10 +16,10 @@ class DataParser(object):
               to the value in the mapping dict",
           additionalFields: "a dict:
               key value pairs will be added into the returned data",
-          idMappings: "a list of keys or single key string: for each key
+          idMapping: "a list of keys or single key string: for each key
               the corresponding values will be concatenated in order to create
-              a unique _human_id field on the returned data and base64
-              encoded in order to create an _id field. If no idMappings
+              a unique _humanId field on the returned data and base64
+              encoded in order to create an _id field. If no idMapping
               are provided then the item start_date and any avaiable
               'dimensions' will be used instead",
           dataType: "a value to be set on a dataType attribute.
@@ -55,11 +55,11 @@ class DataParser(object):
         }
         self.timespan = frequency_to_timespan_mapping[frequency]
 
-    def get_data(self, special_fields):
+    def get_data(self, special_fields=None):
         """
         special_fields: "a dict of data specific to collector type
             that should be added to the data returned by the parser.
-            This will also be and operated on by idMappings, mappings and
+            This will also be and operated on by idMapping, mappings and
             plugins"
 
         This method loops through the data provided to the instance.
@@ -76,11 +76,11 @@ class DataParser(object):
             mappings changing keys in this dict from self.mappings
                are then applied on the above
             ...
-            "_human_id": "derived from either the values corresponding to
-               idMappings concatenated or the data_type, item.start_date,
+            "_humanId": "derived from either the values corresponding to
+               idMapping concatenated or the data_type, item.start_date,
                timespan and item.dimensions values if any concatenated"
             "_id": "derived from either the values corresponding to
-               idMappings concatenated or the data_type, item.start_date,
+               idMapping concatenated or the data_type, item.start_date,
                timespan and item.dimensions values if any concatenated and
                then base64 encoded"
         }
@@ -100,13 +100,23 @@ def build_document_set(results, data_type, mappings, special_fields,
                        idMapping=None,
                        timespan='week',
                        additionalFields={}):
-    if len(results) != len(special_fields):
+    if special_fields and len(results) != len(special_fields):
         raise ValueError(
             "There must be same number of special fields as results")
-    return (build_document(item, data_type, special_fields[i], mappings,
-                           idMapping, timespan=timespan,
-                           additionalFields=additionalFields)
-            for i, item in enumerate(results))
+    parsed = []
+    for i, item in enumerate(results):
+        if not special_fields:
+            special = {}
+        else:
+            special = special_fields[i]
+        parsed.append(build_document(item,
+                                     data_type,
+                                     special,
+                                     mappings,
+                                     idMapping,
+                                     timespan=timespan,
+                                     additionalFields=additionalFields))
+    return parsed
 
 
 def build_document(item, data_type, special_fields={},
