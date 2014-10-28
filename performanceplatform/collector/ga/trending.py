@@ -4,7 +4,7 @@ import gapy.client
 
 from performanceplatform.client import DataSet
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
-from performanceplatform.collector.ga.datetimeutil \
+from performanceplatform.utils.datetimeutil \
     import to_datetime
 
 ga_date_keys = ['day', 'month', 'year']

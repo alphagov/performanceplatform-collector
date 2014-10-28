@@ -1,12 +1,10 @@
 from datetime import date, datetime
-import pytz
 from hamcrest import assert_that, only_contains, is_, equal_to
 from nose.tools import raises
 from freezegun import freeze_time
-from performanceplatform.collector.ga.datetimeutil import(
+from performanceplatform.utils.datetimeutil import(
     period_range,
-    to_date,
-    to_datetime)
+    to_date)
 
 
 def test_to_date_passes_none_through():
