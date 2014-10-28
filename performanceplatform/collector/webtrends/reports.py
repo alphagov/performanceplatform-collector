@@ -108,13 +108,14 @@ class Parser(object):
         special_fields = []
         for date, data_point in item.items():
             start_date = Parser.to_datetime(date)
-            for row_type, row in data_point['SubRows'].items():
-                initial_data.append({
-                    'start_date': start_date,
-                })
-                special_fields.append(dict({
-                    self.row_type_name: row_type
-                }.items() + row['measures'].items()))
+            if data_point['SubRows']:
+                for row_type, row in data_point['SubRows'].items():
+                    initial_data.append({
+                        'start_date': start_date,
+                    })
+                    special_fields.append(dict({
+                        self.row_type_name: row_type
+                    }.items() + row['measures'].items()))
         return initial_data, special_fields
 
     @classmethod

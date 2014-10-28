@@ -199,6 +199,27 @@ class TestParser(unittest.TestCase):
                 "10/14/2014-10/15/2014"),
             equal_to(dt(2014, 10, 14, 0, 0, 0, "UTC")))
 
+    def test_handles_no_data_in_period(self):
+        query = {'frequency': 'daily', 'report_id': 'whoop'}
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            # does it matter that this is joined by blank string?
+            'idMapping': ["dataType", "_timestamp", "timeSpan", "browser"]}
+        data_type = "browsers"
+        parser = Parser(options, query, data_type)
+        no_data_response = {
+            "10/14/2014-10/15/2014": {
+                "SubRows": None,
+                "measures": {
+                    "Visits": 0.0
+                }
+            }
+        }
+        results = list(parser.parse([no_data_response]))
+        assert_that(results, equal_to([]))
+
     def test_parses_data_correctly(self):
         posted_data = [
             {
