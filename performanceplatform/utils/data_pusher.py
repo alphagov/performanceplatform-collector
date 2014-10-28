@@ -1,4 +1,5 @@
 from performanceplatform.client import DataSet
+import logging
 
 
 class Pusher(object):
@@ -7,5 +8,8 @@ class Pusher(object):
         self.chunk_size = options.get('chunk-size', 100)
 
     def push(self, data):
-        self.data_set_client.post(
-            data, chunk_size=self.chunk_size)
+        if data:
+            self.data_set_client.post(
+                data, chunk_size=self.chunk_size)
+        else:
+            logging.info("Doing nothing - no data to push")
