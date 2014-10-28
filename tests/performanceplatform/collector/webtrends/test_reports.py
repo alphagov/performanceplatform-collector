@@ -164,6 +164,12 @@ class TestCollector(unittest.TestCase):
         assert_that(
             Collector.parse_date_for_query(date), equal_to("2014m12d19"))
 
+    def test_parse_standard_date_string_to_date_leaves_datetimes(self):
+        date = Collector.parse_standard_date_string_to_date("2014-12-19")
+        date_unchanged = Collector.parse_standard_date_string_to_date(date)
+        assert_that(date_unchanged, equal_to(date))
+        assert_that(type(date), datetime.datetime)
+
     def test_collect_builds_date_ranges_correctly_when_start_and_end_given(
             self):
         assert_that(Collector.date_range_for_webtrends(
