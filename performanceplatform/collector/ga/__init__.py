@@ -2,9 +2,9 @@ from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
 from performanceplatform.collector.ga.core \
-    import create_client, query_documents_for, send_data
+    import create_client, query_documents_for
 
-from performanceplatform.client import DataSet
+from performanceplatform.utils.data_pusher import Pusher
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):
@@ -15,7 +15,4 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
         data_set_config['data-type'],
         start_at, end_at)
 
-    data_set = DataSet.from_config(data_set_config)
-    chunk_size = options.get('chunk-size', 100)
-
-    send_data(data_set, documents, chunk_size)
+    Pusher(data_set_config, options).push(documents)
