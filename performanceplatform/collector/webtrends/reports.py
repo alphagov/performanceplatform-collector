@@ -22,6 +22,8 @@ class Collector(object):
 
     @classmethod
     def parse_standard_date_string_to_date(cls, date_string):
+        if type(date_string) == datetime:
+            return date_string
         return datetime.strptime(date_string, "%Y-%m-%d")
 
     @classmethod
