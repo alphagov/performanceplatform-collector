@@ -1,6 +1,6 @@
 # encoding: utf-8
 from datetime import date
-from hamcrest import assert_that, is_, has_entries, has_item, equal_to
+from hamcrest import assert_that, is_, has_entries, has_item, equal_to, is_not, calling, raises
 
 import mock
 
@@ -447,3 +447,10 @@ def test_data_type_can_be_overriden():
     ))
 
     eq_(result[0]['dataType'], 'overriden')
+
+
+def test_build_document_set_handles_big_numbers():
+    results = [0] * 3142
+    special_fields = [0] * 3142
+
+    assert_that(calling(build_document_set).with_args(results, '', {}, special_fields), is_not(raises(ValueError)))
