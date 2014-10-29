@@ -6,7 +6,7 @@ import re
 
 
 class DataParser(object):
-    def __init__(self, data, options, query, data_type):
+    def __init__(self, data, options, data_type):
         # it would be nice to have some json schemas or something to validate
         # for now here are some docs
         """
@@ -29,11 +29,6 @@ class DataParser(object):
               To be run on the passed in data to mutate it.
               See performanceplatform.collector.ga.plugins for more details"
         }
-        query: {
-          frequency: "a string - either daily, weekly or monthly, to be
-              converted to a timespan - either day month or week that is
-              then set as a timespan attribute on the returned data"
-        }
         data_type: "a string - the data_type to be set as a data_type
             attribute on the returned data unless it is overridden in options"
         """
@@ -47,14 +42,6 @@ class DataParser(object):
         self.idMapping = options.get("idMapping", None)
         self.additionalFields = options.get('additionalFields', {})
 
-        frequency = query.get('frequency', 'weekly')
-        frequency_to_timespan_mapping = {
-            'daily': 'day',
-            'weekly': 'week',
-            'monthly': 'month',
-        }
-        self.timespan = frequency_to_timespan_mapping[frequency]
-
     def get_data(self, special_fields=None):
         """
         special_fields: "a dict of data specific to collector type
@@ -66,7 +53,6 @@ class DataParser(object):
         For each item it will return a dict of the format:
         {
             "_timestamp": "the item start_date",
-            "timeSpan": "self.timespan for the instance",
             "dataType": "self.data_type for the instance",
             ...
             "any additional fields": "from self.additionalFields",
@@ -78,16 +64,16 @@ class DataParser(object):
             ...
             "_humanId": "derived from either the values corresponding to
                idMapping concatenated or the data_type, item.start_date,
-               timespan and item.dimensions values if any concatenated"
+               timeSpan and item.dimensions values if any concatenated"
             "_id": "derived from either the values corresponding to
                idMapping concatenated or the data_type, item.start_date,
-               timespan and item.dimensions values if any concatenated and
+               timeSpan and item.dimensions values if any concatenated and
                then base64 encoded"
         }
         """
         docs = build_document_set(self.data, self.data_type, self.mappings,
                                   special_fields,
-                                  self.idMapping, timespan=self.timespan,
+                                  self.idMapping,
                                   additionalFields=self.additionalFields)
 
         if self.plugins:
@@ -98,7 +84,6 @@ class DataParser(object):
 
 def build_document_set(results, data_type, mappings, special_fields,
                        idMapping=None,
-                       timespan='week',
                        additionalFields={}):
     if special_fields and len(results) != len(special_fields):
         raise ValueError(
@@ -114,14 +99,13 @@ def build_document_set(results, data_type, mappings, special_fields,
                                      special,
                                      mappings,
                                      idMapping,
-                                     timespan=timespan,
                                      additionalFields=additionalFields))
     return parsed
 
 
 def build_document(item, data_type, special_fields={},
                    mappings=None, idMapping=None,
-                   timespan='week', additionalFields={}):
+                   additionalFields={}):
     if data_type is None:
         raise ValueError("Must provide a data type")
     if mappings is None:
@@ -129,7 +113,6 @@ def build_document(item, data_type, special_fields={},
 
     base_properties = {
         "_timestamp": to_datetime(item["start_date"]),
-        "timeSpan": timespan,
         "dataType": data_type
     }
 
@@ -139,25 +122,46 @@ def build_document(item, data_type, special_fields={},
                special_fields.items())
     doc = apply_key_mapping(mappings, doc)
 
-    if idMapping is not None:
-        if isinstance(idMapping, list):
-            values_for_id = map(lambda d: unicode(doc[d]), idMapping)
-            value_for_id = "".join(values_for_id)
-        else:
-            value_for_id = doc[idMapping]
+    def get_value_for_key(key):
+        return unicode(doc.get(key, ""))
 
-        (_id, human_id) = value_id(value_for_id)
+    if idMapping is not None:
+        if not isinstance(idMapping, list):
+            idMapping = [idMapping]
+
+        values_for_id = map(get_value_for_key, idMapping)
+        string_for_id = "".join(values_for_id)
     else:
-        (_id, human_id) = data_id(
+        string_for_id = get_string_for_data_id(
             data_type,
             to_datetime(item["start_date"]),
-            timespan,
+            item.get('timeSpan', None),
             item.get('dimensions', {}).values())
+    (_id, human_id) = value_id(string_for_id)
 
     doc['humanId'] = human_id
     doc['_id'] = _id
 
     return doc
+
+
+def get_string_for_data_id(data_type, timestamp, period, dimension_values):
+    # `dimension_values` may be non-string python types and need to be coerced.
+    values = map(unicode, dimension_values)
+    slugs = [data_type, _format(timestamp), period] + values
+    slugs = [value for value in slugs
+             if value is not None]
+    return "_".join(slugs)
+
+
+def _format(timestamp):
+    return to_utc(timestamp).strftime("%Y%m%d%H%M%S")
+
+
+def value_id(value):
+    value_bytes = value.encode('utf-8')
+    logging.debug(u"'{0}' ({1})".format(value, type(value)))
+    return base64.urlsafe_b64encode(value_bytes), value_bytes
 
 
 def run_plugins(plugins_strings, results):
@@ -209,20 +213,3 @@ def map_multi_value_fields(mapping, pairs):
                 mapped_pairs[to_key] = values[index]
 
     return mapped_pairs
-
-
-def data_id(data_type, timestamp, period, dimension_values):
-    # `dimension_values` may be non-string python types and need to be coerced.
-    values = map(unicode, dimension_values)
-    slugs = [data_type, _format(timestamp), period] + values
-    return value_id("_".join(slugs))
-
-
-def _format(timestamp):
-    return to_utc(timestamp).strftime("%Y%m%d%H%M%S")
-
-
-def value_id(value):
-    value_bytes = value.encode('utf-8')
-    logging.debug(u"'{0}' ({1})".format(value, type(value)))
-    return base64.urlsafe_b64encode(value_bytes), value_bytes

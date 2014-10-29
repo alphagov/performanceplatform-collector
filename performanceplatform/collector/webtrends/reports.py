@@ -13,7 +13,6 @@ class Collector(object):
         self.password = credentials['password']
         self.base_url = credentials['reports_url']
         self.report_id = query.pop('report_id')
-        self.query = query
         self.query_format = 'json'
 
     @classmethod
@@ -80,16 +79,15 @@ class Collector(object):
     def collect_parse_and_push(self, data_set_config, options):
         raw_json_data = self.collect()
         parsed_data = Parser(
-            options, self.query, data_set_config['data-type']
+            options, data_set_config['data-type']
         ).parse(raw_json_data)
         Pusher(data_set_config, options).push(parsed_data)
 
 
 class Parser(object):
-    def __init__(self, options, query, data_type):
+    def __init__(self, options, data_type):
         self.options = options
         self.row_type_name = options['row_type_name']
-        self.query = query
         self.data_type = data_type
 
     def parse(self, data):
@@ -100,7 +98,7 @@ class Parser(object):
             base_items += res[0]
             special_fields += res[1]
         return DataParser(
-            base_items, self.options, self.query, self.data_type
+            base_items, self.options, self.data_type
         ).get_data(special_fields)
 
     def parse_item(self, item):
