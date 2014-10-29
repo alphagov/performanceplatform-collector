@@ -122,20 +122,24 @@ def build_document(item, data_type, special_fields={},
                special_fields.items())
     doc = apply_key_mapping(mappings, doc)
 
-    if idMapping is not None:
-        if isinstance(idMapping, list):
-            values_for_id = map(lambda d: unicode(doc[d]), idMapping)
-            value_for_id = "".join(values_for_id)
-        else:
-            value_for_id = doc[idMapping]
+    def get_value_for_key(key):
+        doc_and_data = dict(doc.items() + item.items())
+        value = doc_and_data.get(key, None)
+        if value:
+            if type(value) == dict:
+                value = "".join(value.values())
+            return unicode(value)
 
-        (_id, human_id) = value_id(value_for_id)
+    if idMapping is not None:
+        if not isinstance(idMapping, list):
+            idMapping = [idMapping]
     else:
-        (_id, human_id) = data_id(
-            data_type,
-            to_datetime(item["start_date"]),
-            item.get('timeSpan', ""),
-            item.get('dimensions', {}).values())
+        idMapping = ['dataType', '_timestamp', 'timeSpan', 'dimensions']
+
+    values_for_id = map(get_value_for_key, idMapping)
+    values_for_id = [value for value in values_for_id if value is not None]
+    value_for_id = "".join(values_for_id)
+    (_id, human_id) = value_id(value_for_id)
 
     doc['humanId'] = human_id
     doc['_id'] = _id
