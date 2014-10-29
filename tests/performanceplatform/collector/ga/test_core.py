@@ -268,3 +268,78 @@ def test_convert_duration():
     assert_that(response_0, is_(expected_response_0))
     assert_that(response_1, is_(expected_response_1))
     assert_that(response_2, is_(expected_response_2))
+
+
+def test_float_number():
+    expected_response_0 = {
+        "start_date": date(2013, 4, 1),
+        "end_date": date(2013, 4, 7),
+        "metrics": {"rate": "23.4"},
+    }
+
+    items = [expected_response_0]
+
+    special_fields = list(build_document_set(items))
+    assert_that(special_fields[0]['rate'], is_(23.4))
+
+
+@mock.patch("performanceplatform.collector.ga.core.query_for_range")
+def test_daily_repeat_day(mock_query_in_range):
+
+    data = [{
+        "metrics": {"visits": "12345"},
+        "dimensions": {"date": "2013-04-02", "customVarValue9": "foo"},
+        "start_date": date(2013, 4, 1),
+    }]
+    data_generator = (item for item in data)
+    mock_query_in_range.return_value = data_generator
+
+    query = {
+        "id": "ga:123",
+        "metrics": ["visits"],
+        "dimensions": ["date", "customVarValue9"],
+        "frequency": 'daily'
+    }
+    data_type = "test"
+    options = {
+    }
+
+    result = list(query_documents_for(
+        {},
+        query,
+        options,
+        data_type,
+        None,
+        None))
+    assert_that(result[0]["timeSpan"], equal_to("day"))
+
+
+@mock.patch("performanceplatform.collector.ga.core.query_for_range")
+def test_daily_repeat_month(mock_query_in_range):
+
+    data = [{
+        "metrics": {"visits": "12345"},
+        "dimensions": {"date": "2013-04-02", "customVarValue9": "foo"},
+        "start_date": date(2013, 4, 1),
+    }]
+    data_generator = (item for item in data)
+    mock_query_in_range.return_value = data_generator
+
+    query = {
+        "id": "ga:123",
+        "metrics": ["visits"],
+        "dimensions": ["date", "customVarValue9"],
+        "frequency": 'monthly'
+    }
+    data_type = "test"
+    options = {
+    }
+
+    result = list(query_documents_for(
+        {},
+        query,
+        options,
+        data_type,
+        None,
+        None))
+    assert_that(result[0]["timeSpan"], equal_to("month"))

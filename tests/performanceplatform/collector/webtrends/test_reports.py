@@ -8,6 +8,7 @@ from hamcrest import assert_that, equal_to, has_entries
 from nose.tools import assert_raises
 import datetime
 import pytz
+from tests.performanceplatform.collector.ga import dt
 
 
 def build_collector(start_at=None,
@@ -42,7 +43,7 @@ class TestCollector(unittest.TestCase):
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
             # does it matter that this is joined by blank string?
-            'idMapping': ["dataType", "_timestamp", "timeSpan", "browser"]}
+            'idMapping': ["dataType", "_timestamp", "browser"]}
         collector = build_collector(query=query)
         collector.collect_parse_and_push(
             {'data-type': 'browsers',
@@ -52,27 +53,25 @@ class TestCollector(unittest.TestCase):
             options)
         posted_data = [
             {
-                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAw"
-                       "OjAwOjAwKzAwOjAwZGF5TW96aWxsYQ==",
+                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAwOj"
+                       "AwOjAwKzAwOjAwTW96aWxsYQ==",
                 "_timestamp": datetime.datetime(
                     2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Mozilla",
                 "dataType": "browsers",
-                "humanId": "browsers2014-10-14 00:00:00+00:00dayMozilla",
+                "humanId": "browsers2014-10-14 00:00:00+00:00Mozilla",
                 # day legit?
-                "timeSpan": "day",
                 "visitors": 1,
                 "test": "field"
             },
             {
-                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAw"
-                       "OjAwOjAwKzAwOjAwZGF5R29vZ2xlIENocm9tZQ==",
+                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAwO"
+                       "jAwOjAwKzAwOjAwR29vZ2xlIENocm9tZQ==",
                 "_timestamp": datetime.datetime(
                     2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Google Chrome",
                 "dataType": "browsers",
-                "humanId": "browsers2014-10-14 00:00:00+00:00dayGoogle Chrome",
-                "timeSpan": "day",
+                "humanId": "browsers2014-10-14 00:00:00+00:00Google Chrome",
                 "visitors": 18,
                 "test": "field"
             }
@@ -193,22 +192,20 @@ class TestCollector(unittest.TestCase):
 
 class TestParser(unittest.TestCase):
     def test_handles_returned_date_format_correctly(self):
-        from tests.performanceplatform.collector.ga import dt
         assert_that(
             Parser.to_datetime(
                 "10/14/2014-10/15/2014"),
             equal_to(dt(2014, 10, 14, 0, 0, 0, "UTC")))
 
     def test_handles_no_data_in_period(self):
-        query = {'frequency': 'daily', 'report_id': 'whoop'}
         options = {
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
             # does it matter that this is joined by blank string?
-            'idMapping': ["dataType", "_timestamp", "timeSpan", "browser"]}
+            'idMapping': ["dataType", "_timestamp", "browser"]}
         data_type = "browsers"
-        parser = Parser(options, query, data_type)
+        parser = Parser(options, data_type)
         no_data_response = {
             "10/14/2014-10/15/2014": {
                 "SubRows": None,
@@ -223,40 +220,37 @@ class TestParser(unittest.TestCase):
     def test_parses_data_correctly(self):
         posted_data = [
             {
-                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAw"
-                       "OjAwOjAwKzAwOjAwZGF5TW96aWxsYQ==",
+                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAwOj"
+                       "AwOjAwKzAwOjAwTW96aWxsYQ==",
                 "_timestamp": datetime.datetime(
                     2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Mozilla",
                 "dataType": "browsers",
-                "humanId": "browsers2014-10-14 00:00:00+00:00dayMozilla",
+                "humanId": "browsers2014-10-14 00:00:00+00:00Mozilla",
                 # day legit?
-                "timeSpan": "day",
                 "visitors": 1,
                 "test": "field"
             },
             {
-                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAw"
-                       "OjAwOjAwKzAwOjAwZGF5R29vZ2xlIENocm9tZQ==",
+                "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAwO"
+                       "jAwOjAwKzAwOjAwR29vZ2xlIENocm9tZQ==",
                 "_timestamp": datetime.datetime(
                     2014, 10, 14, 0, 0, tzinfo=pytz.UTC),
                 "browser": "Google Chrome",
                 "dataType": "browsers",
-                "humanId": "browsers2014-10-14 00:00:00+00:00dayGoogle Chrome",
-                "timeSpan": "day",
+                "humanId": "browsers2014-10-14 00:00:00+00:00Google Chrome",
                 "visitors": 18,
                 "test": "field"
             }
         ]
-        query = {'frequency': 'daily', 'report_id': 'whoop'}
         options = {
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
             # does it matter that this is joined by blank string?
-            'idMapping': ["dataType", "_timestamp", "timeSpan", "browser"]}
+            'idMapping': ["dataType", "_timestamp", "browser"]}
         data_type = "browsers"
-        parser = Parser(options, query, data_type)
+        parser = Parser(options, data_type)
         results = list(parser.parse([get_fake_response()['data']]))
         assert_that(results[0], has_entries(posted_data[0]))
         assert_that(results[1], has_entries(posted_data[1]))

@@ -116,7 +116,19 @@ def query_documents_for(client, query, options,
     results = query_for_range(client, query, start_date, end_date)
 
     results = list(results)
-    special_fields = list(build_document_set(results))
-    return DataParser(results, options, query, data_type).get_data(
+    frequency = query.get('frequency', 'weekly')
+    special_fields = add_timeSpan(frequency, build_document_set(results))
+    return DataParser(results, options, data_type).get_data(
         special_fields
     )
+
+
+def add_timeSpan(frequency, special_fields):
+    frequency_to_timespan_mapping = {
+        'daily': 'day',
+        'weekly': 'week',
+        'monthly': 'month',
+    }
+    timespan = frequency_to_timespan_mapping[frequency]
+    return [dict(item.items() + [('timeSpan', timespan)])
+            for item in special_fields]

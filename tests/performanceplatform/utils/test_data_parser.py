@@ -2,8 +2,6 @@
 from datetime import date
 from hamcrest import assert_that, is_, has_entries, has_item, equal_to
 
-import mock
-
 from nose.tools import (
     eq_,
     assert_raises,
@@ -19,39 +17,7 @@ from performanceplatform.utils.data_parser import \
 from performanceplatform.collector.ga.core import \
     build_document_set as ga_build_document_set
 
-from performanceplatform.collector.ga.core import query_for_range
 from tests.performanceplatform.collector.ga import dt
-
-
-def test_float_number():
-    query = {
-        "id": "12345",
-        "metrics": ["rate"],
-        "dimensions": [],
-    }
-    expected_response_0 = {
-        "start_date": date(2013, 4, 1),
-        "end_date": date(2013, 4, 7),
-        "metrics": {"rate": "23.4"},
-    }
-
-    client = mock.Mock()
-    client.query.get.side_effect = [
-        [expected_response_0],
-    ]
-
-    items = list(
-        query_for_range(client, query, date(2013, 4, 1), date(2013, 4, 7)))
-
-    assert_that(len(items), is_(1))
-    (response_0,) = items
-    assert_that(response_0, is_(expected_response_0))
-
-    special_fields = list(ga_build_document_set(items))
-    (doc_0,) = build_document_set(
-        items, "", None, special_fields, idMapping=None)
-
-    assert_that(doc_0['rate'], is_(23.4))
 
 
 def test_build_document_set_raises_error_if_special_fields_different_length():
@@ -169,7 +135,6 @@ def test_mapping_is_applied_to_whole_document():
     assert_that(doc, has_entries({
         "count": 12345,
         "name": "Jane",
-        "period": "week",
     }))
 
 
@@ -234,7 +199,6 @@ def test_build_document_no_dimensions():
 
     assert_that(data, has_entries({
         "_timestamp": dt(2013, 4, 1, 0, 0, 0, "UTC"),
-        "timeSpan": "week",
         "visits": 12345,
         "visitors": 5376,
     }))
@@ -315,15 +279,10 @@ def test_plugin():
             'start_date': date(2013, 4, 1)
         }
     ]
-    query = {
-        "id": "ga:123",
-        "metrics": ["visits"],
-        "dimensions": ["date", "customVarValue9"],
-    }
     data_type = "test"
     options = {}
 
-    result = list(DataParser(data, options, query, data_type).get_data())
+    result = list(DataParser(data, options, data_type).get_data())
 
     assert_in("customVarValue9", result[0])
 
@@ -334,7 +293,7 @@ def test_plugin():
     ]
 
     # Check that plugin has desired effect
-    result = list(DataParser(data, options, query, data_type).get_data())
+    result = list(DataParser(data, options, data_type).get_data())
     assert_not_in("customVarValue9", result[0])
 
 
@@ -345,15 +304,10 @@ def test_data_type_defaults_to_passed_in_data_type():
         "start_date": date(2013, 4, 1)
     }]
 
-    query = {
-        "id": "ga:123",
-        "metrics": ["visits"],
-        "dimensions": ["date"],
-    }
     data_type = "original"
     options = {}
 
-    result = list(DataParser(data, options, query, data_type).get_data())
+    result = list(DataParser(data, options, data_type).get_data())
 
     eq_(result[0]['dataType'], 'original')
 
@@ -366,46 +320,15 @@ def test_additional_fields():
         "start_date": date(2013, 4, 1),
     }]
 
-    query = {
-        "id": "ga:123",
-        "metrics": ["visits"],
-        "dimensions": ["date", "customVarValue9"],
-    }
     data_type = "test"
     options = {
         "additionalFields": {"foo": "bar"},
     }
 
     # Check that foo is set on the output document
-    result = list(DataParser(data, options, query, data_type).get_data())
+    result = list(DataParser(data, options, data_type).get_data())
     assert_in("foo", result[0])
     assert_that(result[0]["foo"], equal_to("bar"))
-
-
-def test_daily_repeat():
-
-    data = [{
-        "metrics": {"visits": "12345"},
-        "dimensions": {"date": "2013-04-02", "customVarValue9": "foo"},
-        "start_date": date(2013, 4, 1),
-    }]
-
-    query = {
-        "id": "ga:123",
-        "metrics": ["visits"],
-        "dimensions": ["date", "customVarValue9"],
-        "frequency": 'daily'
-    }
-    data_type = "test"
-    options = {
-    }
-
-    # Check that foo is set on the output document
-    result = list(DataParser(data, options, query, data_type).get_data())
-    assert_that(result[0]["timeSpan"], equal_to("day"))
-    query['frequency'] = 'monthly'
-    result = list(DataParser(data, options, query, data_type).get_data())
-    assert_that(result[0]["timeSpan"], equal_to("month"))
 
 
 def test_data_type_can_be_overriden():
@@ -415,14 +338,9 @@ def test_data_type_can_be_overriden():
         "start_date": date(2013, 4, 1)
     }]
 
-    query = {
-        "id": "ga:123",
-        "metrics": ["visits"],
-        "dimensions": ["date"],
-    }
     data_type = "original"
     options = {"dataType": "overriden"}
 
-    result = list(DataParser(data, options, query, data_type).get_data())
+    result = list(DataParser(data, options, data_type).get_data())
 
     eq_(result[0]['dataType'], 'overriden')

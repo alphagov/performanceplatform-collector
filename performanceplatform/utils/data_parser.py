@@ -6,7 +6,7 @@ import re
 
 
 class DataParser(object):
-    def __init__(self, data, options, query, data_type):
+    def __init__(self, data, options, data_type):
         # it would be nice to have some json schemas or something to validate
         # for now here are some docs
         """
@@ -29,11 +29,6 @@ class DataParser(object):
               To be run on the passed in data to mutate it.
               See performanceplatform.collector.ga.plugins for more details"
         }
-        query: {
-          frequency: "a string - either daily, weekly or monthly, to be
-              converted to a timespan - either day month or week that is
-              then set as a timespan attribute on the returned data"
-        }
         data_type: "a string - the data_type to be set as a data_type
             attribute on the returned data unless it is overridden in options"
         """
@@ -47,14 +42,6 @@ class DataParser(object):
         self.idMapping = options.get("idMapping", None)
         self.additionalFields = options.get('additionalFields', {})
 
-        frequency = query.get('frequency', 'weekly')
-        frequency_to_timespan_mapping = {
-            'daily': 'day',
-            'weekly': 'week',
-            'monthly': 'month',
-        }
-        self.timespan = frequency_to_timespan_mapping[frequency]
-
     def get_data(self, special_fields=None):
         """
         special_fields: "a dict of data specific to collector type
@@ -66,7 +53,6 @@ class DataParser(object):
         For each item it will return a dict of the format:
         {
             "_timestamp": "the item start_date",
-            "timeSpan": "self.timespan for the instance",
             "dataType": "self.data_type for the instance",
             ...
             "any additional fields": "from self.additionalFields",
@@ -78,16 +64,16 @@ class DataParser(object):
             ...
             "_humanId": "derived from either the values corresponding to
                idMapping concatenated or the data_type, item.start_date,
-               timespan and item.dimensions values if any concatenated"
+               timeSpan and item.dimensions values if any concatenated"
             "_id": "derived from either the values corresponding to
                idMapping concatenated or the data_type, item.start_date,
-               timespan and item.dimensions values if any concatenated and
+               timeSpan and item.dimensions values if any concatenated and
                then base64 encoded"
         }
         """
         docs = build_document_set(self.data, self.data_type, self.mappings,
                                   special_fields,
-                                  self.idMapping, timespan=self.timespan,
+                                  self.idMapping,
                                   additionalFields=self.additionalFields)
 
         if self.plugins:
@@ -98,7 +84,6 @@ class DataParser(object):
 
 def build_document_set(results, data_type, mappings, special_fields,
                        idMapping=None,
-                       timespan='week',
                        additionalFields={}):
     if special_fields and len(results) is not len(special_fields):
         raise ValueError(
@@ -114,14 +99,13 @@ def build_document_set(results, data_type, mappings, special_fields,
                                      special,
                                      mappings,
                                      idMapping,
-                                     timespan=timespan,
                                      additionalFields=additionalFields))
     return parsed
 
 
 def build_document(item, data_type, special_fields={},
                    mappings=None, idMapping=None,
-                   timespan='week', additionalFields={}):
+                   additionalFields={}):
     if data_type is None:
         raise ValueError("Must provide a data type")
     if mappings is None:
@@ -129,7 +113,6 @@ def build_document(item, data_type, special_fields={},
 
     base_properties = {
         "_timestamp": to_datetime(item["start_date"]),
-        "timeSpan": timespan,
         "dataType": data_type
     }
 
@@ -151,7 +134,7 @@ def build_document(item, data_type, special_fields={},
         (_id, human_id) = data_id(
             data_type,
             to_datetime(item["start_date"]),
-            timespan,
+            item.get('timeSpan', ""),
             item.get('dimensions', {}).values())
 
     doc['humanId'] = human_id
