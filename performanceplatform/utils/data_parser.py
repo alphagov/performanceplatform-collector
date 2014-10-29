@@ -100,7 +100,7 @@ def build_document_set(results, data_type, mappings, special_fields,
                        idMapping=None,
                        timespan='week',
                        additionalFields={}):
-    if len(results) is not len(special_fields):
+    if len(results) != len(special_fields):
         raise ValueError(
             "There must be same number of special fields as results")
     return (build_document(item, data_type, special_fields[i], mappings,
