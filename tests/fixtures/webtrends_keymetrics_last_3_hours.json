@@ -1,0 +1,155 @@
+{  
+   "definition":{  
+      "accountID":1,
+      "profileID":"JkVVAoASUb7",
+      "ID":"JkVVAoASUb7",
+      "name":"Apprenticeships App (Summarised)",
+      "language":null,
+      "type":"profilestats",
+      "properties":{  
+         "useRealtime":true,
+         "isSingleBucket":true,
+         "total_rda_operations":2,
+         "total_rda_operations_w_retries":0,
+         "total_rda_retries":0
+      },
+      "dimension":{  
+         "ID":null,
+         "name":"Date Range",
+         "type":"period",
+         "Range":{  
+            "startperiod":"30/10/2014 13:00",
+            "endperiod":"30/10/2014 13:00"
+         },
+         "Properties":null,
+         "SubDimension":{  
+            "ID":null,
+            "name":"Date",
+            "type":"period",
+            "Range":null,
+            "Properties":null,
+            "SubDimension":null
+         }
+      },
+      "measures":[  
+         {  
+            "name":"Page Views",
+            "accumulationType":null,
+            "ID":"PageViews",
+            "columnID":0,
+            "measureFormatType":"numeric",
+            "AllowTotals":false,
+            "Sortable":false
+         },
+         {  
+            "name":"Visits",
+            "accumulationType":null,
+            "ID":"Visits",
+            "columnID":0,
+            "measureFormatType":"numeric",
+            "AllowTotals":false,
+            "Sortable":false
+         },
+         {  
+            "name":"Visitors",
+            "accumulationType":null,
+            "ID":"Visitors",
+            "columnID":0,
+            "measureFormatType":"numeric",
+            "AllowTotals":false,
+            "Sortable":false
+         },
+         {  
+            "name":"Bounce Rate",
+            "accumulationType":null,
+            "ID":"BounceRate",
+            "columnID":0,
+            "measureFormatType":"percent",
+            "AllowTotals":false,
+            "Sortable":false
+         },
+         {  
+            "name":"Avg. Time on Site",
+            "accumulationType":null,
+            "ID":"AvgTimeOnSite",
+            "columnID":0,
+            "measureFormatType":"time_seconds",
+            "AllowTotals":false,
+            "Sortable":false
+         },
+         {  
+            "name":"Avg. Visitors per Day",
+            "accumulationType":null,
+            "ID":"AvgVisitorsPerDay",
+            "columnID":0,
+            "measureFormatType":"numeric",
+            "AllowTotals":false,
+            "Sortable":false
+         },
+         {  
+            "name":"Page Views per Visit",
+            "accumulationType":null,
+            "ID":"PageViewsPerVisit",
+            "columnID":0,
+            "measureFormatType":"numeric",
+            "AllowTotals":false,
+            "Sortable":false
+         },
+         {  
+            "name":"New Visitors",
+            "accumulationType":null,
+            "ID":"NewVisitors",
+            "columnID":0,
+            "measureFormatType":"numeric",
+            "AllowTotals":false,
+            "Sortable":false
+         }
+      ]
+   },
+   "data":{  
+      "10/30/2014 13-10/30/2014 13":{  
+         "Attributes":null,
+         "measures":{  
+            "Page Views":31.0,
+            "Visits":5.0,
+            "Visitors":3.0,
+            "Bounce Rate":0.0,
+            "Avg. Time on Site":0.0,
+            "Avg. Visitors per Day":null,
+            "Page Views per Visit":13.5,
+            "New Visitors":1.0
+         },
+         "SubRows":{  
+            "10/30/2014 12":{  
+               "Attributes":null,
+               "measures":{  
+                  "Page Views":19.0,
+                  "Visits":2.0,
+                  "Visitors":1.0,
+                  "Bounce Rate":0.0,
+                  "Avg. Time on Site":0.0,
+                  "Avg. Visitors per Day":0.0,
+                  "Page Views per Visit":9.50,
+                  "New Visitors":0.0
+               },
+               "SubRows":null
+            },
+            "10/30/2014 13":{  
+               "Attributes":null,
+               "measures":{  
+                  "Page Views":12.0,
+                  "Visits":3.0,
+                  "Visitors":2.0,
+                  "Bounce Rate":0.0,
+                  "Avg. Time on Site":0.0,
+                  "Avg. Visitors per Day":0.0,
+                  "Page Views per Visit":4.0,
+                  "New Visitors":1.0
+               },
+               "SubRows":null
+            },
+            "10/30/2014 14":null
+         }
+      }
+   }
+}
