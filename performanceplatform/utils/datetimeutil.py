@@ -7,6 +7,8 @@ MONDAY = 0
 
 
 def to_datetime(a_date):
+    if type(a_date) == datetime:
+        return a_date.replace(tzinfo=pytz.UTC)
     return datetime.combine(a_date, time(0)).replace(tzinfo=pytz.UTC)
 
 

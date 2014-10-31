@@ -4,7 +4,9 @@ from nose.tools import raises
 from freezegun import freeze_time
 from performanceplatform.utils.datetimeutil import(
     period_range,
-    to_date)
+    to_date,
+    to_datetime)
+import pytz
 
 
 def test_to_date_passes_none_through():
@@ -21,6 +23,17 @@ def test_to_date_passes_date_through():
     assert_that(
         to_date(date(2012, 12, 12)),
         equal_to(date(2012, 12, 12)))
+
+
+def test_to_datetime_passes_through_datetimes():
+    a_datetime = datetime(2012, 12, 12, 13).replace(tzinfo=pytz.UTC)
+    assert_that(to_datetime(a_datetime), equal_to(a_datetime))
+
+
+def test_to_datetime_converts_dates():
+    a_date = date(2012, 12, 12)
+    a_datetime = datetime(2012, 12, 12).replace(tzinfo=pytz.UTC)
+    assert_that(to_datetime(a_date), equal_to(a_datetime))
 
 
 @raises(ValueError)
