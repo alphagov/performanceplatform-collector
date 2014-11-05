@@ -1,10 +1,10 @@
 .. _Google Analytics: http://www.google.com/analytics/
 .. _Pingdom: https://www.pingdom.com/
+.. _Webtrends: http://webtrends.com/
 
 A python command line tool that aggregates data from third party sources and pushes
 the result through to the Performance Platform (see http://alphagov.github.io/performanceplatform-documentation/
-for more details). This tool will currently interface with `Google Analytics`_
-and `Pingdom`_ to retrieve data.
+for more details). This tool uses the `Google Analytics`_, `Pingdom`_ and `Webtrends`_ APIs to retrieve data.
 
 .. image:: https://travis-ci.org/alphagov/performanceplatform-collector.svg?branch=master
    :target: https://travis-ci.org/alphagov/performanceplatform-collector
@@ -207,7 +207,7 @@ Due to the use of namespace packages, you must not install requirements with
 ::
   pip install -r requirements.txt
 
-If you have run this command, your virtualenv may be broken - you can fix by 
+If you have run this command, your virtualenv may be broken - you can fix by
 running
 
 ::
