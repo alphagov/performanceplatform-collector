@@ -42,7 +42,6 @@ class TestCollector(unittest.TestCase):
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
-            # does it matter that this is joined by blank string?
             'idMapping': ["dataType", "_timestamp", "browser"]}
         collector = build_collector(query=query)
         collector.collect_parse_and_push(
@@ -60,7 +59,6 @@ class TestCollector(unittest.TestCase):
                 "browser": "Mozilla",
                 "dataType": "browsers",
                 "humanId": "browsers2014-10-14 00:00:00+00:00Mozilla",
-                # day legit?
                 "visitors": 1,
                 "test": "field"
             },
@@ -202,7 +200,6 @@ class TestParser(unittest.TestCase):
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
-            # does it matter that this is joined by blank string?
             'idMapping': ["dataType", "_timestamp", "browser"]}
         data_type = "browsers"
         parser = Parser(options, data_type)
@@ -227,7 +224,6 @@ class TestParser(unittest.TestCase):
                 "browser": "Mozilla",
                 "dataType": "browsers",
                 "humanId": "browsers2014-10-14 00:00:00+00:00Mozilla",
-                # day legit?
                 "visitors": 1,
                 "test": "field"
             },
@@ -247,7 +243,6 @@ class TestParser(unittest.TestCase):
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
-            # does it matter that this is joined by blank string?
             'idMapping': ["dataType", "_timestamp", "browser"]}
         data_type = "browsers"
         parser = Parser(options, data_type)
