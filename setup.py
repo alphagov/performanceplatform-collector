@@ -66,7 +66,7 @@ if __name__ == '__main__':
         maintainer='Government Digital Service',
         url='https://github.com/alphagov/performanceplatform-collector',
 
-        description='performanceplatform-collector: tools for sending'
+        description='performanceplatform-collector: tools for sending '
             'data to the Performance Platform',
         long_description=_get_long_description(),
         license='MIT',
