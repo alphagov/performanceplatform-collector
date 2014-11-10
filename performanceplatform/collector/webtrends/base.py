@@ -1,5 +1,6 @@
 from performanceplatform.utils.data_parser import DataParser
 from performanceplatform.utils.data_pusher import Pusher
+from datetime import datetime
 
 
 class BaseCollector(object):
@@ -9,6 +10,16 @@ class BaseCollector(object):
         self.user = credentials['user']
         self.password = credentials['password']
         self.query_format = 'json'
+
+    @classmethod
+    def parse_date_for_query(cls, date):
+        return date.strftime("%Ym%md%d")
+
+    @classmethod
+    def parse_standard_date_string_to_date(cls, date_string):
+        if type(date_string) == datetime:
+            return date_string
+        return datetime.strptime(date_string, "%Y-%m-%d")
 
     def collect(self):
         data = []
@@ -25,6 +36,10 @@ class BaseCollector(object):
         parsed_data = self.build_parser(
             data_set_config, options).parse(raw_json_data)
         Pusher(data_set_config, options).push(parsed_data)
+
+    def get_date_range_for_webtrends(self):
+        return self.__class__.date_range_for_webtrends(
+            self.start_at, self.end_at)
 
 
 class BaseParser(object):

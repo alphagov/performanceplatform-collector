@@ -12,16 +12,6 @@ class Collector(BaseCollector):
         super(Collector, self).__init__(credentials, query, start_at, end_at)
 
     @classmethod
-    def parse_date_for_query(cls, date):
-        return date.strftime("%Ym%md%d")
-
-    @classmethod
-    def parse_standard_date_string_to_date(cls, date_string):
-        if type(date_string) == datetime:
-            return date_string
-        return datetime.strptime(date_string, "%Y-%m-%d")
-
-    @classmethod
     def date_range_for_webtrends(cls, start_at=None, end_at=None):
         """
         Get the day dates in between start and end formatted for query.
@@ -58,9 +48,6 @@ class Collector(BaseCollector):
                 'format': self.query_format
             }
         )
-
-    def get_date_range_for_webtrends(self):
-        return Collector.date_range_for_webtrends(self.start_at, self.end_at)
 
     def build_parser(self, data_set_config, options):
         return Parser(options, data_set_config['data-type'])
