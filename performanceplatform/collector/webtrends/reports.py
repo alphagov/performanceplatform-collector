@@ -1,29 +1,15 @@
 from performanceplatform.utils import requests_with_backoff
 from datetime import datetime, timedelta
 import pytz
-from performanceplatform.utils.data_parser import DataParser
-from performanceplatform.utils.data_pusher import Pusher
+from performanceplatform.collector.webtrends.base import(
+    BaseCollector, BaseParser)
 
 
-class Collector(object):
+class Collector(BaseCollector):
     def __init__(self, credentials, query, start_at, end_at):
-        self.start_at = start_at
-        self.end_at = end_at
-        self.user = credentials['user']
-        self.password = credentials['password']
         self.base_url = credentials['reports_url']
         self.report_id = query.pop('report_id')
-        self.query_format = 'json'
-
-    @classmethod
-    def parse_date_for_query(cls, date):
-        return date.strftime("%Ym%md%d")
-
-    @classmethod
-    def parse_standard_date_string_to_date(cls, date_string):
-        if type(date_string) == datetime:
-            return date_string
-        return datetime.strptime(date_string, "%Y-%m-%d")
+        super(Collector, self).__init__(credentials, query, start_at, end_at)
 
     @classmethod
     def date_range_for_webtrends(cls, start_at=None, end_at=None):
@@ -63,43 +49,14 @@ class Collector(object):
             }
         )
 
-    def collect(self):
-        data = []
-        for start_at, end_at in self.get_date_range_for_webtrends():
-            response = self._make_request(
-                start_at,
-                end_at)
-            response.raise_for_status()
-            data.append(response.json()["data"])
-        return data
-
-    def get_date_range_for_webtrends(self):
-        return Collector.date_range_for_webtrends(self.start_at, self.end_at)
-
-    def collect_parse_and_push(self, data_set_config, options):
-        raw_json_data = self.collect()
-        parsed_data = Parser(
-            options, data_set_config['data-type']
-        ).parse(raw_json_data)
-        Pusher(data_set_config, options).push(parsed_data)
+    def build_parser(self, data_set_config, options):
+        return Parser(options, data_set_config['data-type'])
 
 
-class Parser(object):
+class Parser(BaseParser):
     def __init__(self, options, data_type):
-        self.options = options
         self.row_type_name = options['row_type_name']
-        self.data_type = data_type
-
-    def parse(self, data):
-        base_items = []
-        special_fields = []
-        for item in data:
-            res = self.parse_item(item)
-            base_items += res[0]
-            special_fields += res[1]
-        return DataParser(
-            base_items, self.options, self.data_type
-        ).get_data(special_fields)
+        super(Parser, self).__init__(options, data_type)
 
     def parse_item(self, item):
         initial_data = []
