@@ -1,6 +1,14 @@
 # encoding: utf-8
 from datetime import date
-from hamcrest import assert_that, is_, has_entries, has_item, equal_to, is_not, calling, raises
+from hamcrest import(
+    assert_that,
+    is_,
+    has_entries,
+    has_item,
+    equal_to,
+    is_not,
+    calling,
+    raises)
 
 from nose.tools import (
     eq_,
@@ -211,12 +219,13 @@ def test_build_document():
     }
 
     (special_fields_for_doc,) = ga_build_document_set([gapy_response])
+    special_fields_for_doc['timeSpan'] = 'week'
     data = build_document(
         gapy_response, "weeklyvisits", special_fields_for_doc)
 
     assert_that(data, has_entries({
-        "_id": "d2Vla2x5dmlzaXRzXzIwMTMwNDAxMDAwMDAwXzIwMTMtMDQtMDI=",
-        "humanId": 'weeklyvisits_20130401000000_2013-04-02',
+        "_id": "d2Vla2x5dmlzaXRzXzIwMTMwNDAxMDAwMDAwX3dlZWtfMjAxMy0wNC0wMg==",
+        "humanId": 'weeklyvisits_20130401000000_week_2013-04-02',
         "dataType": "weeklyvisits",
         "_timestamp": dt(2013, 4, 1, 0, 0, 0, "UTC"),
         "date": "2013-04-02",
@@ -360,4 +369,6 @@ def test_build_document_set_handles_big_numbers():
     results = [0] * 3142
     special_fields = [0] * 3142
 
-    assert_that(calling(build_document_set).with_args(results, '', {}, special_fields), is_not(raises(ValueError)))
+    assert_that(
+        calling(build_document_set).with_args(results, '', {}, special_fields),
+        is_not(raises(ValueError)))
