@@ -135,7 +135,7 @@ def build_document(item, data_type, special_fields={},
         string_for_id = get_string_for_data_id(
             data_type,
             to_datetime(item["start_date"]),
-            item.get('timeSpan', None),
+            doc.get('timeSpan', None),
             item.get('dimensions', {}).values())
     (_id, human_id) = value_id(string_for_id)
 
