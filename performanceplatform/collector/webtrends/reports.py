@@ -23,18 +23,15 @@ class Collector(BaseCollector):
             end_date = cls.parse_standard_date_string_to_date(
                 end_at)
             numdays = (end_date - start_date).days + 1
-            end_dates = [(end_date + timedelta(1)) - timedelta(days=x)
-                         for x in reversed(range(0, numdays))]
             start_dates = [end_date - timedelta(days=x)
                            for x in reversed(range(0, numdays))]
             date_range = []
             for i, date in enumerate(start_dates):
-                date_range.append((
-                    cls.parse_date_for_query(date),
-                    cls.parse_date_for_query(end_dates[i])))
+                query_date = cls.parse_date_for_query(date)
+                date_range.append((query_date, query_date))
             return date_range
         else:
-            return [("current_day-2", "current_day-1")]
+            return [("current_day-1", "current_day-1")]
 
     def _make_request(self, start_at_for_webtrends, end_at_for_webtrends):
         return requests_with_backoff.get(
