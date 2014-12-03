@@ -93,7 +93,7 @@ class TestCollector(unittest.TestCase):
                 auth=('abc', 'def'),
                 params={
                     'start_period': "2014m08d03",
-                    'end_period': "2014m08d04",
+                    'end_period': "2014m08d03",
                     'format': 'json'
                 }
             ),
@@ -102,7 +102,7 @@ class TestCollector(unittest.TestCase):
                 auth=('abc', 'def'),
                 params={
                     'start_period': "2014m08d04",
-                    'end_period': "2014m08d05",
+                    'end_period': "2014m08d04",
                     'format': 'json'}
             ),
             call(
@@ -110,7 +110,7 @@ class TestCollector(unittest.TestCase):
                 auth=('abc', 'def'),
                 params={
                     'start_period': "2014m08d05",
-                    'end_period': "2014m08d06",
+                    'end_period': "2014m08d05",
                     'format': 'json'
                 })
         ]
@@ -132,7 +132,7 @@ class TestCollector(unittest.TestCase):
             url="http://this.com/whoop",
             auth=('abc', 'def'),
             params={
-                'start_period': "current_day-2",
+                'start_period': "current_day-1",
                 'end_period': "current_day-1",
                 'format': 'json'
             }
@@ -167,9 +167,9 @@ class TestCollector(unittest.TestCase):
             "2014-08-03",
             "2014-08-05"),
             equal_to([
-                ("2014m08d03", "2014m08d04"),
-                ("2014m08d04", "2014m08d05"),
-                ("2014m08d05", "2014m08d06")
+                ("2014m08d03", "2014m08d03"),
+                ("2014m08d04", "2014m08d04"),
+                ("2014m08d05", "2014m08d05")
             ])
         )
 
@@ -177,7 +177,7 @@ class TestCollector(unittest.TestCase):
         assert_that(
             Collector.date_range_for_webtrends(),
             equal_to([
-                ("current_day-2", "current_day-1")
+                ("current_day-1", "current_day-1")
             ])
         )
 
