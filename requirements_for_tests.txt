@@ -1,6 +1,6 @@
 PyHamcrest
 nose
 mock
-pep8==1.6.1
+pep8==1.6.2
 coverage
 freezegun

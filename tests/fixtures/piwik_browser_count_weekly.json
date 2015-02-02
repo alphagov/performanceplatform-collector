@@ -1,0 +1,54 @@
+{
+  "From 2015-02-02 to 2015-02-08": [
+    {
+      "label": "Chrome",
+      "nb_visits": 5634,
+      "nb_actions": 9965,
+      "max_actions": 83,
+      "sum_visit_length": 596601,
+      "bounce_count": 4282,
+      "nb_visits_converted": 66,
+      "sum_daily_nb_uniq_visitors": 5188,
+      "sum_daily_nb_users": 0,
+      "logo": "plugins/DevicesDetection/images/browsers/CH.gif"
+    },
+    {
+      "label": "Safari",
+      "nb_visits": 634,
+      "nb_actions": 965,
+      "max_actions": 83,
+      "sum_visit_length": 96601,
+      "bounce_count": 282,
+      "nb_visits_converted": 66,
+      "sum_daily_nb_uniq_visitors": 188,
+      "sum_daily_nb_users": 0,
+      "logo": "plugins/DevicesDetection/images/browsers/SF.gif"
+    }
+  ],
+  "From 2015-02-09 to 2015-02-15": [
+    {
+      "label": "Chrome",
+      "nb_visits": 5634,
+      "nb_actions": 9965,
+      "max_actions": 83,
+      "sum_visit_length": 596601,
+      "bounce_count": 4282,
+      "nb_visits_converted": 66,
+      "sum_daily_nb_uniq_visitors": 5188,
+      "sum_daily_nb_users": 0,
+      "logo": "plugins/DevicesDetection/images/browsers/CH.gif"
+    },
+    {
+      "label": "Safari",
+      "nb_visits": 634,
+      "nb_actions": 965,
+      "max_actions": 83,
+      "sum_visit_length": 96601,
+      "bounce_count": 282,
+      "nb_visits_converted": 66,
+      "sum_daily_nb_uniq_visitors": 188,
+      "sum_daily_nb_users": 0,
+      "logo": "plugins/DevicesDetection/images/browsers/SF.gif"
+    }
+  ]
+}
