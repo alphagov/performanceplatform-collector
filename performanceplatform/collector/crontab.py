@@ -2,6 +2,10 @@ import argparse
 import os
 import re
 import sys
+import socket
+
+# Number of hosts we are running the crons on
+NUMBER_OF_HOSTS = 2
 
 
 ignore_line_re = re.compile("^#.*|\s*$")
@@ -50,6 +54,28 @@ def parse_job_line(line):
     return parsed
 
 
+def skip_job(counter):
+    """ Should we skip the job based on its number
+
+    If the machine has a number at the end of its hostname (n), and we have m
+    machines in the pool -
+
+    on machine 1, run job 1, 1 + m, 1+2m etc
+
+    on machine 2, run job 2, 2 + m , 2 + 2m etc
+
+    Else run all the jobs
+    """
+    try:
+        host_number = int(socket.gethostname().split('-')[-1])
+    except ValueError:
+        return False
+
+    if (counter + host_number) % NUMBER_OF_HOSTS == 0:
+        return False
+    return True
+
+
 def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
     """Returns a crontab with jobs from job path
 
@@ -72,12 +98,18 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
     crontab = [line.strip() for line in current_crontab]
     crontab = remove_existing_crontab_for_app(crontab, unique_id)
     additional_crontab = []
+
+    job_number = 0
     with open(path_to_jobs) as jobs:
         try:
             for job in jobs:
                 parsed = parse_job_line(job)
 
                 if parsed is not None:
+                    job_number += 1
+                    if skip_job(job_number):
+                        continue
+
                     schedule, query, credentials, \
                         token, performanceplatform = parsed
 

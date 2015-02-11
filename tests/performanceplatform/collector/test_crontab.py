@@ -6,6 +6,7 @@ from performanceplatform.collector.crontab import remove_existing_crontab_for_ap
 
 from tests.performanceplatform.collector.tools import temp_file
 from performanceplatform.collector import crontab
+from mock import patch
 
 
 def test_jobs_are_not_removed_for_other_apps():
@@ -154,6 +155,29 @@ class TestGenerateCrontab(object):
             assert_that(generated_jobs,
                         has_item(
                             contains_string(job_contains)))
+
+    @patch('socket.gethostname')
+    def test_jobs_based_on_hostname(self, hostname):
+        hostname.return_value = 'development-1'
+
+        temp_contents = ("schedule,query,creds,token,performanceplatforn\n"
+                         "schedule2,query2,creds2,token2,performanceplatforn\n")
+
+        with temp_file(temp_contents) as something:
+            generated_jobs = crontab.generate_crontab(
+                [],
+                something,
+                "/path/to/my-app",
+                "unique-id-of-my-app"
+            )
+            print generated_jobs
+
+            assert_that(generated_jobs,
+                        has_item(
+                            contains_string('schedule')))
+            assert_that(generated_jobs,
+                        is_not(has_item(
+                            contains_string('schedule2'))))
 
 
 class ProcessFailureError(StandardError):
