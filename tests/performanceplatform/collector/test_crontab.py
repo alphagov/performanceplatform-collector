@@ -6,52 +6,66 @@ from performanceplatform.collector.crontab import remove_existing_crontab_for_ap
 
 from tests.performanceplatform.collector.tools import temp_file
 from performanceplatform.collector import crontab
+from mock import patch
 
 
-def test_jobs_are_not_removed_for_other_apps():
-    crontab = [
-        '# Begin performanceplatform.collector jobs for my-app',
-        'foobar',
-        '# End performanceplatform.collector jobs for my-app',
-        '# Begin performanceplatform.collector jobs for other-app',
-        'barfoo',
-        '# End performanceplatform.collector jobs for other-app',
-    ]
-    new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
-    assert_that(new_crontab,
-                has_item(contains_string('barfoo')))
-    assert_that(new_crontab,
-                is_not(has_item(contains_string('foobar'))))
+class TestRemoveExistingCrontab(object):
+    def setUp(self):
+        self.patcher = patch('socket.gethostname')
+        self.mock_gethostname = self.patcher.start()
+        self.mock_gethostname.return_value = 'nonnumerichostname'
 
+    def test_jobs_are_not_removed_for_other_apps(self):
+        crontab = [
+            '# Begin performanceplatform.collector jobs for my-app',
+            'foobar',
+            '# End performanceplatform.collector jobs for my-app',
+            '# Begin performanceplatform.collector jobs for other-app',
+            'barfoo',
+            '# End performanceplatform.collector jobs for other-app',
+        ]
+        new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
+        assert_that(new_crontab,
+                    has_item(contains_string('barfoo')))
+        assert_that(new_crontab,
+                    is_not(has_item(contains_string('foobar'))))
 
-def test_crontab_end_before_begin():
-    crontab = [
-        '# End performanceplatform.collector jobs for my-app',
-        'foobar',
-        '# Begin performanceplatform.collector jobs for my-app',
-        'other'
-    ]
-    new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
-    assert_that(new_crontab,
-                has_item(contains_string('foobar')))
-    assert_that(new_crontab,
-                is_not(has_item(contains_string('other'))))
+    def test_crontab_end_before_begin(self):
+        crontab = [
+            '# End performanceplatform.collector jobs for my-app',
+            'foobar',
+            '# Begin performanceplatform.collector jobs for my-app',
+            'other'
+        ]
+        new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
+        assert_that(new_crontab,
+                    has_item(contains_string('foobar')))
+        assert_that(new_crontab,
+                    is_not(has_item(contains_string('other'))))
 
+    def test_crontab_begin_with_no_end(self):
+        crontab = [
+            'foobar',
+            '# Begin performanceplatform.collector jobs for my-app',
+            'other',
+        ]
+        new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
+        assert_that(new_crontab,
+                    has_item(contains_string('foobar')))
+        assert_that(new_crontab,
+                    is_not(has_item(contains_string('other'))))
 
-def test_crontab_begin_with_no_end():
-    crontab = [
-        'foobar',
-        '# Begin performanceplatform.collector jobs for my-app',
-        'other',
-    ]
-    new_crontab = remove_existing_crontab_for_app(crontab, 'my-app')
-    assert_that(new_crontab,
-                has_item(contains_string('foobar')))
-    assert_that(new_crontab,
-                is_not(has_item(contains_string('other'))))
+    def tearDown(self):
+        self.patcher.stop()
 
 
 class TestGenerateCrontab(object):
+
+    def setUp(self):
+        self.patcher = patch('socket.gethostname')
+        self.mock_gethostname = self.patcher.start()
+        self.mock_gethostname.return_value = 'nonnumerichostname'
+
     def test_other_cronjobs_are_preserved(self):
         with temp_file("") as jobs_path:
             generated_jobs = crontab.generate_crontab(
@@ -155,6 +169,31 @@ class TestGenerateCrontab(object):
                         has_item(
                             contains_string(job_contains)))
 
+    @patch('socket.gethostname')
+    def test_jobs_based_on_hostname(self, hostname):
+        hostname.return_value = 'development-1'
+
+        temp_contents = ("schedule,query,creds,token,performanceplatforn\n"
+                         "schedule2,query2,creds2,token2,performanceplatforn\n")
+
+        with temp_file(temp_contents) as something:
+            generated_jobs = crontab.generate_crontab(
+                [],
+                something,
+                "/path/to/my-app",
+                "unique-id-of-my-app"
+            )
+
+            assert_that(generated_jobs,
+                        has_item(
+                            contains_string('schedule')))
+            assert_that(generated_jobs,
+                        is_not(has_item(
+                            contains_string('schedule2'))))
+
+    def tearDown(self):
+        self.patcher.stop()
+
 
 class ProcessFailureError(StandardError):
     def __init__(self, code, command, output):
@@ -164,6 +203,12 @@ class ProcessFailureError(StandardError):
 
 
 class TestCrontabScript(object):
+
+    def setUp(self):
+        self.patcher = patch('socket.gethostname')
+        self.mock_gethostname = self.patcher.start()
+        self.mock_gethostname.return_value = 'nonnumerichostname'
+
     def run_crontab_script(self, current_crontab, path_to_app, path_to_jobs,
                            unique_id):
         with temp_file(current_crontab) as stdin_path:
@@ -212,3 +257,6 @@ class TestCrontabScript(object):
                 'current crontab', '/path/to/app', 'invalid path', 'some_id')
         except ProcessFailureError as e:
             assert_that(e.output, contains_string('current crontab'))
+
+    def tearDown(self):
+        self.patcher.stop()
