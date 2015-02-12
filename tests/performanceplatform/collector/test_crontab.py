@@ -235,16 +235,6 @@ class TestCrontabScript(object):
             assert_that(output.strip(),
                         is_('current crontab'))
 
-    def test_with_jobs(self):
-        with temp_file('one,two,three,four,five') as path_to_jobs:
-            output = self.run_crontab_script(
-                'current crontab', '/path/to/my-app', path_to_jobs, 'some_id')
-
-            cronjobs = output.split("\n")
-
-            assert_that(cronjobs,
-                        has_item(contains_string('pp-collector')))
-
     def test_failure_results_in_non_zero_exit_status(self):
         assert_raises(ProcessFailureError,
                       self.run_crontab_script,
