@@ -36,6 +36,8 @@ class Fetcher(BaseFetcher):
         params.update({
             'period': self.period,
             'date': self.date})
+        if self.api_method_arguments:
+            params.update(self.api_method_arguments)
         return params
 
 

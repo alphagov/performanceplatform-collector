@@ -66,6 +66,12 @@ class TestFetcher(unittest.TestCase):
         period = mock_get.call_args[1]['params']['date']
         assert_that(period, equal_to('2015-01-21,2015-01-22'))
 
+    def test_api_method_specific_request_params_can_be_set(self, mock_get):
+        fetcher = build_fetcher({'api_method_arguments': {'idGoal': '1'}})
+        fetcher.fetch()
+        goal_id = mock_get.call_args[1]['params']['idGoal']
+        assert_that(goal_id, equal_to('1'))
+
     def test_data_can_be_fetched(self, mock_get):
         mock_get().json.return_value = get_piwik_data()
         fetcher = build_fetcher()
