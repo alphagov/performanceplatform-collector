@@ -5,7 +5,7 @@ import sys
 import socket
 
 # Number of hosts we are running the crons on
-NUMBER_OF_HOSTS = 2
+NUMBER_OF_HOSTS = 3
 
 
 ignore_line_re = re.compile("^#.*|\s*$")
@@ -70,8 +70,7 @@ def skip_job(counter):
         host_number = int(socket.gethostname().split('-')[-1])
     except ValueError:
         return False
-
-    if (counter + host_number) % NUMBER_OF_HOSTS == 0:
+    if (counter + host_number - (NUMBER_OF_HOSTS - 1)) % NUMBER_OF_HOSTS == 0:
         return False
     return True
 
