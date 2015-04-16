@@ -1,5 +1,7 @@
 import unittest
-from performanceplatform.collector.webtrends.reports import Collector, Parser
+from performanceplatform.collector.webtrends.reports import(Collector,
+                                                            V3Parser,
+                                                            V2Parser)
 import performanceplatform
 import json
 from mock import patch, call
@@ -24,8 +26,8 @@ def build_collector(start_at=None,
     return Collector(credentials, query, start_at, end_at)
 
 
-def get_fake_response():
-    with open("tests/fixtures/webtrends_day_one.json", "r") as f:
+def get_fake_response(file='webtrends_day_one.json'):
+    with open("tests/fixtures/{}".format(file), "r") as f:
         return json.loads(f.read())
 
 
@@ -183,20 +185,20 @@ class TestCollector(unittest.TestCase):
 
 
 class TestParser(unittest.TestCase):
-    def test_handles_returned_date_format_correctly(self):
+    def test_handles_returned_date_format_correctly_when_v2(self):
         assert_that(
-            Parser.to_datetime(
+            V2Parser.to_datetime(
                 "10/14/2014-10/15/2014"),
             equal_to(dt(2014, 10, 14, 0, 0, 0, "UTC")))
 
-    def test_handles_no_data_in_period(self):
+    def test_handles_no_data_in_period_when_v2(self):
         options = {
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
             'additionalFields': {'test': 'field'},
             'idMapping': ["dataType", "_timestamp", "browser"]}
         data_type = "browsers"
-        parser = Parser(options, data_type)
+        parser = V2Parser(options, data_type)
         no_data_response = {
             "10/14/2014-10/15/2014": {
                 "SubRows": None,
@@ -208,7 +210,7 @@ class TestParser(unittest.TestCase):
         results = list(parser.parse([no_data_response]))
         assert_that(results, equal_to([]))
 
-    def test_parses_data_correctly(self):
+    def test_parses_data_correctly_when_v2(self):
         posted_data = [
             {
                 "_id": "YnJvd3NlcnMyMDE0LTEwLTE0IDAwOj"
@@ -239,7 +241,110 @@ class TestParser(unittest.TestCase):
             'additionalFields': {'test': 'field'},
             'idMapping': ["dataType", "_timestamp", "browser"]}
         data_type = "browsers"
-        parser = Parser(options, data_type)
+        parser = V2Parser(options, data_type)
         results = list(parser.parse([get_fake_response()['data']]))
+        assert_that(results[0], has_entries(posted_data[0]))
+        assert_that(results[1], has_entries(posted_data[1]))
+
+    def test_handles_returned_date_format_correctly_when_v3(self):
+        date_data = {
+            "start_date": "2015-03",
+            "end_date": "2015-03"
+        }
+        assert_that(
+            V3Parser.to_datetime(
+                date_data),
+            equal_to(dt(2015, 03, 01, 0, 0, 0, "UTC")))
+
+    def test_handles_full_returned_date_format_correctly_when_v3(self):
+        date_data = {
+            "start_date": "2015-03-02",
+            "end_date": "2015-03-03"
+        }
+        assert_that(
+            V3Parser.to_datetime(
+                date_data),
+            equal_to(dt(2015, 03, 02, 0, 0, 0, "UTC")))
+
+    def test_handles_no_data_in_period_when_v3(self):
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            'idMapping': ["dataType", "_timestamp", "browser"]}
+        data_type = "browsers"
+        parser = V3Parser(options, data_type)
+        no_data_response = [
+            {
+                "period": "Month",
+                "start_date": "2015-03",
+                "end_date": "2015-03",
+                "measures": {
+                    "Visits": 0,
+                    "Hits": 0
+                },
+                "SubRows": []
+            }
+        ]
+        results = list(parser.parse([no_data_response]))
+        assert_that(results, equal_to([]))
+
+    def test_handles_none_data_in_period_when_v3(self):
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            'idMapping': ["dataType", "_timestamp", "browser"]}
+        data_type = "browsers"
+        parser = V3Parser(options, data_type)
+        no_data_response = [
+            {
+                "period": "Month",
+                "start_date": "2015-03",
+                "end_date": "2015-03",
+                "measures": {
+                    "Visits": 0,
+                    "Hits": 0
+                },
+                "SubRows": None
+            }
+        ]
+        results = list(parser.parse([no_data_response]))
+        assert_that(results, equal_to([]))
+
+    def test_parses_data_correctly_when_v3(self):
+        posted_data = [
+            {
+                "_id": "YnJvd3NlcnMyMDE1LTAzLTAxIDAwOj"
+                       "AwOjAwKzAwOjAwQW5kcm9pZCBCcm93c2Vy",
+                "_timestamp": datetime.datetime(
+                    2015, 03, 01, 0, 0, tzinfo=pytz.UTC),
+                "browser": "Android Browser",
+                "dataType": "browsers",
+                "humanId": "browsers2015-03-01 00:00:00+00:00Android Browser",
+                "visitors": 3862240,
+                "test": "field"
+            },
+            {
+                "_id": "YnJvd3NlcnMyMDE1LTAzLTAxID"
+                       "AwOjAwOjAwKzAwOjAwRmlyZWZveA==",
+                "_timestamp": datetime.datetime(
+                    2015, 03, 01, 0, 0, tzinfo=pytz.UTC),
+                "browser": "Firefox",
+                "dataType": "browsers",
+                "humanId": "browsers2015-03-01 00:00:00+00:00Firefox",
+                "visitors": 1850026,
+                "test": "field"
+            }
+        ]
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            'idMapping': ["dataType", "_timestamp", "browser"]}
+        data_type = "browsers"
+        parser = V3Parser(options, data_type)
+        results = list(parser.parse([get_fake_response(
+            'webtrends_v3.json')['data']]))
         assert_that(results[0], has_entries(posted_data[0]))
         assert_that(results[1], has_entries(posted_data[1]))

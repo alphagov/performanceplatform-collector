@@ -1,0 +1,475 @@
+{  
+  "definition":{  
+    "accountID":10123,
+    "profileID":"fgkdatFA7d7",
+    "ID":"95df19b6d9e",
+    "name":"Browsers by Version",
+    "description":"Browsers by Version",
+    "language":null,
+    "timezone":"UTC 1",
+    "dimensions":[  
+      {  
+        "ID":"Browser",
+        "name":"Browser"
+      },
+      {  
+        "ID":"Version",
+        "name":"Version"
+      }
+    ],
+    "measures":[  
+      {  
+        "name":"Visits",
+        "ID":"Visits",
+        "columnID":0,
+        "measureFormatType":null
+      },
+      {  
+        "name":"Hits",
+        "ID":"Hits",
+        "columnID":1,
+        "measureFormatType":null
+      }
+    ]
+  },
+  "data":[  
+    {  
+      "period":"Month",
+      "start_date":"2015-03",
+      "end_date":"2015-03",
+      "attributes":{  
+
+      },
+      "measures":{  
+        "Visits":49152881,
+        "Hits":121076884
+      },
+      "SubRows":[  
+        {  
+          "Android Browser":{  
+            "attributes":{  
+
+            },
+            "measures":{  
+              "Visits":3862240,
+              "Hits":9983638
+            },
+            "SubRows":{  
+              "4.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":2635974,
+                  "Hits":6074757
+                },
+                "SubRows":null
+              },
+              "Unknown":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":1090517,
+                  "Hits":3526136
+                },
+                "SubRows":null
+              },
+              "1.5":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":78105,
+                  "Hits":243510
+                },
+                "SubRows":null
+              },
+              "4.2":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":24411,
+                  "Hits":53745
+                },
+                "SubRows":null
+              },
+              "4.1":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":20782,
+                  "Hits":49642
+                },
+                "SubRows":null
+              },
+              "4.2.2":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":9422,
+                  "Hits":27526
+                },
+                "SubRows":null
+              },
+              "4.3":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":1001,
+                  "Hits":3603
+                },
+                "SubRows":null
+              },
+              "4.4.2":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":530,
+                  "Hits":1527
+                },
+                "SubRows":null
+              },
+              "4.2.1":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":519,
+                  "Hits":956
+                },
+                "SubRows":null
+              },
+              "3.1.2":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":386,
+                  "Hits":878
+                },
+                "SubRows":null
+              },
+              "5.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":325,
+                  "Hits":712
+                },
+                "SubRows":null
+              },
+              "4.1.2":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":179,
+                  "Hits":389
+                },
+                "SubRows":null
+              },
+              "1.6":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":38,
+                  "Hits":108
+                },
+                "SubRows":null
+              },
+              "4.0.4":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":20,
+                  "Hits":75
+                },
+                "SubRows":null
+              },
+              "2.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":18,
+                  "Hits":45
+                },
+                "SubRows":null
+              },
+              "4.0.3":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":5,
+                  "Hits":19
+                },
+                "SubRows":null
+              },
+              "3.0.4":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":3,
+                  "Hits":4
+                },
+                "SubRows":null
+              },
+              "1.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":3,
+                  "Hits":4
+                },
+                "SubRows":null
+              },
+              "6.0.1":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":1,
+                  "Hits":1
+                },
+                "SubRows":null
+              },
+              "4.4":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":1,
+                  "Hits":1
+                },
+                "SubRows":null
+              }
+            }
+          },
+          "Firefox":{  
+            "attributes":{  
+
+            },
+            "measures":{  
+              "Visits":1850026,
+              "Hits":5565793
+            },
+            "SubRows":{  
+              "36.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":1280726,
+                  "Hits":3894288
+                },
+                "SubRows":null
+              },
+              "35.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":274781,
+                  "Hits":835889
+                },
+                "SubRows":null
+              },
+              "34.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":47780,
+                  "Hits":123481
+                },
+                "SubRows":null
+              },
+              "31.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":45166,
+                  "Hits":127671
+                },
+                "SubRows":null
+              },
+              "37.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":31274,
+                  "Hits":81909
+                },
+                "SubRows":null
+              },
+              "33.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":29421,
+                  "Hits":62693
+                },
+                "SubRows":null
+              },
+              "32.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":12475,
+                  "Hits":35078
+                },
+                "SubRows":null
+              },
+              "30.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":12055,
+                  "Hits":31098
+                },
+                "SubRows":null
+              },
+              "24.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":11903,
+                  "Hits":36549
+                },
+                "SubRows":null
+              },
+              "29.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":8947,
+                  "Hits":23896
+                },
+                "SubRows":null
+              },
+              "16.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":6848,
+                  "Hits":19375
+                },
+                "SubRows":null
+              },
+              "28.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":6555,
+                  "Hits":17401
+                },
+                "SubRows":null
+              },
+              "17.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":6162,
+                  "Hits":17003
+                },
+                "SubRows":null
+              },
+              "26.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":5655,
+                  "Hits":16206
+                },
+                "SubRows":null
+              },
+              "12.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":5554,
+                  "Hits":16249
+                },
+                "SubRows":null
+              },
+              "27.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":5260,
+                  "Hits":14308
+                },
+                "SubRows":null
+              },
+              "23.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":4141,
+                  "Hits":11169
+                },
+                "SubRows":null
+              },
+              "20.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":4046,
+                  "Hits":64193
+                },
+                "SubRows":null
+              },
+              "19.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":3856,
+                  "Hits":10785
+                },
+                "SubRows":null
+              },
+              "25.0":{  
+                "attributes":{  
+
+                },
+                "measures":{  
+                  "Visits":3398,
+                  "Hits":9107
+                },
+                "SubRows":null
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
