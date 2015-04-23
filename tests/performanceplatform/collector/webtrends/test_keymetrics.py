@@ -1,8 +1,7 @@
 import unittest
 from performanceplatform.collector.webtrends.keymetrics import(
-    Collector, Parser)
+    Collector, V2Parser, V3Parser)
 import performanceplatform
-import json
 from mock import patch
 import requests
 from hamcrest import assert_that, equal_to, has_entries
@@ -10,6 +9,8 @@ from nose.tools import assert_raises
 import datetime
 import pytz
 from tests.performanceplatform.collector.ga import dt
+from tests.performanceplatform.collector.webtrends.test_reports import(
+    get_fake_response)
 
 
 def build_collector(start_at=None,
@@ -25,10 +26,9 @@ def build_collector(start_at=None,
     return Collector(credentials, query, start_at, end_at)
 
 
-def get_fake_response():
-    with open("tests/fixtures/"
-              "webtrends_keymetrics_last_3_hours.json", "r") as f:
-        return json.loads(f.read())
+def get_fake_response_keymetrics(
+        file='webtrends_keymetrics_last_3_hours.json'):
+    return get_fake_response(file)
 
 
 class TestCollector(unittest.TestCase):
@@ -38,7 +38,7 @@ class TestCollector(unittest.TestCase):
         "performanceplatform.collector.webtrends"
         ".keymetrics.requests_with_backoff.get")
     def test_collect_parse_and_push(self, mock_get, mock_post):
-        mock_get().json.return_value = get_fake_response()
+        mock_get().json.return_value = get_fake_response_keymetrics()
         query = {}
         options = {
             'mappings': {'Visitors': 'visitors',
@@ -92,12 +92,12 @@ class TestCollector(unittest.TestCase):
     @patch("performanceplatform.collector.webtrends"
            ".keymetrics.requests_with_backoff.get")
     def test_collect_when_specified_start_and_end_and_hourly(self, mock_get):
-        mock_get().json.return_value = get_fake_response()
+        mock_get().json.return_value = get_fake_response_keymetrics()
         # as the above bit of setup is a call
         mock_get.reset_mock()
         collector = build_collector("2014-08-03", "2014-08-05")
         assert_that(collector.collect(), equal_to([
-            get_fake_response()["data"]]))
+            get_fake_response_keymetrics()["data"]]))
         mock_get.assert_called_once_with(
             url="http://this.com/",
             auth=('abc', 'def'),
@@ -111,13 +111,13 @@ class TestCollector(unittest.TestCase):
     @patch("performanceplatform.collector.webtrends"
            ".keymetrics.requests_with_backoff.get")
     def test_collect_when_no_specified_start_and_end(self, mock_get):
-        mock_get().json.return_value = get_fake_response()
+        mock_get().json.return_value = get_fake_response_keymetrics()
         # as the above bit of setup is a call
         mock_get.reset_mock()
         collector = build_collector()
         assert_that(
             collector.collect(),
-            equal_to([get_fake_response()["data"]]))
+            equal_to([get_fake_response_keymetrics()["data"]]))
         mock_get.assert_called_once_with(
             url="http://this.com/",
             auth=('abc', 'def'),
@@ -172,13 +172,13 @@ class TestCollector(unittest.TestCase):
 
 
 class TestParser(unittest.TestCase):
-    def test_handles_returned_date_format_correctly(self):
+    def test_handles_returned_date_format_correctly_when_v2(self):
         assert_that(
-            Parser.to_datetime(
+            V2Parser.to_datetime(
                 "10/30/2014 13"),
             equal_to(dt(2014, 10, 30, 13, 0, 0, "UTC")))
 
-    def test_handles_no_data_in_period(self):
+    def test_handles_no_data_in_period_when_v2(self):
         options = {
             'row_type_name': 'browser',
             'mappings': {'Visits': 'visitors'},
@@ -186,7 +186,7 @@ class TestParser(unittest.TestCase):
             # does it matter that this is joined by blank string?
             'idMapping': ["dataType", "_timestamp", "browser"]}
         data_type = "realtime"
-        parser = Parser(options, data_type)
+        parser = V2Parser(options, data_type)
         no_data_response = {
             "10/14/2014-10/15/2014": {
                 "SubRows": None,
@@ -198,7 +198,7 @@ class TestParser(unittest.TestCase):
         results = list(parser.parse([no_data_response]))
         assert_that(results, equal_to([]))
 
-    def test_parses_data_correctly(self):
+    def test_parses_data_correctly_when_v2(self):
         posted_data = [
             {
                 "_id": "cmVhbHRpbWUyMDE0LTEwLTMwIDEyOjAwOjAwKzAwOjAwZmllbGQ=",
@@ -228,7 +228,105 @@ class TestParser(unittest.TestCase):
             # does it matter that this is joined by blank string?
             'idMapping': ["dataType", "_timestamp", "test"]}
         data_type = "realtime"
-        parser = Parser(options, data_type)
-        results = list(parser.parse([get_fake_response()['data']]))
+        parser = V2Parser(options, data_type)
+        results = list(parser.parse([get_fake_response_keymetrics()['data']]))
         assert_that(results[0], has_entries(posted_data[1]))
         assert_that(results[1], has_entries(posted_data[0]))
+
+    def test_handles_returned_date_format_correctly_when_v3(self):
+        date_data = {
+            "start_date": "2015-03",
+            "end_date": "2015-03"
+        }
+        assert_that(
+            V3Parser.to_datetime(
+                date_data),
+            equal_to(dt(2015, 03, 01, 0, 0, 0, "UTC")))
+
+    def test_handles_full_returned_date_format_correctly_when_v3(self):
+        date_data = {
+            "start_date": "2015-03-02",
+            "end_date": "2015-03-03"
+        }
+        assert_that(
+            V3Parser.to_datetime(
+                date_data),
+            equal_to(dt(2015, 03, 02, 0, 0, 0, "UTC")))
+
+    def test_handles_no_data_in_period_when_v3(self):
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            'idMapping': ["dataType", "_timestamp", "browser"]}
+        data_type = "browsers"
+        parser = V3Parser(options, data_type)
+        no_data_response = [
+            {
+                "period": "Month",
+                "start_date": "2015-03",
+                "end_date": "2015-03",
+                "measures": {
+                    "Visits": 0,
+                    "Hits": 0
+                },
+                "SubRows": []
+            }
+        ]
+        results = list(parser.parse([no_data_response]))
+        assert_that(results, equal_to([]))
+
+    def test_handles_none_data_in_period_when_v3(self):
+        options = {
+            'row_type_name': 'browser',
+            'mappings': {'Visits': 'visitors'},
+            'additionalFields': {'test': 'field'},
+            'idMapping': ["dataType", "_timestamp", "browser"]}
+        data_type = "browsers"
+        parser = V3Parser(options, data_type)
+        no_data_response = [
+            {
+                "period": "Month",
+                "start_date": "2015-03",
+                "end_date": "2015-03",
+                "measures": {
+                    "Visits": 0,
+                    "Hits": 0
+                },
+                "SubRows": None
+            }
+        ]
+        results = list(parser.parse([no_data_response]))
+        assert_that(results, equal_to([]))
+
+    def test_parses_data_correctly_when_v3(self):
+        posted_data = [
+            {
+                u'AvgVisitorsperDay': 1392933.67857143,
+                '_timestamp': datetime.datetime(
+                    2015, 3, 26, 0, 0, tzinfo=pytz.UTC),
+                u'PageViews': 96971613,
+                'dataType': 'realtime',
+                u'Visits': 44331856,
+                '_id': 'cmVhbHRpbWUyMDE1LTAzLTI2IDAwOjAwOjAwKzAwOjAwZmllbGQ=',
+                u'AvgTimeonSite': 403.282126908444,
+                'visitors': 34451356,
+                'humanId': 'realtime2015-03-26 00:00:00+00:00field',
+                u'BounceRate': 65.7744489650963,
+                u'PageViewsperVisit': 2.18740250802944,
+                'test': 'field',
+                u'NewVisitors': 10651479,
+                u'AvgTimeonSiteperVisitor': 176.891636021526
+            }
+        ]
+        options = {
+            'mappings': {'Visitors': 'visitors',
+                         'Page Views per Visit': 'page_views_per_visit'},
+            'additionalFields': {'test': 'field'},
+            # does it matter that this is joined by blank string?
+            'idMapping': ["dataType", "_timestamp", "test"]}
+        data_type = "realtime"
+        parser = V3Parser(options, data_type)
+        results = list(parser.parse([get_fake_response_keymetrics(
+            'webtrends_keymetrics_v3.json')['data']]))
+        assert_that(results[0], has_entries(posted_data[0]))

@@ -7,6 +7,7 @@ from performanceplatform.collector.webtrends.base import(
 
 class Collector(BaseCollector):
     def __init__(self, credentials, query, start_at, end_at):
+        self.api_version = credentials.get('api_version')
         self.base_url = credentials['keymetrics_url']
         super(Collector, self).__init__(credentials, query, start_at, end_at)
 
@@ -44,10 +45,13 @@ class Collector(BaseCollector):
         )
 
     def build_parser(self, data_set_config, options):
-        return Parser(options, data_set_config['data-type'])
+        if self.api_version == 'v3':
+            return V3Parser(options, data_set_config['data-type'])
+        else:
+            return V2Parser(options, data_set_config['data-type'])
 
 
-class Parser(BaseParser):
+class V2Parser(BaseParser):
     def parse_item(self, item):
         initial_data = []
         special_fields = []
@@ -55,7 +59,7 @@ class Parser(BaseParser):
             if value['SubRows']:
                 row_items = value['SubRows'].items()
                 for date, row in row_items:
-                    start_date = Parser.to_datetime(date)
+                    start_date = self.__class__.to_datetime(date)
                     if row:
                         initial_data.append({
                             'start_date': start_date,
@@ -67,6 +71,33 @@ class Parser(BaseParser):
     def to_datetime(cls, webtrends_formatted_date):
         return datetime.strptime(
             webtrends_formatted_date, "%m/%d/%Y %H").replace(tzinfo=pytz.UTC)
+
+
+class V3Parser(BaseParser):
+    def parse_item(self, items):
+        initial_data = []
+        special_fields = []
+        for value in items:
+            start_date = self.__class__.to_datetime(value)
+            if value['SubRows']:
+                for _, row in value['SubRows'].items():
+                    if row:
+                        initial_data.append({
+                            'start_date': start_date,
+                        })
+                        special_fields.append(row['measures'])
+        return initial_data, special_fields
+
+    @classmethod
+    def to_datetime(cls, webtrends_formatted_data_point):
+        start_at = webtrends_formatted_data_point['start_date']
+        date_parts = start_at.split('-')
+        if len(date_parts) == 3:
+            return datetime.strptime(
+                start_at, "%Y-%m-%d").replace(tzinfo=pytz.UTC)
+        else:
+            return datetime.strptime(
+                start_at, "%Y-%m").replace(tzinfo=pytz.UTC)
 
 
 def main(credentials, data_set_config, query, options, start_at, end_at):
