@@ -196,6 +196,7 @@ Developing performanceplatform-collector
 To begin working on the code
 
 ::
+
   git clone https://github.com/alphagov/performanceplatform-collector.git
   cd performanceplatform-collector
   virtualenv venv
@@ -205,11 +206,13 @@ To begin working on the code
 Due to the use of namespace packages, you must not install requirements with
 
 ::
+
   pip install -r requirements.txt
 
 If you have run this command, your virtualenv may be broken - you can fix by
 running
 
 ::
+
   pip uninstall performanceplatform-client
   python setup.py develop
