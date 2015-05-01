@@ -345,6 +345,6 @@ class TestParser(unittest.TestCase):
         data_type = "browsers"
         parser = V3Parser(options, data_type)
         results = list(parser.parse([get_fake_response(
-            'webtrends_v3.json')['data']]))
+            'webtrends_reports_v3.json')['data']]))
         assert_that(results[0], has_entries(posted_data[0]))
         assert_that(results[1], has_entries(posted_data[1]))
