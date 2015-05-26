@@ -186,7 +186,7 @@ class TestGenerateCrontab(object):
                 "unique-id-of-my-app"
             )
 
-            assert_that(generated_jobs, has_length(3))
+            assert_that(removeCommentsFromCrontab(generated_jobs), has_length(1))
 
     @patch('socket.gethostname')
     def test_jobs_based_on_hostname_with_2(self, hostname):
@@ -205,7 +205,7 @@ class TestGenerateCrontab(object):
                 "unique-id-of-my-app"
             )
 
-            assert_that(generated_jobs, has_length(3))
+            assert_that(removeCommentsFromCrontab(generated_jobs), has_length(1))
 
     @patch('socket.gethostname')
     def test_jobs_based_on_hostname_with_3(self, hostname):
@@ -224,10 +224,14 @@ class TestGenerateCrontab(object):
                 "unique-id-of-my-app"
             )
 
-            assert_that(generated_jobs, has_length(3))
+            assert_that(removeCommentsFromCrontab(generated_jobs), has_length(1))
 
     def tearDown(self):
         self.patcher.stop()
+
+
+def removeCommentsFromCrontab(generated_jobs):
+    return filter(lambda job: not job.startswith("#"), generated_jobs)
 
 
 class ProcessFailureError(StandardError):
