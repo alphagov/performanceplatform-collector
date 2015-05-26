@@ -189,6 +189,8 @@ class TestGenerateCrontab(object):
 
             assert_that(
                 removeCommentsFromCrontab(generated_jobs), has_length(1))
+            assert_that(removeCommentsFromCrontab(
+                generated_jobs)[0], contains_string("schedule "))
 
     @patch('socket.gethostname')
     def test_jobs_based_on_hostname_with_2(self, hostname):
@@ -209,6 +211,8 @@ class TestGenerateCrontab(object):
 
             assert_that(
                 removeCommentsFromCrontab(generated_jobs), has_length(1))
+            assert_that(removeCommentsFromCrontab(
+                generated_jobs)[0], contains_string("schedule3 "))
 
     @patch('socket.gethostname')
     def test_jobs_based_on_hostname_with_3(self, hostname):
@@ -229,6 +233,8 @@ class TestGenerateCrontab(object):
 
             assert_that(
                 removeCommentsFromCrontab(generated_jobs), has_length(1))
+            assert_that(removeCommentsFromCrontab(
+                generated_jobs)[0], contains_string("schedule2 "))
 
     def tearDown(self):
         self.patcher.stop()
