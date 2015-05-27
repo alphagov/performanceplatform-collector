@@ -1,3 +1,4 @@
+import re
 from performanceplatform.collector.ga.plugins.department import \
     try_get_department
 
@@ -28,21 +29,12 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
         return list(gen())
 
     for filters in options["filtersets"]:
+
         all_filters = insert_ga(original_filters + filters)
         query["filters"] = [";".join(all_filters)]
 
-        for f in filters:
-            if f.startswith("customVarValue9=~^"):
-                department = try_get_department(f[len("customVarValue9=~^"):])
-                break
-        else:
-            # If no matches, raise a RuntimeError
-            raise RuntimeError("department not found in filters, expected "
-                               "filter expression beginning "
-                               "'customVarValue9=~^'.")
-
         options.setdefault("additionalFields", {}).update(
-            {"department": department})
+            {"department": get_department(filters)})
 
         ds = query_documents_for(
             client, query, options, data_set_config['data-type'],
@@ -52,3 +44,19 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
         documents.extend(ds)
 
     Pusher(data_set_config, options).push(documents)
+
+
+def get_department(filters):
+    for f in filters:
+        try:
+            filter_key, filter_value = re.split('=~\^', f)
+            return try_get_department(filter_value)
+        except:
+            raise ValueError("department not found in filters, expected "
+                             "filter expression expression containing "
+                             "'=~^' e.g. 'Organisation=~^<A1>'.")
+    else:
+        # If no matches, raise a RuntimeError
+        raise RuntimeError("department not found in filters, expected "
+                           "filter expression beginning "
+                           "'customVarValue9=~^'.")
