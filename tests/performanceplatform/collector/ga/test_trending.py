@@ -233,6 +233,12 @@ class test_query_parsing(unittest.TestCase):
             ['pageTitle', 'pagePath', 'day', 'month', 'year']
         )
 
+    def test_query_ga_with_segment(self):
+        pass
+
+    def test_segment_is_optional_for_querying(self):
+        pass
+
 
 class test_date_picking(unittest.TestCase):
 

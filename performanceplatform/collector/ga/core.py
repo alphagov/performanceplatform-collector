@@ -56,6 +56,7 @@ def query_ga(client, config, start_date, end_date):
         config.get("filters"),
         maxResults,
         sort,
+        config.get("segment")
     )
 
 

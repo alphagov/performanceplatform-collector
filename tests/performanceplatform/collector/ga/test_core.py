@@ -79,6 +79,7 @@ def test_query_ga_with_empty_response():
         ["some-filter"],
         None,
         None,
+        None
     )
 
     eq_(response, [])
@@ -103,6 +104,7 @@ def test_filters_are_optional_for_querying():
         None,
         None,
         None,
+        None
     )
 
 
@@ -123,6 +125,7 @@ def test_dimensions_are_optional_for_querying():
         ["visits"],
         None,
         ["some-filter"],
+        None,
         None,
         None
     )
@@ -221,6 +224,7 @@ def test_query_ga_with_sort():
         ["some-filter"],
         None,
         ["-foo"],
+        None
     )
 
     eq_(response, [])
@@ -248,6 +252,7 @@ def test_query_ga_with_maxresults():
         ["some-filter"],
         1000,
         None,
+        None
     )
 
     eq_(response, [])
@@ -343,3 +348,56 @@ def test_daily_repeat_month(mock_query_in_range):
         None,
         None))
     assert_that(result[0]["timeSpan"], equal_to("month"))
+
+
+def test_query_ga_with_segment():
+    config = {
+        "id": "ga:123",
+        "metrics": ["visits"],
+        "segment": "gaid::-123",
+    }
+    client = mock.Mock()
+    client.query.get.return_value = []
+
+    response = list(
+        query_ga(client, config, date(2013, 4, 1), date(2013, 4, 7)))
+
+    client.query.get.assert_called_once_with(
+        "123",
+        date(2013, 4, 1),
+        date(2013, 4, 7),
+        ["visits"],
+        None,
+        None,
+        None,
+        None,
+        "gaid::-123"
+    )
+
+    assert_that(response, equal_to([]))
+
+
+def test_segment_is_optional_for_querying():
+    config = {
+        "id": "ga:123",
+        "metrics": ["visits"],
+    }
+    client = mock.Mock()
+    client.query.get.return_value = []
+
+    response = list(
+        query_ga(client, config, date(2013, 4, 1), date(2013, 4, 7)))
+
+    client.query.get.assert_called_once_with(
+        "123",
+        date(2013, 4, 1),
+        date(2013, 4, 7),
+        ["visits"],
+        None,
+        None,
+        None,
+        None,
+        None
+    )
+
+    assert_that(response, equal_to([]))
