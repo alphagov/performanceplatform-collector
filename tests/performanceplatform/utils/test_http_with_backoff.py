@@ -1,6 +1,7 @@
 from mock import patch, call
 from nose.tools import assert_equal
 from performanceplatform.utils.http_with_backoff import HttpWithBackoff
+from performanceplatform.utils.http_with_backoff import parse_reason
 from httplib2 import Response
 
 
@@ -181,3 +182,26 @@ class TestHttpWithBackoff(object):
                                         "foo",
                                         10,
                                         "wibble")
+
+    def test_parse_reason_with_empty_content(self):
+        assert_equal(parse_reason(Response({}), ''), 'Ok')
+
+    def test_parse_reason_with_html_content(self):
+        assert_equal(parse_reason(Response({}), '<strong>lol</strong>'), 'Ok')
+
+    def test_parse_reason_with_json_content(self):
+        assert_equal(parse_reason(Response({}), """{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "invalidParameter",
+    "message": "Invalid value '-1' for max-results. Value must be within the range: [1, 1000]",
+    "locationType": "parameter",
+    "location": "max-results"
+   }
+  ],
+  "code": 400,
+  "message": "Invalid value '-1' for max-results. Value must be within the range: [1, 1000]"
+ }
+}"""), 'invalidParameter')
