@@ -1,6 +1,0 @@
-PyHamcrest
-nose
-mock
-pep8==1.6.2
-coverage
-freezegun

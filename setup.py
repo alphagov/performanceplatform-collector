@@ -38,17 +38,6 @@ def _get_version():
     return version.encode('ascii')
 
 
-def _get_requirements(fname):
-    """
-    Create a list of requirements from the output of the pip freeze command
-    saved in a text file.
-    """
-    packages = _read(fname).split('\n')
-    packages = (p.strip() for p in packages)
-    packages = (p for p in packages if p and not p.startswith('#'))
-    return list(packages)
-
-
 def _get_long_description():
     return _read('README.rst')
 
@@ -72,8 +61,25 @@ if __name__ == '__main__':
         license='MIT',
         keywords='api data performance_platform',
 
-        install_requires=_get_requirements('requirements.txt'),
-        tests_require=_get_requirements('requirements_for_tests.txt'),
+        install_requires=['pytz==2013d',
+                          'argparse',
+                          'python-dateutil',
+                          'logstash_formatter',
+                          'gapy==1.3.0',
+                          'google-api-python-client==1.0',
+                          'lxml>=3.2.0',
+                          'dshelpers>=1.0.4',
+                          'unicodecsv',
+                          'requests>=1.2.0',
+                          'statsd==3.0',
+                          'performanceplatform-client==0.2.6'
+                          ],
+        tests_require=['PyHamcrest',
+                       'nose',
+                       'mock',
+                       'pep8==1.6.2',
+                       'coverage',
+                       'freezegun'],
 
         test_suite='nose.collector',
 
