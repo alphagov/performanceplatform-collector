@@ -1,11 +1,32 @@
 from httplib2 import *
 from httplib2 import DEFAULT_MAX_REDIRECTS
+import json
 import logging
 import time
 from performanceplatform.collector.logging_setup import (
     extra_fields_from_exception)
 
 _MAX_RETRIES = 5
+
+
+def parse_reason(response, content):
+    """
+    Google return a JSON document describing the error. We should parse this
+    and extract the error reason. See
+    https://developers.google.com/analytics/devguides/reporting/core/v3/coreErrors
+    """
+    def first_error(data):
+        errors = data['error']['errors']
+        if len(errors) > 1:
+            # we have more than one error. We should capture that?
+            logging.info('Received {} errors'.format(len(errors)))
+        return errors[0]
+
+    try:
+        json_data = json.loads(content)
+        return first_error(json_data)['reason']
+    except:
+        return response.reason
 
 
 class HttpWithBackoff(Http):
@@ -50,12 +71,13 @@ class HttpWithBackoff(Http):
             # * how Piwik works
             # * how Pingdom works
             if code in [403, 502, 503]:
+                reason = parse_reason(response, content)
                 retry_info = (
                     '{} request for {} failed with code {},'
                     'reason {} (Attempt {} of {}).'.format(method,
                                                            uri,
                                                            code,
-                                                           response.reason,
+                                                           reason,
                                                            n + 1,
                                                            _MAX_RETRIES))
                 if n + 1 < _MAX_RETRIES:
