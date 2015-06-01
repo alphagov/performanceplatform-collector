@@ -3,11 +3,13 @@ import unittest
 from freezegun import freeze_time
 from datetime import date
 from copy import copy
+from hamcrest import assert_that, equal_to
+from mock import Mock
 
 from tests.performanceplatform.collector.ga import dt
 from performanceplatform.collector.ga.trending import encode_id, get_date, \
     sum_data, get_trends, flatten_data_and_assign_ids, assign_day_to_week, \
-    parse_query
+    parse_query, query_ga
 
 
 class test_data_calculations(unittest.TestCase):
@@ -252,3 +254,55 @@ class test_date_picking(unittest.TestCase):
             start,
             date(2014, 01, 29)
         )
+
+
+class SegmentedQueryTestCase(unittest.TestCase):
+    def test_query_with_segment(self):
+        query = {
+            'id': '123',
+            'metric': 'pageview',
+            'segment': 'gaid::-123'
+        }
+
+        client = Mock()
+        client.query.get.return_value = []
+
+        response = query_ga(client, date(2013, 4, 7), query, date(2013, 4, 1))
+
+        client.query.get.assert_called_once_with(
+            "123",
+            date(2013, 4, 1),
+            date(2013, 4, 7),
+            ["pageview"],
+            ['day', 'month', 'year'],
+            None,
+            None,
+            None,
+            'gaid::-123',
+        )
+
+        assert_that(response, equal_to([]))
+
+    def test_segment_is_optional_for_querying(self):
+        query = {
+            "id": "123",
+            "metric": 'pageview',
+        }
+        client = Mock()
+        client.query.get.return_value = []
+
+        response = query_ga(client, date(2013, 4, 7), query, date(2013, 4, 1))
+
+        client.query.get.assert_called_once_with(
+            "123",
+            date(2013, 4, 1),
+            date(2013, 4, 7),
+            ["pageview"],
+            ['day', 'month', 'year'],
+            None,
+            None,
+            None,
+            None,
+        )
+
+        assert_that(response, equal_to([]))

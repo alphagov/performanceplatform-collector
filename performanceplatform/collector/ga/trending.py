@@ -108,6 +108,22 @@ def flatten_data_and_assign_ids(data):
     return flattened
 
 
+def query_ga(client, end, query, start):
+    ga_query = parse_query(query)
+
+    return client.query.get(
+        ga_query['id'],
+        start,
+        end,
+        [ga_query['metric']],
+        ga_query['dimensions'],
+        ga_query['filters'] if 'filters' in ga_query else None,
+        None,
+        None,
+        ga_query.get('segment')
+    )
+
+
 def main(credentials, data_set_config, query, options, start_at, end_at):
 
     credentials = credentials
@@ -117,22 +133,13 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
         http_client=HttpWithBackoff(),
     )
 
-    ga_query = parse_query(query)
-
     collapse_key = "pageTitle"
 
     (start, middle, end) = get_date()
 
-    data = client.query.get(
-        ga_query['id'],
-        start,
-        end,
-        [ga_query['metric']],
-        ga_query['dimensions'],
-        ga_query['filters'] if 'filters' in ga_query else None
-    )
+    data = query_ga(client, end, query, start)
 
-    collapsed_data = sum_data(data, ga_query['metric'], collapse_key,
+    collapsed_data = sum_data(data, query['metric'], collapse_key,
                               (start, middle, end), 500)
     trended_data = get_trends(collapsed_data)
     flattened_data = flatten_data_and_assign_ids(trended_data)
