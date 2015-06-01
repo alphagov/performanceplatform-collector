@@ -52,6 +52,8 @@ class Parser():
         base_items = []
         special_fields = []
         for date_key, data_points in data.items():
+            if type(data_points) == dict:
+                data_points = [data_points]
             data = self._parse_item(date_key, data_points)
             base_items += data[0]
             special_fields += data[1]

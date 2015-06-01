@@ -9,8 +9,8 @@ from nose.tools import assert_raises
 from performanceplatform.collector.piwik.core import main, Fetcher, Parser
 
 
-def get_piwik_data(period='daily'):
-    file = "tests/fixtures/piwik_browser_count_{0}.json".format(period)
+def get_piwik_data(filename='piwik_browser_count', period='daily'):
+    file = "tests/fixtures/{0}_{1}.json".format(filename, period)
     with open(file, "r") as f:
         return json.loads(f.read())
 
@@ -112,19 +112,19 @@ class TestParser(unittest.TestCase):
 
     def test_parses_from_date_of_a_piwik_date_range_key_into_a_timestamp(self):
         parser = build_parser()
-        parsed_data = parser.parse(get_piwik_data('weekly'))
+        parsed_data = parser.parse(get_piwik_data(period='weekly'))
         assert_that(parsed_data[0]['_timestamp'],
                     equal_to(datetime(2015, 2, 2, 0, 0, tzinfo=pytz.UTC)))
 
     def test_parses_piwik_month_key_into_a_timestamp(self):
         parser = build_parser()
-        parsed_data = parser.parse(get_piwik_data('monthly'))
+        parsed_data = parser.parse(get_piwik_data(period='monthly'))
         assert_that(parsed_data[0]['_timestamp'],
                     equal_to(datetime(2015, 2, 1, 0, 0, tzinfo=pytz.UTC)))
 
     def test_parses_piwik_datapoints_keyed_by_multiple_dates(self):
         parser = build_parser()
-        parsed_data = parser.parse(get_piwik_data('weekly'))
+        parsed_data = parser.parse(get_piwik_data(period='weekly'))
         assert_that(len(parsed_data), equal_to(4))
 
     def test_mapping_of_piwik_datapoint_keys(self):
@@ -140,6 +140,23 @@ class TestParser(unittest.TestCase):
         parsed_data = parser.parse(get_piwik_data())
         assert_that(parsed_data[0]['browser'], equal_to('Chrome'))
         assert_that(parsed_data[0]['sessions'], equal_to(5634))
+
+    def test_parses_non_list_based_data_points(self):
+        options = {
+            'mappings': {
+                'nb_visits_converted': 'converted',
+                'nb_conversions': 'sessions'},
+            'idMapping': [
+                'dataType', '_timestamp', 'timeSpan']
+        }
+        parser = Parser(query(), options, 'journey-by-goal')
+        data = get_piwik_data(
+            filename='piwik_goal_completion', period='weekly')
+        parsed_data = parser.parse(data)
+        assert_that(parsed_data[0], has_key('converted'))
+        assert_that(parsed_data[0], has_key('sessions'))
+        assert_that(parsed_data[0]['converted'], equal_to(730))
+        assert_that(parsed_data[0]['sessions'], equal_to(730))
 
     def test_ignores_other_non_mapped_piwik_datapoint_keys(self):
         parser = build_parser()
