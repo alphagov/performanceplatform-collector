@@ -151,6 +151,15 @@ The credentials file is used to pass through any usernames, passwords, API keys 
       "STORAGE_PATH": path/to/oauth/db,
   }
 
+  # Piwik example
+  {
+    "token_auth": "your Piwik secret token",
+    "url": "your Piwik API url"
+  }
+
+  You can get your Piwik secret token from the Manage Users
+  admin area in your Piwik account.
+
 Google Analytics
 ================
 
@@ -173,7 +182,89 @@ To retrieve accurate paths for secrets (Google Analytics pathway):
       * If you get an 'invalid client error', adding a name and support email under the ""APIs & auth" -> "Consent screen" Should fix this.
       * See http://stackoverflow.com/questions/18677244/error-invalid-client-no-application-name for more.
 
+Piwik
+=====
 
+Example Piwik query file
+------------------------
+
+Here is an example Piwik query file::
+
+ {
+   "data-set": {
+      "data-group": "consular-appointment-booking-service",
+      "data-type": "journey-by-goal"
+    },
+    "entrypoint": "performanceplatform.collector.piwik.core",
+    "query": {
+      "site_id": "9",
+      "api_method": "Goals.get",
+      "frequency": "daily",
+      "api_method_arguments": {
+         "idGoal": "3"
+      }
+    },
+    "options": {
+      "mappings": {
+        "nb_visits_converted": "converted",
+        "nb_conversions": "sessions"
+      },
+      "idMapping": ["dataType","_timestamp","timeSpan"]
+      },
+    "token": "piwik_fco"
+ }
+
+The above query file will instruct the Piwik collector to fetch data
+via the Goals.get method of your Piwik Reporting API endpoint. The
+endpoint is specified via the 'url' setting in your credentials file.
+
+The 'site_id' and 'frequency' settings map to the standard
+Piwik Reporting API method arguments of 'idSite' and 'period' respectively.
+
+* site_id - a number representing your website
+* frequency - how statistics should be reported (daily, weekly, monthly)
+
+If not specified, the 'frequency' setting defaults to 'weekly'.
+
+You can specify API method-specific arguments using the 'api_method_arguments'
+key in your query file as shown in the example. For a full list of methods
+available in the Piwik Reporting API, see
+http://developer.piwik.org/api-reference/reporting-api.
+
+The Piwik collector uses the 'mappings' settings in your query file to determine
+which data items to extract from an API response and how to map their
+keys. The above query file, for example, will configure the collector
+to extract the 'nb_visits_converted' and 'nb_conversions' data items
+from the following example API response::
+
+  {
+    "From 2015-05-25 to 2015-05-31": {
+      "nb_visits_converted": 791,
+      "nb_conversions": 791,
+      "conversion_rate": 18.09,
+      "revenue": 0 }
+  }
+
+The keys of these data items will be replaced with
+'converted' and 'sessions' respectively, ready for storage in
+the Performance Platform's data application, Backdrop.
+
+Running the Piwik collector
+---------------------------
+
+The Piwik collector is run from the command line in the normal
+way - see the Usage section above.
+
+If you want to collect data by day, week or month over a period of time,
+specify an appropriate value for the 'frequency' setting in your
+query file and a start and end date in your run command using the
+'--start' and '--end' optional arguments. The dates are passed
+to the Piwik API via a 'date' argument of the form 'YYYY-MM-DD,YYYY-MM-DD'.
+
+If date arguments are not provided, a value of 'previous1' is passed
+for the Piwik 'date' argument which will return data for the
+previous day, week or month (according to the value of your
+'frequency' setting).
 
 Extending performanceplatform-collector
 =======================================
