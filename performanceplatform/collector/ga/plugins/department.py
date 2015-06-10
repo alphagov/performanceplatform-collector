@@ -467,6 +467,7 @@ DEPARTMENT_MAPPING = {
     "<PB531>": "nhs-pay-review-body",
     "<PB534>": "animals-in-science-committee",
     "<PB542>": "the-office-of-the-schools-commissioner",
+    "<PB1062>": "company-names-tribunal",
     "<PC163>": "architects-registration-board",
     "<PC259>": "uk-financial-investments-limited",
     "<PC343>": "audit-commission",
