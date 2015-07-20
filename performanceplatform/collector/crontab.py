@@ -5,7 +5,7 @@ import sys
 import socket
 
 # Number of hosts we are running the crons on
-NUMBER_OF_HOSTS = 3
+NUMBER_OF_HOSTS = 2
 
 
 ignore_line_re = re.compile("^#.*|\s*$")
