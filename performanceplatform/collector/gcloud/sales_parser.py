@@ -43,9 +43,13 @@ _SME_LARGE_KEY = {
 }
 
 _LOT_KEY = {
+    #'IaaS - Cloud Infrastructure as a Service': 'iaas',
+    #'PaaS - Cloud Platform as a Service': 'paas',
+    #'SaaS - Cloud Software as a Service': 'saas',
     'Infrastructure as a Service (IaaS)': 'iaas',
     'Platform as a Service (PaaS)': 'paas',
     'Software as a Service (SaaS)': 'saas',
+    #'Software as a Service': 'saas',
     'Specialist Cloud Services': 'css'
 }
 
