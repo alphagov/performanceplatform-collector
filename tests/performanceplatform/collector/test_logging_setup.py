@@ -18,7 +18,7 @@ class TestJsonLogging(unittest.TestCase):
         set_up_logging('collector_foo', logging.DEBUG, './log')
         logging.info('Writing out JSON formatted logs m8')
 
-        with open('log/collector.log.json') as log_file:
+        with open('log/production.json.log') as log_file:
             data = json.loads(log_file.readlines()[-1])
 
         assert_that(data, has_entries({
@@ -30,8 +30,8 @@ class TestJsonLogging(unittest.TestCase):
         }))
 
         # Only remove file if assertion passes
-        os.remove('log/collector.log.json')
-        os.remove('log/collector.log')
+        os.remove('log/production.json.log')
+        os.remove('log/production.log')
 
     def test_extra_fields_from_exception(self):
         try:

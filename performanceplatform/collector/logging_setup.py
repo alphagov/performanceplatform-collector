@@ -37,9 +37,9 @@ def set_up_logging(app_name, log_level, logfile_path, json_fields=None):
     logger = logging.getLogger()
     logger.setLevel(log_level)
     logger.addHandler(get_log_file_handler(
-        os.path.join(logfile_path, 'collector.log')))
+        os.path.join(logfile_path, 'production.log')))
     logger.addHandler(get_json_log_handler(
-        os.path.join(logfile_path, 'collector.log.json'),
+        os.path.join(logfile_path, 'production.json.log'),
         app_name,
         json_fields=json_fields if json_fields else {}))
     logger.info("{0} logging started".format(app_name))
