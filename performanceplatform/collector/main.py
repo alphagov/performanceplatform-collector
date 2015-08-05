@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from performanceplatform.collector import arguments
 from performanceplatform.collector.logging_setup import set_up_logging
+from performanceplatform.utils.collector import get_config
 
 
 def logging_for_entrypoint(entrypoint, json_fields):
@@ -99,6 +100,8 @@ def _log_collector_instead_of_running(entrypoint, args):
 
 def main():
     args = arguments.parse_args('Performance Platform Collector')
+    config = get_config(args.collector_slug)
+    args.query = config
     entrypoint = args.query['entrypoint']
 
     if args.console_logging:

@@ -48,7 +48,13 @@ class TestMain(unittest.TestCase):
                 '_log_collector_instead_of_running')
     @mock.patch('performanceplatform.collector.main._run_collector')
     @mock.patch('performanceplatform.collector.arguments.parse_args')
-    def test_collectors_can_be_disabled(self, mock_parse_args,
+    @mock.patch(
+        'performanceplatform.client.collector.CollectorAPI.get_collector')
+    @mock.patch(
+        'performanceplatform.client.collector.CollectorAPI.get_collector_type')
+    def test_collectors_can_be_disabled(self, mock_get_collector_type,
+                                        mock_get_collector,
+                                        mock_parse_args,
                                         mock_run_collector,
                                         mock_log_collector_instead_of_running):
         orig_disable_collectors = os.getenv('DISABLE_COLLECTORS')
