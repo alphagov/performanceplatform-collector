@@ -42,7 +42,7 @@ Usage
 
 pp-collector takes paths to various JSON files as arguments::
 
-  pp-collector -l [collector slug] -b [backdrop file] -c [credentials file] -t [token file]
+  pp-collector (-l [collector slug] | -q [query file]) -b [backdrop file] -c [credentials file] -t [token file]
 
 All the target files are likely to be located in the performanceplatform-collector-config
 repo. Make sure you update the content of the token file to match the token expected
@@ -75,9 +75,14 @@ Configuration
 
 There are four configuration files that get injected into pp-collector, each file is a required parameter.
 
-Collector configuration
+Collector Slug
+~~~~~~~~~~~~~~
+The collector slug is used to query Stagecraft to get the collector configuration.  The collector configuration returned from Stagecraft is the same as that provided in the query file.
+
+
+Query File
 ~~~~~~~~~~~~~~~~~~~~~~~
-The collector configuration contains everything about what the collector will do during execution. It provides an entrypoint that pp-collector will execute and provide the query and options k-v pairs::
+The query file contains everything about what the collector will do during execution. It provides an entrypoint that pp-collector will execute and provide the query and options k-v pairs. It is being replaced by the collector slug as a parameter::
 
   # pingdom example
   {

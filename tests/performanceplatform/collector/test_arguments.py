@@ -8,29 +8,32 @@ from performanceplatform.collector.arguments import parse_args
 class TestParseArgs(object):
     def test_happy_path(self):
         with json_file({}) as config_path:
-            parse_args(
-                args=["-c", config_path, "-l", "test-collector-slug",
-                      "-t", config_path, "-b", config_path]
-            )
-
-    def test_get_happy_path_args(self):
-        with json_file({}) as config_path:
             args = parse_args(
                 args=["-c", config_path, "-l", "test-collector-slug",
                       "-t", config_path, "-b", config_path]
             )
+
             assert_that(args.collector_slug, equal_to("test-collector-slug"))
 
-    def test_query_file_is_an_invalid_option(self):
+    def test_both_query_file_and_collector_slug_not_allowed(self):
         with json_file({}) as config_path:
             with json_file({}) as query_path:
                 assert_raises(
                     SystemExit, parse_args, args=["-c", config_path,
+                                                  "-l", "test-collector-slug",
                                                   "-q", query_path,
                                                   "-t", config_path,
                                                   "-b", config_path])
 
-    def test_collector_slug_arg_is_required(self):
+    def test_query_file_is_a_valid_option(self):
+        with json_file({}) as config_path:
+            with json_file({}) as query_path:
+                parse_args(
+                    args=["-c", config_path, "-q", query_path,
+                          "-t", config_path, "-b", config_path]
+                )
+
+    def test_collector_slug_or_query_file_is_required(self):
         with json_file({}) as config_path:
             assert_raises(
                 SystemExit, parse_args, args=["-c", config_path,

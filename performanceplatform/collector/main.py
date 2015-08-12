@@ -100,8 +100,9 @@ def _log_collector_instead_of_running(entrypoint, args):
 
 def main():
     args = arguments.parse_args('Performance Platform Collector')
-    config = get_config(args.collector_slug)
-    args.query = config
+    if args.collector_slug:
+        args.query = get_config(args.collector_slug)
+
     entrypoint = args.query['entrypoint']
 
     if args.console_logging:

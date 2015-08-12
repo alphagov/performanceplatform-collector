@@ -1,3 +1,4 @@
+from argparse import Namespace
 from hamcrest import assert_that, equal_to
 import mock
 import os
@@ -76,3 +77,38 @@ class TestMain(unittest.TestCase):
                 os.environ['DISABLE_COLLECTORS'] = orig_disable_collectors
             else:
                 os.unsetenv('DISABLE_COLLECTORS')
+
+    @mock.patch('performanceplatform.collector.main._run_collector')
+    @mock.patch('performanceplatform.utils.collector.get_config')
+    @mock.patch('performanceplatform.collector.arguments.parse_args')
+    def test_get_config_not_called_if_query_file_in_args(self,
+                                                         mock_parse_args,
+                                                         mock_get_config,
+                                                         mock_run_collector):
+        mock_parse_args.return_value = Namespace(query={})
+        try:
+            main.main()
+            assert not mock_get_config.called
+        except:
+            pass
+
+    @mock.patch('performanceplatform.collector.main._run_collector')
+    @mock.patch(
+        'performanceplatform.client.collector.CollectorAPI.get_collector')
+    @mock.patch(
+        'performanceplatform.client.collector.CollectorAPI.get_collector_type')
+    @mock.patch('performanceplatform.utils.collector.get_config')
+    @mock.patch('performanceplatform.collector.arguments.parse_args')
+    def test_get_config_called_if_collector_in_args(self,
+                                                    mock_parse_args,
+                                                    mock_get_config,
+                                                    mock_get_collector_type,
+                                                    mock_get_collector,
+                                                    mock_run_collector):
+        mock_parse_args.return_value = Namespace(
+            collector_slug="some-collector")
+        try:
+            main.main()
+            assert mock_get_config.called
+        except:
+            pass
