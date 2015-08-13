@@ -51,9 +51,7 @@ class TestMain(unittest.TestCase):
     @mock.patch('performanceplatform.collector.arguments.parse_args')
     @mock.patch(
         'performanceplatform.client.collector.CollectorAPI.get_collector')
-    @mock.patch(
-        'performanceplatform.client.collector.CollectorAPI.get_collector_type')
-    def test_collectors_can_be_disabled(self, mock_get_collector_type,
+    def test_collectors_can_be_disabled(self,
                                         mock_get_collector,
                                         mock_parse_args,
                                         mock_run_collector,
@@ -95,14 +93,11 @@ class TestMain(unittest.TestCase):
     @mock.patch('performanceplatform.collector.main._run_collector')
     @mock.patch(
         'performanceplatform.client.collector.CollectorAPI.get_collector')
-    @mock.patch(
-        'performanceplatform.client.collector.CollectorAPI.get_collector_type')
     @mock.patch('performanceplatform.utils.collector.get_config')
     @mock.patch('performanceplatform.collector.arguments.parse_args')
     def test_get_config_called_if_collector_in_args(self,
                                                     mock_parse_args,
                                                     mock_get_config,
-                                                    mock_get_collector_type,
                                                     mock_get_collector,
                                                     mock_run_collector):
         mock_parse_args.return_value = Namespace(

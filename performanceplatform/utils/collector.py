@@ -8,15 +8,14 @@ def get_config(collector_name):
 
     collector_client = CollectorAPI(stagecraft_host, token)
     collector = collector_client.get_collector(collector_name)
-    collector_type = collector_client.get_collector_type(
-        collector.get('type').get('slug'))
     return {
         'query': collector.get('query'),
         'options': collector.get('options'),
         'data-set': {
             'data-group': collector.get('data_set').get('data_group'),
-            'data-type': collector.get('data_set').get('data_type')
+            'data-type': collector.get('data_set').get('data_type'),
+            'bearer_token': collector.get('data_set').get('bearer_token')
         },
-        'entrypoint': collector_type.get('entry_point'),
-        'token': collector_type.get('provider').get('slug')
+        'entrypoint': collector.get('entry_point'),
+        'token': collector.get('provider').get('slug')
     }

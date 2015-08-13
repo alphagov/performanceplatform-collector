@@ -9,9 +9,7 @@ from tests.performanceplatform.collector.tools import json_file
 
 class ConfigTest(unittest.TestCase):
     @patch('performanceplatform.client.collector.CollectorAPI.get_collector')
-    @patch(
-        'performanceplatform.client.collector.CollectorAPI.get_collector_type')
-    def test_get_config(self, mock_collector_type, mock_collector):
+    def test_get_config(self, mock_collector):
 
         mock_collector.return_value = {
             'id': '1234',
@@ -19,8 +17,10 @@ class ConfigTest(unittest.TestCase):
             'slug': 'foo',
             'query': {},
             'options': {},
+            'entry_point': 'foo.collector',
             'type': {
                 'id': '1234',
+                'slug': 'foo-type',
                 'name': 'foo-type'
             },
             'data_source': {
@@ -29,16 +29,9 @@ class ConfigTest(unittest.TestCase):
             },
             'data_set': {
                 'data_type': 'foo-data-type',
-                'data_group': 'foo-data-group'
-            }
-        }
-
-        mock_collector_type.return_value = {
-            'id': '1234',
-            'name': 'foo-type',
-            'entry_point': 'foo.collector',
-            'query_schema': {},
-            'options_schema': {},
+                'data_group': 'foo-data-group',
+                'bearer_token': 'foo-token'
+            },
             'provider': {
                 'id': '1234',
                 'slug': 'foo-provider'
@@ -51,7 +44,8 @@ class ConfigTest(unittest.TestCase):
             'options': {},
             'data-set': {
                 'data-group': 'foo-data-group',
-                'data-type': 'foo-data-type'
+                'data-type': 'foo-data-type',
+                'bearer_token': 'foo-token'
             },
             "entrypoint": 'foo.collector',
             "token": "foo-provider"
