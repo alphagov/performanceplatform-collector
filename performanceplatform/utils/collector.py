@@ -1,13 +1,12 @@
 from performanceplatform.client.collector import CollectorAPI
 
 
-def get_config(collector_name):
-    stagecraft_host = \
-        'http://stagecraft.development.performance.service.gov.uk'
-    token = 'development-oauth-access-token'
-
-    collector_client = CollectorAPI(stagecraft_host, token)
-    collector = collector_client.get_collector(collector_name)
+def get_config(collector_slug, performanceplatform):
+    collector_client = CollectorAPI(
+        performanceplatform['stagecraft_url'],
+        performanceplatform['omniscient_api_token']
+    )
+    collector = collector_client.get_collector(collector_slug)
     return {
         'query': collector.get('query'),
         'options': collector.get('options'),
