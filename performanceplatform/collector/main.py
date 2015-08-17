@@ -20,7 +20,7 @@ def merge_performanceplatform_config(
         performanceplatform, data_set, token, dry_run=False):
     return {
         'url': '{0}/{1}/{2}'.format(
-            performanceplatform['url'],
+            performanceplatform['backdrop_url'],
             data_set['data-group'],
             data_set['data-type']
         ),
@@ -36,13 +36,15 @@ def make_extra_json_fields(args):
     From the parsed command-line arguments, generate a dictionary of additional
     fields to be inserted into JSON logs (logstash_formatter module)
     """
-    return {
+    extra_json_fields = {
         'data_group': _get_data_group(args.query),
         'data_type': _get_data_type(args.query),
         'data_group_data_type': _get_data_group_data_type(args.query),
         'query': _get_query_params(args.query),
-        'path_to_query': _get_path_to_json_file(args.query),
     }
+    if "path_to_json_file" in args.query:
+        extra_json_fields['path_to_query'] = _get_path_to_json_file(args.query)
+    return extra_json_fields
 
 
 def _get_data_group(query):
@@ -100,8 +102,8 @@ def _log_collector_instead_of_running(entrypoint, args):
 
 def main():
     args = arguments.parse_args('Performance Platform Collector')
-    if args.collector_slug:
-        args.query = get_config(args.collector_slug)
+    if 'collector_slug' in args and args.collector_slug:
+        args.query = get_config(args.collector_slug, args.performanceplatform)
 
     entrypoint = args.query['entrypoint']
 

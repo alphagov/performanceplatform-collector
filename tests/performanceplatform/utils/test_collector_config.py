@@ -1,10 +1,7 @@
-import argparse
 import unittest
 from hamcrest import assert_that, equal_to
 from mock import patch
-from performanceplatform.collector.arguments import parse_args
 from performanceplatform.utils.collector import get_config
-from tests.performanceplatform.collector.tools import json_file
 
 
 class ConfigTest(unittest.TestCase):
@@ -38,7 +35,13 @@ class ConfigTest(unittest.TestCase):
             }
         }
 
-        config_data = get_config('foo')
+        performanceplatform = {
+            'url': 'http://foo/data',
+            'stagecraft_url': 'http://foo.config.uk',
+            'omniscient_api_token': 'fake-access-token'
+        }
+
+        config_data = get_config('foo', performanceplatform)
         expected_data = {
             'query': {},
             'options': {},
