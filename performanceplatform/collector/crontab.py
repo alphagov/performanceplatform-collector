@@ -88,7 +88,7 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
     job_template = '{schedule} ' \
                    '{set_disable_envar}' \
                    '{app_path}/venv/bin/pp-collector ' \
-                   '-q {app_path}/config/{query} ' \
+                   '-l {collector_slug} ' \
                    '-c {app_path}/config/{credentials} ' \
                    '-t {app_path}/config/{token} ' \
                    '-b {app_path}/config/{performanceplatform} ' \
@@ -109,14 +109,14 @@ def generate_crontab(current_crontab, path_to_jobs, path_to_app, unique_id):
                     if skip_job(job_number):
                         continue
 
-                    schedule, query, credentials, \
+                    schedule, collector_slug, credentials, \
                         token, performanceplatform = parsed
 
                     cronjob = job_template.format(
                         schedule=schedule,
                         set_disable_envar=set_disable_envar,
                         app_path=path_to_app,
-                        query=query,
+                        collector_slug=collector_slug,
                         credentials=credentials,
                         token=token,
                         performanceplatform=performanceplatform
