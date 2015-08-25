@@ -21,13 +21,17 @@ def parse_args(name="", args=None):
                         help='JSON file containing credentials '
                              'for the collector',
                         required=True)
-    parser.add_argument('-q', '--query', dest='query',
-                        type=_load_json_file,
-                        help='JSON file containing details '
-                             'about the query to make'
-                             'against the source API '
-                             'and the target data-set',
-                        required=True)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-l', '--collector', dest='collector_slug',
+                       type=str,
+                       help='Collector slug to query the API for the '
+                            'collector config')
+    group.add_argument('-q', '--query', dest='query',
+                       type=_load_json_file,
+                       help='JSON file containing details '
+                            'about the query to make '
+                            'against the source API '
+                            'and the target data-set')
     parser.add_argument('-t', '--token', dest='token',
                         type=_load_json_file,
                         help='JSON file containing token '

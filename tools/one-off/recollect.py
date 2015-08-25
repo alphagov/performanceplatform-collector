@@ -59,7 +59,8 @@ def get_config(config_path, config_id):
 
 
 def get_base_url(config_path):
-    return load_json(join(config_path, 'performanceplatform.json'))['url']
+    return load_json(join(
+        config_path, 'performanceplatform.json'))['backdrop_url']
 
 
 def empty_dataset(config_path, data_set, token):
