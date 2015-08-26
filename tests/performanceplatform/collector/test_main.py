@@ -56,6 +56,13 @@ class TestMain(unittest.TestCase):
                                         mock_run_collector,
                                         mock_log_collector_instead_of_running):
         orig_disable_collectors = os.getenv('DISABLE_COLLECTORS')
+        mock_parse_args.return_value = Namespace(
+            collector_slug=None,
+            query={
+                'entrypoint': 'foo.collector'
+            },
+            console_logging=True,
+        )
         try:
             os.environ['DISABLE_COLLECTORS'] = 'false'
             main.main()
@@ -86,7 +93,8 @@ class TestMain(unittest.TestCase):
             query={
                 'entrypoint': 'foo.collector'
             },
-            console_logging=False
+            console_logging=False,
+            collector_slug=None
         )
         try:
             main.main()
@@ -111,7 +119,8 @@ class TestMain(unittest.TestCase):
                 'stagecraft_url': 'http://foo.config.uk',
                 'omniscient_api_token': 'fake-access-token'
             },
-            console_logging=False
+            console_logging=False,
+            query=None
         )
         try:
             main.main()
