@@ -1,7 +1,8 @@
 # encoding: utf-8
 
 from datetime import date
-from hamcrest import assert_that, is_, has_entries, has_item, equal_to
+from hamcrest import (assert_that, is_, has_entries, has_item, equal_to,
+                      match_equality, has_entry)
 
 import mock
 import datetime
@@ -14,6 +15,9 @@ from performanceplatform.collector.ga.core import \
     build_document_set, query_for_range, \
     query_documents_for, \
     convert_durations
+
+from performanceplatform.collector.ga import main
+from contextlib import nested
 
 
 # wanted something big and complicated to ensure my refactor worked
@@ -401,3 +405,14 @@ def test_segment_is_optional_for_querying():
     )
 
     assert_that(response, equal_to([]))
+
+
+def test_main():
+    with nested(
+        mock.patch('performanceplatform.collector.ga.Pusher'),
+        mock.patch('performanceplatform.collector.ga.query_documents_for'),
+        mock.patch('performanceplatform.collector.ga.create_client'),
+    ) as (pusher, _, _):
+        main({}, {'data-type': 'foo'}, {'empty_data_set': True}, {}, '', '')
+        pusher.assert_called_once_with(
+            mock.ANY, match_equality(has_entry('empty_data_set', True)))

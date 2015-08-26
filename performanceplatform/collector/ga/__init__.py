@@ -15,4 +15,7 @@ def main(credentials, data_set_config, query, options, start_at, end_at):
         data_set_config['data-type'],
         start_at, end_at)
 
+    if query.get('empty_data_set'):
+        options['empty_data_set'] = True
+
     Pusher(data_set_config, options).push(documents)

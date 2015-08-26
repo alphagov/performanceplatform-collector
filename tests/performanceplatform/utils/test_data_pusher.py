@@ -37,3 +37,13 @@ class TestPusher(unittest.TestCase):
         data_set_config = {'beep': 'boop'}
         Pusher(data_set_config, {}).push([])
         assert_that(mock_data_set_client.post.called, equal_to(False))
+
+    @patch('performanceplatform.utils.data_pusher.DataSet.from_config')
+    def test_empties_dataset_when_empty_option_set(self, mock_from_config):
+        mock_data_set_client = Mock()
+        mock_from_config.return_value = mock_data_set_client
+        data_set_config = {'beep': 'boop'}
+        data = {'some': 'data'}
+        Pusher(data_set_config, {'empty_data_set': True}).push(data)
+        mock_data_set_client.empty_data_set.assert_called_once()
+        mock_data_set_client.post.assert_called_once()
