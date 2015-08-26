@@ -5,35 +5,45 @@ from mock import patch, Mock
 from hamcrest import assert_that, equal_to
 
 
+@patch('performanceplatform.utils.data_pusher.DataSet.from_config')
 class TestPusher(unittest.TestCase):
-    @patch('performanceplatform.utils.data_pusher.DataSet.from_config')
-    def test_Pusher_init_sets_up_client_correctly(self, mock_from_config):
-        data_set_config = {'beep': 'boop'}
-        Pusher(data_set_config, {})
-        mock_from_config.assert_called_once_with(data_set_config)
+    def setUp(self):
+        self.data_set_config = {'beep': 'boop'}
+        self.data = {'some': 'data'}
 
-    @patch('performanceplatform.utils.data_pusher.DataSet.from_config')
+    def test_Pusher_init_sets_up_client_correctly(self, mock_from_config):
+        Pusher(self.data_set_config, {})
+        mock_from_config.assert_called_once_with(self.data_set_config)
+
     def test_pushes_with_default_chunk_100(self, mock_from_config):
         mock_data_set_client = Mock()
         mock_from_config.return_value = mock_data_set_client
-        data_set_config = {'beep': 'boop'}
-        data = {'some': 'data'}
-        Pusher(data_set_config, {}).push(data)
-        mock_data_set_client.post.assert_called_once_with(data, chunk_size=100)
+        Pusher(self.data_set_config, {}).push(self.data)
+        mock_data_set_client.post.assert_called_once_with(self.data,
+                                                          chunk_size=100)
 
-    @patch('performanceplatform.utils.data_pusher.DataSet.from_config')
     def test_pushes_with_chunk_in_options(self, mock_from_config):
         mock_data_set_client = Mock()
         mock_from_config.return_value = mock_data_set_client
-        data_set_config = {'beep': 'boop'}
-        data = {'some': 'data'}
-        Pusher(data_set_config, {'chunk-size': 98}).push(data)
-        mock_data_set_client.post.assert_called_once_with(data, chunk_size=98)
+        Pusher(self.data_set_config, {'chunk-size': 98}).push(self.data)
+        mock_data_set_client.post.assert_called_once_with(self.data,
+                                                          chunk_size=98)
 
-    @patch('performanceplatform.utils.data_pusher.DataSet.from_config')
     def test_pushes_nothing_when_empty_data(self, mock_from_config):
         mock_data_set_client = Mock()
         mock_from_config.return_value = mock_data_set_client
-        data_set_config = {'beep': 'boop'}
-        Pusher(data_set_config, {}).push([])
+        Pusher(self.data_set_config, {}).push([])
         assert_that(mock_data_set_client.post.called, equal_to(False))
+
+    def test_empties_data_set(self, mock_from_config):
+        mock_data_set_client = Mock()
+        mock_from_config.return_value = mock_data_set_client
+        Pusher(self.data_set_config, {'empty-data-set': True}).push(self.data)
+        assert_that(mock_data_set_client.empty_data_set.called, equal_to(True))
+
+    def test_does_not_empty_data_set(self, mock_from_config):
+        mock_data_set_client = Mock()
+        mock_from_config.return_value = mock_data_set_client
+        Pusher(self.data_set_config, {}).push(self.data)
+        assert_that(mock_data_set_client.empty_data_set.called,
+                    equal_to(False))
