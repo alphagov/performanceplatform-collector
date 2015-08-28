@@ -35,7 +35,7 @@ def _get_version():
         data,
         re.M | re.I
     ).group(1).strip()
-    return version.encode('ascii')
+    return version
 
 
 def _get_requirements(fname):
