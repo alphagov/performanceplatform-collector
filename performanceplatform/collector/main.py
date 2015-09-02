@@ -74,6 +74,9 @@ def _get_path_to_json_file(query):
 
 def _run_collector(entrypoint, args):
     entrypoint_module = importlib.import_module(entrypoint)
+    logging.info('Running collection into {}/{}'.format(
+        args.query.get('data-set')['data-group'],
+        args.query.get('data-set')['data-type']))
     entrypoint_module.main(
         args.credentials,
         merge_performanceplatform_config(
