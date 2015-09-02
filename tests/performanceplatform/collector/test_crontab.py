@@ -77,7 +77,7 @@ class TestGenerateCrontab(object):
             assert_that(generated_jobs, has_item("other cronjob"))
 
     def test_some_cronjobs_are_added_between_containing_comments(self):
-        with temp_file("schedule,query.json,creds.json,token.json,performanceplatform.json") as jobs_path:
+        with temp_file("schedule,collector-slug,creds.json,token.json,performanceplatform.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
@@ -90,7 +90,7 @@ class TestGenerateCrontab(object):
                         has_item(contains_string("schedule")))
             assert_that(generated_jobs,
                         has_item(
-                            contains_string("-q /path/to/my-app/config/query.json")))
+                            contains_string("-l collector-slug")))
             assert_that(generated_jobs,
                         has_item(
                             contains_string("-c /path/to/my-app/config/creds.json")))
@@ -105,7 +105,7 @@ class TestGenerateCrontab(object):
                         has_item('# End performanceplatform.collector jobs for some_id'))
 
     def test_added_jobs_run_the_crontab_module(self):
-        with temp_file("schedule,query.json,creds.json,token.json,performanceplatform.json") as jobs_path:
+        with temp_file("schedule,collector-slug,creds.json,token.json,performanceplatform.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [],
                 jobs_path,
@@ -116,7 +116,7 @@ class TestGenerateCrontab(object):
                             contains_string("pp-collector")))
 
     def test_existing_pp_cronjobs_are_purged(self):
-        with temp_file("schedule,query.json,creds.json,token.json,performanceplatform.json") as jobs_path:
+        with temp_file("schedule,collector-slug,creds.json,token.json,performanceplatform.json") as jobs_path:
             generated_jobs = crontab.generate_crontab(
                 [
                     '# Begin performanceplatform.collector jobs for some_id',
@@ -156,7 +156,7 @@ class TestGenerateCrontab(object):
     def test_can_handle_whitespace_and_comments(self):
         temp_contents = ("# some comment\n"
                          "          \n"
-                         "schedule,query,creds,token,performanceplatforn\n")
+                         "schedule,collector-slug,creds,token,performanceplatform\n")
 
         with temp_file(temp_contents) as something:
             generated_jobs = crontab.generate_crontab(
@@ -165,7 +165,7 @@ class TestGenerateCrontab(object):
                 "/path/to/my-app",
                 "unique-id-of-my-app"
             )
-            job_contains = "pp-collector -q /path/to/my-app/config/query"
+            job_contains = "pp-collector -l collector-slug"
             assert_that(generated_jobs,
                         has_item(
                             contains_string(job_contains)))
@@ -174,9 +174,9 @@ class TestGenerateCrontab(object):
     def test_jobs_based_on_hostname_with_1(self, hostname):
         hostname.return_value = 'development-1'
 
-        temp_contents = ("schedule,query,creds,token,performanceplatforn\n"
-                         "schedule2,query2,creds2,token2,performanceplatforn\n"
-                         "schedule3,query2,creds3,token3,performanceplatforn\n"
+        temp_contents = ("schedule,collector-slug,creds,token,performanceplatform\n"
+                         "schedule2,collector-slug2,creds2,token2,performanceplatform\n"
+                         "schedule3,collector-slug2,creds3,token3,performanceplatform\n"
                          )
 
         with temp_file(temp_contents) as something:
@@ -196,9 +196,9 @@ class TestGenerateCrontab(object):
     def test_jobs_based_on_hostname_with_2(self, hostname):
         hostname.return_value = 'development-2'
 
-        temp_contents = ("schedule,query,creds,token,performanceplatforn\n"
-                         "schedule2,query2,creds2,token2,performanceplatforn\n"
-                         "schedule3,query2,creds3,token3,performanceplatforn\n"
+        temp_contents = ("schedule,collector-slug,creds,token,performanceplatform\n"
+                         "schedule2,collector-slug2,creds2,token2,performanceplatform\n"
+                         "schedule3,collector-slug2,creds3,token3,performanceplatform\n"
                          )
 
         with temp_file(temp_contents) as something:
