@@ -125,12 +125,15 @@ The following entrypoints are currently available::
 Backdrop file
 ~~~~~~~~~~~~~
 
-This is a simple pointer to the performance platform's data-store application. It will define the endpoint for your collector to send all data to.::
+This is a simple pointer to the performance platform's data-store applications. It will define the endpoint for your collector to send all data to.::
 
   {
-    "url": "https://www.performance.service.gov.uk/data"
+    "backdrop_url": "https://www.performance.service.gov.uk/data",
+    "stagecraft_url": "http://stagecraft.development.performance.service.gov.uk",
+    "omniscient_api_token": "some-omniscient-token"
   }
 
+stagecraft_url and omniscient_api_token only need to be defined when using the -l option to pass in a collector slug.
 
 Token File
 ~~~~~~~~~~
