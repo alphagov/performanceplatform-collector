@@ -1,35 +1,9 @@
 import json
 import logging
-from performanceplatform.utils.http_with_backoff import HttpWithBackoff
-from performanceplatform.utils import statsd
 from performanceplatform.utils.data_parser import DataParser
-
-from gapy.client import from_private_key, from_secrets_file
 
 from performanceplatform.utils.datetimeutil \
     import period_range
-
-
-def create_client(credentials):
-    if "CLIENT_SECRETS" in credentials:
-        return from_secrets_file(
-            credentials['CLIENT_SECRETS'],
-            storage_path=credentials['STORAGE_PATH'],
-            http_client=HttpWithBackoff(),
-            ga_hook=track_ga_api_usage,
-        )
-    else:
-        return from_private_key(
-            credentials['ACCOUNT_NAME'],
-            private_key_path=credentials['PRIVATE_KEY'],
-            storage_path=credentials['STORAGE_PATH'],
-            http_client=HttpWithBackoff(),
-            ga_hook=track_ga_api_usage,
-        )
-
-
-def track_ga_api_usage(kwargs):
-    statsd.incr('ga.core.{}.count'.format(kwargs['ids'].replace(':', '')))
 
 
 def query_ga(client, config, start_date, end_date):

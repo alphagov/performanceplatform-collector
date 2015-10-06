@@ -2,7 +2,9 @@ from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
 
 from performanceplatform.collector.ga.core \
-    import create_client, query_documents_for
+    import query_documents_for
+
+from performanceplatform.collector.ga.lib.helper import create_client
 
 from performanceplatform.utils.data_pusher import Pusher
 
