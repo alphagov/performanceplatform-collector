@@ -28,7 +28,7 @@ def fetch_realtime_response():
 
 class TestCollector(object):
     @patch("performanceplatform.collector.ga.realtime.DataSet")
-    @patch.object(performanceplatform.collector.ga.realtime.Realtime, "_authenticate")
+    @patch("performanceplatform.collector.ga.realtime.create_client")
     @patch.object(performanceplatform.collector.ga.realtime.Realtime, "execute_ga_query")
     def test_send_records_for_winter_real_response(self, execute_ga_query, authenticate, DataSet):
         execute_ga_query.return_value = fetch_realtime_response()
@@ -53,7 +53,7 @@ class TestCollector(object):
         })
 
     @patch("performanceplatform.collector.ga.realtime.DataSet")
-    @patch.object(performanceplatform.collector.ga.realtime.Realtime, "_authenticate")
+    @patch("performanceplatform.collector.ga.realtime.create_client")
     @patch.object(performanceplatform.collector.ga.realtime.Realtime, "execute_ga_query")
     def test_send_records_for_summer_real_response(self, execute_ga_query, authenticate, DataSet):
         execute_ga_query.return_value = fetch_realtime_response()
@@ -143,7 +143,7 @@ class TestRealtime(object):
     This class just deals with the google analytics client. Testing it would
     require a lot of mocking and would be quite brittle.
     """
-    @patch.object(performanceplatform.collector.ga.realtime.Realtime, "_authenticate")
+    @patch("performanceplatform.collector.ga.realtime.create_client")
     @patch.object(performanceplatform.collector.ga.realtime.Realtime, "execute_ga_query")
     def test_valid_ga_response_parses_active_visitors_correctly(
             self, execute_ga_query, authenticate):
@@ -152,7 +152,7 @@ class TestRealtime(object):
         value = realtime.query(None)
         assert_equal(value, 20459)
 
-    @patch.object(performanceplatform.collector.ga.realtime.Realtime, "_authenticate")
+    @patch("performanceplatform.collector.ga.realtime.create_client")
     @patch.object(performanceplatform.collector.ga.realtime.Realtime, "execute_ga_query")
     def test_should_return_zero_if_no_rows_returned_from_ga(
             self, execute_ga_query, authenticate):

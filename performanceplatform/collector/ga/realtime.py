@@ -1,14 +1,10 @@
-from apiclient.discovery import build
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.file import Storage
-from oauth2client.tools import run
 from datetime import datetime
 import pytz
-import logging
 import sys
 
+from performanceplatform.collector.ga.lib.helper import create_client
+
 from performanceplatform.client import DataSet
-from performanceplatform.utils.http_with_backoff import HttpWithBackoff
 
 
 GOOGLE_API_SCOPE = "https://www.googleapis.com/auth/analytics"
@@ -40,24 +36,10 @@ class Collector(object):
 
 class Realtime(object):
     def __init__(self, credentials):
-        self._authenticate(credentials["CLIENT_SECRETS"],
-                           credentials["STORAGE_PATH"])
-
-    def _authenticate(self, client_secrets, storage_path):
-        flow = flow_from_clientsecrets(client_secrets, scope=GOOGLE_API_SCOPE)
-        storage = Storage(storage_path)
-        credentials = storage.get()
-        if credentials is None or credentials.invalid:
-            credentials = run(flow, storage)
-
-        self.service = build(
-            serviceName="analytics",
-            version="v3",
-            http=credentials.authorize(HttpWithBackoff())
-        )
+        self._client = create_client(credentials)
 
     def execute_ga_query(self, query):
-        return self.service.data().realtime().get(
+        return self._client._service.data().realtime().get(
             **query
         ).execute()
 
