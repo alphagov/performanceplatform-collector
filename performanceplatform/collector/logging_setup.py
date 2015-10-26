@@ -1,7 +1,6 @@
 from logstash_formatter import LogstashFormatter
 import logging
 import os
-import pdb
 import sys
 import traceback
 
@@ -32,14 +31,22 @@ def uncaught_exception_handler(*exc_info):
     logging.error("Unhandled exception: %s", text, extra=extra)
 
 
-def set_up_logging(app_name, log_level, logfile_path, json_fields=None):
+def set_up_logging(
+        app_name,
+        log_level,
+        logfile_path,
+        logfile_name,
+        json_fields=None):
+
+    if logfile_name is None:
+        logfile_name = 'production'
     sys.excepthook = uncaught_exception_handler
     logger = logging.getLogger()
     logger.setLevel(log_level)
     logger.addHandler(get_log_file_handler(
-        os.path.join(logfile_path, 'production.log')))
+        os.path.join(logfile_path, '{}.log'.format(logfile_name))))
     logger.addHandler(get_json_log_handler(
-        os.path.join(logfile_path, 'production.json.log'),
+        os.path.join(logfile_path, '{}.json.log'.format(logfile_name)),
         app_name,
         json_fields=json_fields if json_fields else {}))
     logger.info("{0} logging started".format(app_name))
