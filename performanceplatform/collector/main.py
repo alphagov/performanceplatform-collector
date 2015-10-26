@@ -73,23 +73,31 @@ def _get_path_to_json_file(query):
 
 
 def _run_collector(entrypoint, args):
-    entrypoint_module = importlib.import_module(entrypoint)
-    logging.info('Running collection into {}/{}'.format(
-        args.query.get('data-set')['data-group'],
-        args.query.get('data-set')['data-type']))
-    entrypoint_module.main(
-        args.credentials,
-        merge_performanceplatform_config(
-            args.performanceplatform,
-            args.query['data-set'],
-            args.token,
-            args.dry_run
-        ),
-        args.query['query'],
-        args.query['options'],
-        args.start_at,
-        args.end_at
-    )
+    if args.console_logging:
+        logging.basicConfig(level=logging.INFO)
+    else:
+        logging_for_entrypoint(entrypoint, make_extra_json_fields(args))
+
+    if os.environ.get('DISABLE_COLLECTORS', 'false') == 'true':
+        _log_collector_instead_of_running(entrypoint, args)
+    else:
+        entrypoint_module = importlib.import_module(entrypoint)
+        logging.info('Running collection into {}/{}'.format(
+            args.query.get('data-set')['data-group'],
+            args.query.get('data-set')['data-type']))
+        entrypoint_module.main(
+            args.credentials,
+            merge_performanceplatform_config(
+                args.performanceplatform,
+                args.query['data-set'],
+                args.token,
+                args.dry_run
+            ),
+            args.query['query'],
+            args.query['options'],
+            args.start_at,
+            args.end_at
+        )
 
 
 def _log_collector_instead_of_running(entrypoint, args):
@@ -108,17 +116,7 @@ def main():
     if args.collector_slug:
         args.query = get_config(args.collector_slug, args.performanceplatform)
 
-    entrypoint = args.query['entrypoint']
-
-    if args.console_logging:
-        logging.basicConfig(level=logging.INFO)
-    else:
-        logging_for_entrypoint(entrypoint, make_extra_json_fields(args))
-
-    if os.environ.get('DISABLE_COLLECTORS', 'false') == 'true':
-        _log_collector_instead_of_running(entrypoint, args)
-    else:
-        _run_collector(entrypoint, args)
+    _run_collector(args.query['entrypoint'], args)
 
 
 if __name__ == '__main__':

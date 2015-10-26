@@ -47,13 +47,11 @@ class TestMain(unittest.TestCase):
 
     @mock.patch('performanceplatform.collector.main.'
                 '_log_collector_instead_of_running')
-    @mock.patch('performanceplatform.collector.main._run_collector')
     @mock.patch('performanceplatform.collector.arguments.parse_args')
     @mock.patch('performanceplatform.utils.collector.get_config')
     def test_collectors_can_be_disabled(self,
                                         mock_get_config,
                                         mock_parse_args,
-                                        mock_run_collector,
                                         mock_log_collector_instead_of_running):
         orig_disable_collectors = os.getenv('DISABLE_COLLECTORS')
         mock_parse_args.return_value = Namespace(
@@ -64,17 +62,8 @@ class TestMain(unittest.TestCase):
             console_logging=True,
         )
         try:
-            os.environ['DISABLE_COLLECTORS'] = 'false'
-            main.main()
-            assert mock_run_collector.called
-            assert not mock_log_collector_instead_of_running.called
-
-            mock_run_collector.reset_mock()
-            mock_log_collector_instead_of_running.reset_mock()
-
             os.environ['DISABLE_COLLECTORS'] = 'true'
             main.main()
-            assert not mock_run_collector.called
             assert mock_log_collector_instead_of_running.called
         finally:
             if orig_disable_collectors:
