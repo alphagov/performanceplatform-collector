@@ -1,19 +1,22 @@
 from logstash_formatter import LogstashFormatter
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 import sys
 import traceback
 
 
 def get_log_file_handler(path):
-    handler = logging.FileHandler(path)
+    handler = RotatingFileHandler(
+        path, maxBytes=2 * 1024 * 1024 * 1024, backupCount=1)
     handler.setFormatter(logging.Formatter(
         "%(asctime)s [%(levelname)s] -> %(message)s"))
     return handler
 
 
 def get_json_log_handler(path, app_name, json_fields):
-    handler = logging.FileHandler(path)
+    handler = RotatingFileHandler(
+        path, maxBytes=2 * 1024 * 1024 * 1024, backupCount=1)
     formatter = LogstashFormatter()
     formatter.defaults['@tags'] = ['collector', app_name]
     formatter.defaults['@fields'] = json_fields
