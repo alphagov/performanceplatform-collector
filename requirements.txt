@@ -11,3 +11,4 @@ requests>=1.2.0
 statsd==3.0
 mock==1.0.1
 performanceplatform-client==0.11.1
+ConcurrentLogHandler==0.9.1
