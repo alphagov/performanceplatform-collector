@@ -55,6 +55,14 @@ def set_up_logging(
     logger.info("{0} logging started".format(app_name))
 
 
+def close_down_logging():
+    logger = logging.getLogger()
+    handlers = logger.handlers[:]
+    for handler in handlers:
+        handler.close()
+        logger.removeHandler(handler)
+
+
 def extra_fields_from_exception(exception):
     """Exception into a dict to be passed to logger
 

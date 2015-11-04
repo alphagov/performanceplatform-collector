@@ -5,7 +5,8 @@ import importlib
 from collections import OrderedDict
 
 from performanceplatform.collector import arguments
-from performanceplatform.collector.logging_setup import set_up_logging
+from performanceplatform.collector.logging_setup import (
+    set_up_logging, close_down_logging)
 from performanceplatform.utils.collector import get_config
 
 
@@ -117,6 +118,8 @@ def _run_collector(entrypoint, args, logfile_path=None, logfile_name=None):
             args.start_at,
             args.end_at
         )
+        if not args.console_logging:
+            close_down_logging()
 
 
 def main():
