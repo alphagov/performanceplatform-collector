@@ -98,6 +98,9 @@ Here's an example of the contents of a query file::
     }
   }
 
+Entrypoints
+~~~~~~~~~~~
+
 Entrypoints describe a python package path.
 
 .. _performanceplatform.collector.ga: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga
