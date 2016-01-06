@@ -19,15 +19,13 @@ for more details). This tool uses the `Google Analytics`_, `Pingdom`_ and `Webtr
 Installation
 ============
 
-Using pip
----------
+Using pip:
 
 ::
 
   pip install performanceplatform-collector
 
-From source
------------
+From source:
 
 ::
 
@@ -40,49 +38,43 @@ From source
 Usage
 =====
 
+Collectors are run from the command line using the Python progam pp-collector.
+
 pp-collector takes paths to various JSON files as arguments::
 
   pp-collector (-l [collector slug] | -q [query file]) -b [backdrop file] -c [credentials file] -t [token file]
 
-All the target files are likely to be located in the performanceplatform-collector-config
-repo. Make sure you update the content of the token file to match the token expected
-by the Backdrop dataset.
+pp-collector also takes optional arguments::
 
-There are also some optional command line arguments you can provide pp-collect::
+  --console-logging
+  Rather than logging out to log/collector.log it will output all logs to stdout/err
 
-    --console-logging
-    Rather than logging out to log/collector.log it will output all logs to stdout/err
+  --dry-run
+  When it comes to submitting the gathered data to the Performance Platform it will skip
+  making the POST requests and instead log out the url, headers and body to your terminal.
 
-    --dry-run
-    When it comes to submitting the gathered data to the Performance Platform it will skip
-    making the POST requests and instead log out the url, headers and body to your terminal.
+  --start, --end
+  If you want the collector to gather past data, you can specify a start date in the format
+  "YYYY-MM-DD". You must also specify an end date. e.g.
 
-    --start, --end
-    If you want the collector to gather past data, you can specify a start date in the format
-    "YYYY-MM-DD". You must also specify an end date. e.g.
+  --start=2014-08-03 --end=2014-09-03
 
-    --start=2014-08-03 --end=2014-09-03
+Here's an example of how to run a collector from the command line using a collector slug argument::
 
-Configuration
--------------
+  venv/bin/python /var/govuk/performanceplatform-collector/venv/bin/pp-collector -l performance-platform-devices-7abb3a26 -b performanceplatform.json -c ga-credentials.json -t ga-token.json --console-logging
 
-**Note on our configuation**
+pp-collector file path arguments
+--------------------------------
 
-    For our deployment of the performanceplatform-collector we pull in configuration files from the performanceplatform-collector-config_ repo.
-    The structure of our deployment configuration can be found there if more detailed examples are required.
+**-l (collector slug)**
 
-.. _performanceplatform-collector-config: https://github.com/alphagov/performanceplatform-collector-config
+The collector slug is used to query Stagecraft to get collector configuration settings. The collector configuration is stored as a Python dictionary in the query_schema field on the Collector model identified by the given slug.
 
-There are four configuration files that get injected into pp-collector, each file is a required parameter.
+**-q (query file)**
 
-Collector Slug
-~~~~~~~~~~~~~~
-The collector slug is used to query Stagecraft to get the collector configuration.  The collector configuration returned from Stagecraft is the same as that provided in the query file.
+A path to a query file can be used in place of the collector slug. The query file will contain the same collector configuration settings as would be stored in the Collector#query_schema field in Stagecraft. In addition, it must contain an entrypoint key whose value points to the type of collector to be run in the performanceplatform-collector codebase.
 
-
-Query File
-~~~~~~~~~~~~~~~~~~~~~~~
-The query file contains everything about what the collector will do during execution. It provides an entrypoint that pp-collector will execute and provide the query and options k-v pairs. It is being replaced by the collector slug as a parameter::
+Here's an example of the contents of a query file::
 
   # pingdom example
   {
@@ -106,26 +98,40 @@ The query file contains everything about what the collector will do during execu
     }
   }
 
-**Entrypoints:**
+Entrypoints describe a python package path.
 
-Entrypoints describe a python package path
+.. _performanceplatform.collector.ga: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga
+.. _performanceplatform.collector.ga.trending: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/trending.py
+.. _performanceplatform.collector.ga.realtime: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/realtime.py
+.. _performanceplatform.collector.gcloud: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/gcloud
+.. _performanceplatform.collector.ga.trending: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/trending.py
+.. _performanceplatform.collector.pingdom: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/pingdom
+.. _performanceplatform.collector.piwik: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/piwik
+.. _performanceplatform.collector.piwik.core: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/piwik/core.py
+.. _performanceplatform.collector.piwik.realtime: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/piwik/realtime.py
+.. _performanceplatform.collector.webtrends: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/webtrends
+.. _performanceplatform.collector.webtrends.keymetrics: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/webtrends/keymetrics.py
+.. _performanceplatform.collector.webtrends.reports: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/webtrends/reports.py
 
-The following entrypoints are currently available::
+The following entrypoints are currently available:
 
-`performanceplatform.collector.ga`_
-`performanceplatform.collector.ga.trending`_
-`performanceplatform.collector.ga.realtime`_
-`performanceplatform.collector.pingdom`_
+- `performanceplatform.collector.ga`_
+- `performanceplatform.collector.ga.trending`_
+- `performanceplatform.collector.ga.realtime`_
+- `performanceplatform.collector.gcloud`_
+- `performanceplatform.collector.pingdom`_
+- `performanceplatform.collector.piwik`_
+- `performanceplatform.collector.piwik.core`_
+- `performanceplatform.collector.piwik.realtime`_
+- `performanceplatform.collector.webtrends`_
+- `performanceplatform.collector.webtrends.keymetrics`_
+- `performanceplatform.collector.webtrends.reports`_
 
- .. _performanceplatform.collector.ga: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga
- .. _performanceplatform.collector.ga.trending: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/trending.py
- .. _performanceplatform.collector.ga.realtime: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/ga/realtime.py
- .. _performanceplatform.collector.pingdom: https://github.com/alphagov/performanceplatform-collector/tree/master/performanceplatform/collector/pingdom
+**-b (backdrop file)**
 
-Backdrop file
-~~~~~~~~~~~~~
+This is a simple pointer to the Performance Platform's data management application (Backdrop). It will define the endpoint for your collector to send all data to.
 
-This is a simple pointer to the performance platform's data-store applications. It will define the endpoint for your collector to send all data to.::
+::
 
   {
     "backdrop_url": "https://www.performance.service.gov.uk/data",
@@ -133,15 +139,9 @@ This is a simple pointer to the performance platform's data-store applications. 
     "omniscient_api_token": "some-omniscient-token"
   }
 
-stagecraft_url and omniscient_api_token only need to be defined when using the -l option to pass in a collector slug.
+stagecraft_url and omniscient_api_token token need only be defined when using the -l option to pass in a collector slug. The omniscient_api_token enables read-only access to the collector configuration settings stored in Stagecraft.
 
-Token File
-~~~~~~~~~~
-
-
-**A Note on Tokens**
-
-  Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
+**-t (token file)**
 
 The token file file holds the bearer token to be used by this collector when POSTing to the Performance Platform::
 
@@ -149,11 +149,17 @@ The token file file holds the bearer token to be used by this collector when POS
     "token": "some long hex value"
   }
 
-Credentials file
-~~~~~~~~~~~~~~~~
-The credentials file is used to pass through any usernames, passwords, API keys etc that are required to communicate to the third party service you desire.::
+Make sure you update the content of the token file to match the token expected by the Backdrop data set being written to.
 
-  # Google analytics Specific example
+Need a token? Email The Performance Platform performance-platform@digital.cabinet-office.gov.uk
+
+**-c (credentials file)**
+
+The credentials file is used to pass through any usernames, passwords, API keys etc that are required to communicate to the third party service you desire.
+
+::
+
+  # Google Analytics example
   credentials = {
       "CLIENT_SECRETS": path/to/client_secret.json,
       "STORAGE_PATH": path/to/oauth/db,
@@ -168,18 +174,32 @@ The credentials file is used to pass through any usernames, passwords, API keys 
   You can get your Piwik secret token from the Manage Users
   admin area in your Piwik account.
 
-Google Analytics
-================
+  # Pingdom example
+  {
+      "user": "your Pingdom user",
+      "password": "your Pingdom password",
+      "app_key": "your Pingdom application key"
+  }
 
-Setting up Google Analytics credentials:
-----------------------------------------
+  # WebTrends example
+  {
+      "user": "your WebTrends user",
+      "password": "your WebTrends password",
+      "reports_url": "your WebTrends report url",
+      "keymetrics_url": "your WebTrends keymetrics url",
+      "api_version": "your WebTrends API version e.g. v3"
+  }
 
-To retrieve accurate paths for secrets (Google Analytics pathway):
-  - Go to the `Google API Console <https://code.google.com/apis/console>`_ 
+Setting up Google Analytics credentials
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following steps will enable you to generate the credentials files that you will need to provide paths to in your credentials file (pointed to by the -c argument):
+
+  - Go to the `Google API Console <https://code.google.com/apis/console>`_
   - Sign in to your Google account
   - If you don't have an active project, click on Create Project to create a new one. Give your project any name.
-  - Create a new client ID 
-    
+  - Create a new client ID
+
     + Go to **Use Google APIs**
     + Select **Credentials**
     + In the **New Credentials** drop-down list, select Oauth client ID.
@@ -187,21 +207,21 @@ To retrieve accurate paths for secrets (Google Analytics pathway):
   - Choose **Application type** > "Other".
   - Enter a name. Again, the name can be anything
   - Once created click the download button. This will download a JSON file containing your client secrets.
-  - To generate the storage path you run ``python tools/generate-ga-credentials.py path/to/client/secrets.json`` where secrets.json is the JSON file downloaded in the previous step. 
+  - To generate the storage path you run ``python tools/generate-ga-credentials.py path/to/client/secrets.json`` where secrets.json is the JSON file downloaded in the previous step.
 
     + The script will output a link to follow in Google accounts. Following the link to with generate an authorization code
     + Copy and paste the authorization code back into the CLI at the prompt.
-    + Google credentials will be created in `./creds/ga.json`. The corresponding client_secrets.json and storage.db files will be created in `./creds/ga/`.
+    + Google credentials will be created in `./creds/ga.json`. The corresponding client_secrets.json and storage.db files will be created in `./creds/ga/`. You can point to these files in the credentials file referenced in the 'credentials file' argument.
     + **Error**::
 
       * If you get an 'invalid client error', adding a name and support email under the ""APIs & auth" -> "Consent screen" Should fix this.
       * See http://stackoverflow.com/questions/18677244/error-invalid-client-no-application-name for more.
 
-Piwik
-=====
+About Piwik Collectors
+======================
 
-Example Piwik configuration
----------------------------
+Example Piwik query file
+------------------------
 
 Here is an example Piwik query file::
 
@@ -281,8 +301,32 @@ for the Piwik 'date' argument which will return data for the
 previous day, week or month (according to the value of your
 'frequency' setting).
 
-Extending performanceplatform-collector
-=======================================
+Developing performanceplatform-collector
+========================================
+
+Working on the code
+-------------------
+
+To begin working on the code::
+
+  git clone https://github.com/alphagov/performanceplatform-collector.git
+  cd performanceplatform-collector
+  virtualenv venv
+  source venv/bin/activate
+  python setup.py develop
+
+Due to the use of namespace packages, you must not install requirements with::
+
+  pip install -r requirements.txt
+
+If you have run this command, your virtualenv may be broken - you can fix by
+running::
+
+  pip uninstall performanceplatform-client
+  python setup.py develop
+
+Adding new types of collector
+-----------------------------
 
 performanceplatform-collector can be extended to support new types of
 collector. To do so you'll need to add new entrypoints. For each new type of
@@ -295,30 +339,3 @@ Inside that file add a ``main`` function which has the following signature::
     main(credentials, data_set_config, query, options, start_at, end_at)
 
 These arguments are all strings which are forwarded from the command line.
-
-Developing performanceplatform-collector
-========================================
-
-To begin working on the code
-
-::
-
-  git clone https://github.com/alphagov/performanceplatform-collector.git
-  cd performanceplatform-collector
-  virtualenv venv
-  source venv/bin/activate
-  python setup.py develop
-
-Due to the use of namespace packages, you must not install requirements with
-
-::
-
-  pip install -r requirements.txt
-
-If you have run this command, your virtualenv may be broken - you can fix by
-running
-
-::
-
-  pip uninstall performanceplatform-client
-  python setup.py develop
