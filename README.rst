@@ -174,17 +174,24 @@ Google Analytics
 Setting up Google Analytics credentials:
 ----------------------------------------
 
-  .. image:: http://cl.ly/image/2W0M191L3L1O/Screen%20Shot%202014-06-10%20at%2011.11.21.png
-
 To retrieve accurate paths for secrets (Google Analytics pathway):
-  - Go to the `Google API Console <https://code.google.com/apis/console>`_ and create a new client ID (APIs & Auth > Credentials > OAuth > Create New Client ID)
-  - Choose **installed application** > "other".
-  - Once created click the Download JSON link. **This is your client secrets file.**
-  - To generate the storage path you can run ``python tools/generate-ga-credentials.py path/to/client/secrets.json``
+  - Go to the `Google API Console <https://code.google.com/apis/console>`_ 
+  - Sign in to your Google account
+  - If you don't have an active project, click on Create Project to create a new one. Give your project any name.
+  - Create a new client ID 
+    
+    + Go to **Use Google APIs**
+    + Select **Credentials**
+    + In the **New Credentials** drop-down list, select Oauth client ID.
+    + If you see 'To create an OAuth client ID, you must first set a product name on the consent screen'; Configure your consent screen. The project name can be anything.
+  - Choose **Application type** > "Other".
+  - Enter a name. Again, the name can be anything
+  - Once created click the download button. This will download a JSON file containing your client secrets.
+  - To generate the storage path you run ``python tools/generate-ga-credentials.py path/to/client/secrets.json`` where secrets.json is the JSON file downloaded in the previous step. 
 
-    + Follow the link to get the correct auth code
-    + Copy and paste back into the CLI
-    + This will default to creating google credentials in `./creds/ga.json`
+    + The script will output a link to follow in Google accounts. Following the link to with generate an authorization code
+    + Copy and paste the authorization code back into the CLI at the prompt.
+    + Google credentials will be created in `./creds/ga.json`. The corresponding client_secrets.json and storage.db files will be created in `./creds/ga/`.
     + **Error**::
 
       * If you get an 'invalid client error', adding a name and support email under the ""APIs & auth" -> "Consent screen" Should fix this.
