@@ -210,7 +210,7 @@ The following steps will enable you to generate the credentials files that you w
   - Choose **Application type** > "Other".
   - Enter a name. Again, the name can be anything
   - Once created click the download button. This will download a JSON file containing your client secrets.
-  - To generate the storage path you run ``python tools/generate-ga-credentials.py path/to/client/secrets.json`` where secrets.json is the JSON file downloaded in the previous step.
+  - To generate the storage path, run ``python tools/generate-ga-credentials.py path/to/client/secrets.json`` in your VM, where secrets.json is the JSON file downloaded in the previous step.
 
     + The script will output a link to follow in Google accounts. Following the link to with generate an authorization code
     + Copy and paste the authorization code back into the CLI at the prompt.
