@@ -17,8 +17,9 @@ import json
 from os.path import abspath, exists as path_exists
 from os import makedirs
 
+from oauth2client import tools
+
 from gapy.client import from_secrets_file
-import oauth2client.tools
 
 
 def copy_json(input_path, output_path):
@@ -30,18 +31,16 @@ def copy_json(input_path, output_path):
                 indent=2)
 
 
-def generate_google_credentials(client_secret):
-    # Prevent oauth2client from trying to open a browser
-    # This is run from inside the VM so there is no browser
-    oauth2client.tools.FLAGS.auth_local_webserver = False
-
+def generate_google_credentials(args):
+    client_secret = args.client_secret
     if not path_exists(abspath("./creds/ga/")):
         makedirs("./creds/ga")
     storage_path = abspath("./creds/ga/storage.db")
     secret_path = abspath("./creds/ga/client_secret.json")
     from_secrets_file(
         client_secret,
-        storage_path=storage_path)
+        storage_path=storage_path,
+        flags=args)
 
     copy_json(client_secret, secret_path)
 
@@ -56,7 +55,8 @@ def generate_google_credentials(client_secret):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description=__doc__,
-        formatter_class=argparse.RawTextHelpFormatter)
+        formatter_class=argparse.RawTextHelpFormatter,
+        parents=[tools.argparser])
 
     parser.add_argument(
         'client_secret',
@@ -64,4 +64,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    generate_google_credentials(args.client_secret)
+    # This script is run from within the VM so
+    # disable need for a browser
+    args.noauth_local_webserver = True
+
+    generate_google_credentials(args)
