@@ -2,7 +2,8 @@ pytz==2013d
 argparse
 python-dateutil
 logstash_formatter
-gapy==1.3.4
+oauth2client==1.5.2
+gapy==1.3.5
 lxml>=3.2.0
 dshelpers>=1.0.4
 unicodecsv
