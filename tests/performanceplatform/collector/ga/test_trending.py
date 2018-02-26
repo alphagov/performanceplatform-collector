@@ -19,11 +19,11 @@ class test_data_calculations_bad_data(unittest.TestCase):
     floor = 500
 
     data_1 = [{'metrics': {u'pageviews': u'1000'},
-             'dimensions': {u'pagePath': u'/foo/page1',
-                            u'pageTitle': u'foo',
-                            u'day': u'29',
-                            u'month': u'01',
-                            u'year': u'2014'}},
+              'dimensions': {u'pagePath': u'/foo/page1',
+                             u'pageTitle': u'foo',
+                             u'day': u'29',
+                             u'month': u'01',
+                             u'year': u'2014'}},
               {'metrics': {u'pageviews': u''},
                'dimensions': {u'pagePath': u'/foo/page1',
                               u'pageTitle': u'foo',
@@ -32,11 +32,11 @@ class test_data_calculations_bad_data(unittest.TestCase):
                               u'year': u'2014'}}]
 
     data_2 = [{'metrics': {u'pageviews': u'1000'},
-             'dimensions': {u'pagePath': u'/foo/page1',
-                            u'pageTitle': u'foo',
-                            u'day': u'29',
-                            u'month': u'01',
-                            u'year': u'2014'}},
+              'dimensions': {u'pagePath': u'/foo/page1',
+                             u'pageTitle': u'foo',
+                             u'day': u'29',
+                             u'month': u'01',
+                             u'year': u'2014'}},
               {'metrics': {u'pageviews': None},
                'dimensions': {u'pagePath': u'/foo/page1',
                               u'pageTitle': u'foo',
@@ -45,11 +45,11 @@ class test_data_calculations_bad_data(unittest.TestCase):
                               u'year': u'2014'}}]
 
     data_3 = [{'metrics': {u'pageviews': u'1000'},
-             'dimensions': {u'pagePath': u'/foo/page1',
-                            u'pageTitle': u'foo',
-                            u'day': u'29',
-                            u'month': u'01',
-                            u'year': u'2014'}}]
+              'dimensions': {u'pagePath': u'/foo/page1',
+                             u'pageTitle': u'foo',
+                             u'day': u'29',
+                             u'month': u'01',
+                             u'year': u'2014'}}]
 
     data_4 = [{'metrics': {u'pageviews': u'600'},
                'dimensions': {u'pagePath': u'/foo/page1',
@@ -70,7 +70,10 @@ class test_data_calculations_bad_data(unittest.TestCase):
 
         dates = get_date()
 
-        for src in [self.data_1, self.data_2, self.data_3, self.data_4,
+        for src in [self.data_1,
+                    self.data_2,
+                    self.data_3,
+                    self.data_4,
                     self.data_5]:
             collapsed_data = sum_data(src, self.metric, self.collapse_key,
                                       dates, self.floor)
