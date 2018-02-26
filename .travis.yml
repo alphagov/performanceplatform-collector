@@ -6,7 +6,7 @@ matrix:
   allow_failures:
     - python: "3.4"
 install:
-  - "pip install . --use-mirrors"
+  - "pip install ."
 script: ./run_tests.sh
 env:
   global:
