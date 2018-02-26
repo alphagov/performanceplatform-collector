@@ -45,7 +45,18 @@ def _get_requirements(fname):
     """
     packages = _read(fname).split('\n')
     packages = (p.strip() for p in packages)
-    packages = (p for p in packages if p and not p.startswith('#'))
+    packages = (p for p in packages if p and not p.startswith('#') and
+                not p.startswith('http'))
+    return list(packages)
+
+
+def _get_dependency_links(fname):
+    """
+    Create a list of github urls from the requirements file
+    """
+    packages = _read(fname).split('\n')
+    packages = (p.strip() for p in packages)
+    packages = (p for p in packages if p and p.startswith('http'))
     return list(packages)
 
 
@@ -72,6 +83,7 @@ if __name__ == '__main__':
         license='MIT',
         keywords='api data performance_platform',
 
+        dependency_links=_get_dependency_links('requirements.txt'),
         install_requires=_get_requirements('requirements.txt'),
         tests_require=_get_requirements('requirements_for_tests.txt'),
 
