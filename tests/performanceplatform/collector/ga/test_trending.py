@@ -12,6 +12,71 @@ from performanceplatform.collector.ga.trending import encode_id, get_date, \
     parse_query, query_ga
 
 
+class test_data_calculations_bad_data(unittest.TestCase):
+
+    collapse_key = 'pageTitle'
+    metric = 'pageviews'
+    floor = 500
+
+    data_1 = [{'metrics': {u'pageviews': u'1000'},
+             'dimensions': {u'pagePath': u'/foo/page1',
+                            u'pageTitle': u'foo',
+                            u'day': u'29',
+                            u'month': u'01',
+                            u'year': u'2014'}},
+              {'metrics': {u'pageviews': u''},
+               'dimensions': {u'pagePath': u'/foo/page1',
+                              u'pageTitle': u'foo',
+                              u'day': u'31',
+                              u'month': u'01',
+                              u'year': u'2014'}}]
+
+    data_2 = [{'metrics': {u'pageviews': u'1000'},
+             'dimensions': {u'pagePath': u'/foo/page1',
+                            u'pageTitle': u'foo',
+                            u'day': u'29',
+                            u'month': u'01',
+                            u'year': u'2014'}},
+              {'metrics': {u'pageviews': None},
+               'dimensions': {u'pagePath': u'/foo/page1',
+                              u'pageTitle': u'foo',
+                              u'day': u'31',
+                              u'month': u'01',
+                              u'year': u'2014'}}]
+
+    data_3 = [{'metrics': {u'pageviews': u'1000'},
+             'dimensions': {u'pagePath': u'/foo/page1',
+                            u'pageTitle': u'foo',
+                            u'day': u'29',
+                            u'month': u'01',
+                            u'year': u'2014'}}]
+
+    data_4 = [{'metrics': {u'pageviews': u'600'},
+               'dimensions': {u'pagePath': u'/foo/page1',
+                              u'pageTitle': u'foo',
+                              u'day': u'31',
+                              u'month': u'01',
+                              u'year': u'2014'}}]
+
+    data_5 = [{'metrics': {},
+               'dimensions': {u'pagePath': u'/foo/page1',
+                              u'pageTitle': u'foo',
+                              u'day': u'31',
+                              u'month': u'01',
+                              u'year': u'2014'}}]
+
+    @freeze_time("2014-02-12 01:00:00")
+    def test_sum_by_day_with_floor(self):
+
+        dates = get_date()
+
+        for src in [self.data_1, self.data_2, self.data_3, self.data_4,
+                    self.data_5]:
+            collapsed_data = sum_data(src, self.metric, self.collapse_key,
+                                      dates, self.floor)
+            self.assertEqual(len(collapsed_data), 1)
+
+
 class test_data_calculations(unittest.TestCase):
 
     collapse_key = 'pageTitle'

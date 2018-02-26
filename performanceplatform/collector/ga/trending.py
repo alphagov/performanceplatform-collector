@@ -81,7 +81,10 @@ def sum_data(data, metric, collapse_key, dates, floor):
         if dimensions['pagePath'] in collapsed[k]['pagePath']:
             collapsed[k]['pagePath'] = dimensions['pagePath']
 
-        collapsed[k][week] += int(row['metrics'][metric])
+        m = row['metrics'].get(metric, 0)
+        if not m:
+            m = 0
+        collapsed[k][week] += int(m)
 
     for key in collapsed:
         for week in ['week1', 'week2']:
