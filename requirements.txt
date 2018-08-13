@@ -3,12 +3,12 @@ argparse
 python-dateutil
 logstash_formatter
 oauth2client==1.5.2
-gapy==1.3.5
+gapy==1.3.6
 lxml>=3.2.0
 dshelpers>=1.0.4
 unicodecsv
 requests>=1.2.0
 statsd==3.0
 mock==1.0.1
-performanceplatform-client==0.11.3
+performanceplatform-client==0.11.5
 ConcurrentLogHandler==0.9.1

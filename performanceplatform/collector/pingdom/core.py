@@ -12,6 +12,7 @@ class Pingdom(object):
         self.user = config['user']
         self.password = config['password']
         self.app_key = config['app_key']
+        self.account_email = config['account_email']
         self.API_LOCATION = "https://api.pingdom.com/api/2.0/"
 
     def _make_request(self, path, url_params=None):
@@ -21,7 +22,8 @@ class Pingdom(object):
             url=self.API_LOCATION + path,
             auth=(self.user, self.password),
             headers={
-                "App-Key": self.app_key
+                "App-Key": self.app_key,
+                "Account-Email": self.account_email
             },
             params=url_params
         )

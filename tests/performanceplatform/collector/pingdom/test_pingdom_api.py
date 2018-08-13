@@ -17,7 +17,8 @@ class TestPingdomApi(unittest.TestCase):
         self.config = {
             "user": "foo@bar.com",
             "password": "secret",
-            "app_key": "12345"
+            "app_key": "12345",
+            "account_email": "foo@bar.com"
         }
 
     def test_init_from_config(self):
