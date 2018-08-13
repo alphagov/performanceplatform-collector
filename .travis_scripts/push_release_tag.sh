@@ -104,10 +104,10 @@ function make_release_tag_from_travis_build_number {
 
   git checkout ${TRAVIS_COMMIT}
   git tag "${RELEASE_BRANCH_NAME}_${TRAVIS_BUILD_NUMBER}"
-  git push origin --tags --quiet > /dev/null 2>&1
+  git push origin --tags --quiet
 
   git tag --force "${RELEASE_BRANCH_NAME}"
-  git push --force origin --tags --quiet > /dev/null 2>&1
+  git push --force origin --tags
 
   popd
 }
